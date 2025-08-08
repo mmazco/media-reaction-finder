@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/dist/$1"
+    }
+  ],
+  "functions": {
+    "app.py": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "OPENAI_API_KEY": "@openai_api_key",
+    "SERPAPI_API_KEY": "@serpapi_api_key",
+    "REDDIT_CLIENT_ID": "@reddit_client_id",
+    "REDDIT_CLIENT_SECRET": "@reddit_client_secret",
+    "REDDIT_USER_AGENT": "@reddit_user_agent"
+  }
+}
