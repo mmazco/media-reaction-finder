@@ -56,24 +56,35 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
       console.log('API Response:', data); // Debug log
-      setNews(data.news || []);
-      setReddit(data.reddit || []);
-      setArticle(data.article || null);
-      console.log('Article set to:', data.article); // Debug log
+      
+      // Validate and clean the response data
+      const cleanNews = Array.isArray(data.news) ? data.news : [];
+      const cleanReddit = Array.isArray(data.reddit) ? data.reddit : [];
+      const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
+      
+      setNews(cleanNews);
+      setReddit(cleanReddit);
+      setArticle(cleanArticle);
+      console.log('Article set to:', cleanArticle); // Debug log
       
       // Save to search history - for URLs use article data, for text queries create basic entry
       let historyItem = null;
       
-      if (data.article) {
+      if (cleanArticle) {
         // URL search with article metadata
         historyItem = {
           id: Date.now(),
-          title: data.article.title,
-          source: data.article.source,
-          date: data.article.date,
-          url: data.article.url,
+          title: cleanArticle.title,
+          source: cleanArticle.source,
+          date: cleanArticle.date,
+          url: cleanArticle.url,
           query: query,
           searchedAt: new Date().toISOString()
         };
@@ -134,9 +145,9 @@ export default function App() {
       if (historyItem) {
         // Store the complete results with the history item
         historyItem.cachedResults = {
-          news: data.news,
-          reddit: data.reddit,
-          article: data.article
+          news: cleanNews,
+          reddit: cleanReddit,
+          article: cleanArticle
         };
         
         const updatedHistory = [historyItem, ...searchHistory.slice(0, 9)]; // Keep last 10

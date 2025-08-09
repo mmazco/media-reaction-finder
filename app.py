@@ -79,16 +79,23 @@ def extract_article_metadata(url):
             if date_element:
                 date_content = date_element.get('content') or date_element.get('datetime')
                 if date_content:
-                    try:
-                        # Parse various date formats
-                        if 'T' in date_content:
-                            date_obj = datetime.fromisoformat(date_content.replace('Z', '+00:00'))
-                        else:
-                            date_obj = datetime.strptime(date_content, '%Y-%m-%d')
-                        date_published = date_obj.strftime('%B %d, %Y')
-                        break
-                    except:
+                                    try:
+                    # Parse various date formats
+                    if 'T' in date_content:
+                        date_obj = datetime.fromisoformat(date_content.replace('Z', '+00:00'))
+                    else:
+                        date_obj = datetime.strptime(date_content, '%Y-%m-%d')
+                    
+                    # Validate date is not in the future
+                    current_date = datetime.now()
+                    if date_obj > current_date:
+                        # If date is in future, likely parsing error - skip this date
                         continue
+                        
+                    date_published = date_obj.strftime('%B %d, %Y')
+                    break
+                except:
+                    continue
         
         # Extract article content for summarization
         content = ""
