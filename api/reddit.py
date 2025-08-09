@@ -8,14 +8,38 @@ load_dotenv()
 
 def search_reddit_posts(query, limit=5):
     try:
+        # Debug: Check if credentials are available
+        client_id = os.getenv("REDDIT_CLIENT_ID")
+        client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+        user_agent = os.getenv("REDDIT_USER_AGENT")
+        
+        print(f"🔐 Reddit credentials check:")
+        print(f"  - Client ID: {'✓ Present' if client_id else '✗ Missing'}")
+        print(f"  - Client Secret: {'✓ Present' if client_secret else '✗ Missing'}")
+        print(f"  - User Agent: {'✓ Present' if user_agent else '✗ Missing'}")
+        
+        if not all([client_id, client_secret, user_agent]):
+            print("❌ Missing Reddit API credentials")
+            return []
+        
         reddit = praw.Reddit(
-            client_id=os.getenv("REDDIT_CLIENT_ID"),
-            client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
-            user_agent=os.getenv("REDDIT_USER_AGENT"),
+            client_id=client_id,
+            client_secret=client_secret,
+            user_agent=user_agent,
             check_for_async=False
         )
         
         reddit.read_only = True
+        
+        # Test Reddit connection
+        try:
+            # Simple test to verify authentication works
+            test_subreddit = reddit.subreddit("test")
+            print(f"✓ Reddit API connection test successful")
+        except Exception as auth_error:
+            print(f"❌ Reddit API authentication failed: {auth_error}")
+            return []
+        
         results = []
 
         # If query is a URL, prioritize URL search
