@@ -181,6 +181,22 @@ def get_reactions():
         
         # Search Reddit - for URLs, pass the URL directly
         print("📣 Searching Reddit...")
+        
+        # Debug: Test Reddit credentials directly in main function
+        print("🔍 Testing Reddit API credentials...")
+        reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
+        reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET") 
+        reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
+        
+        print(f"Reddit credentials status:")
+        print(f"  Client ID: {'Present' if reddit_client_id else 'MISSING'}")
+        print(f"  Client Secret: {'Present' if reddit_client_secret else 'MISSING'}")
+        print(f"  User Agent: {'Present' if reddit_user_agent else 'MISSING'}")
+        
+        if reddit_client_id and reddit_client_secret and reddit_user_agent:
+            print(f"  Client ID (first 8 chars): {reddit_client_id[:8]}...")
+            print(f"  User Agent: {reddit_user_agent}")
+        
         reddit_results = search_reddit_posts(query)
         
         # Add summaries to Reddit posts
