@@ -77,7 +77,7 @@ cd frontend
 npm run dev
 ```
 
-3. Open http://localhost:5173
+3. Open https://media-reaction-finder.vercel.app/
 
 ## Deployment
 
