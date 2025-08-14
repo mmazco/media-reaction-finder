@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, Response
-from api.search_logger import SearchLogger
+from search_logger import SearchLogger
 from datetime import datetime, timedelta
 import json
 
