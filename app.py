@@ -3,6 +3,7 @@ from flask_cors import CORS
 from search import search_news
 from reddit import search_reddit_posts, get_title_from_url
 from summarize import summarize_text
+from api.analytics import analytics_bp
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -17,6 +18,9 @@ load_dotenv()
 app = Flask(__name__)
 # Enable CORS for the frontend running on localhost:5173, 5174, 5175, 5176
 CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
+
+# Register analytics blueprint
+app.register_blueprint(analytics_bp)
 
 def extract_article_metadata(url):
     """
@@ -177,7 +181,8 @@ def get_reactions():
         
         # Search news
         print("📰 Searching news...")
-        news_results = search_news(query)
+        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        news_results = search_news(query, user_ip=user_ip)
         
         # Search Reddit - for URLs, pass the URL directly
         print("📣 Searching Reddit...")
