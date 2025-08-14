@@ -186,7 +186,8 @@ def get_reactions():
         
         # Search news
         print("📰 Searching news...")
-        news_results = search_news(query)
+        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        news_results = search_news(query, user_ip=user_ip)
         
         # Search Reddit - for URLs, pass the URL directly
         print("📣 Searching Reddit...")
