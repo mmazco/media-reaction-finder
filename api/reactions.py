@@ -16,8 +16,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-# Enable CORS for the frontend running on localhost:5173, 5174, 5175, 5176
-CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
+# Enable CORS - allow all origins in production (Vercel), restrict in development
+if os.getenv('VERCEL_ENV'):
+    # Production: allow all origins for Vercel deployment
+    CORS(app, allow_headers=['Content-Type'], methods=['GET', 'POST'])
+else:
+    # Development: restrict to localhost
+    CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
 
 # Register analytics blueprint
 app.register_blueprint(analytics_bp)
