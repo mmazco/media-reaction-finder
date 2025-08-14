@@ -267,5 +267,9 @@ if __name__ == '__main__':
     print("🚀 Starting Media Reaction Finder API on http://localhost:5002")
     app.run(debug=True, port=5002)
 
-# For Vercel deployment
+# For Vercel deployment - export the WSGI app
+def application(environ, start_response):
+    return app(environ, start_response)
+
+# Export for legacy Vercel compatibility
 app = app
