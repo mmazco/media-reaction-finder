@@ -8,6 +8,8 @@ A web application that analyzes public discourse around articles and media conte
 - **News Search**: Find related news articles using Google Search API
 - **Reddit Reactions**: Discover Reddit discussions and reactions to articles
 - **Archive System**: Save and instantly access previous searches
+- **Search Analytics**: Track and analyze all search queries with detailed statistics
+- **Data Export**: Export search history in JSON or CSV formats
 - **Dark Mode**: Toggle between light and dark themes
 - **AI-Powered Summaries**: Generate intelligent summaries of articles and Reddit comments
 
@@ -19,6 +21,7 @@ A web application that analyzes public discourse around articles and media conte
 - **SerpAPI**: Google search integration
 - **Reddit PRAW**: Reddit API integration
 - **BeautifulSoup**: Web scraping for article extraction
+- **SQLite**: Search analytics and history database
 
 ### Frontend
 - **React**: User interface
@@ -92,12 +95,49 @@ This application is configured for deployment on Vercel:
 1. **Analyze an Article**: Paste any article URL and click "ANALYZE REACTIONS"
 2. **View Results**: See article summary, related news, and Reddit discussions
 3. **Archive Access**: Click "ARCHIVE" to view and re-access previous searches
-4. **Dark Mode**: Toggle the theme using the "DARK/LIGHT" button
+4. **Search Analytics**: Click "ANALYTICS" to view search statistics and export data
+5. **Dark Mode**: Toggle the theme using the "DARK/LIGHT" button
 
-## API Endpoints
+### Analytics Features
+
+The application now tracks all search queries and provides comprehensive analytics:
+
+#### Web Interface
+- **Analytics Dashboard**: Access via the "ANALYTICS" button
+- **Search Statistics**: View total searches, unique queries, and average results
+- **Top Queries**: See your most frequently searched terms
+- **Data Export**: Download search history in JSON or CSV format
+
+#### Command Line Interface
+Use the analytics CLI tool for advanced data analysis:
+
+```bash
+# View overall statistics
+python3 analytics_cli.py stats --days 30
+
+# Show recent search history
+python3 analytics_cli.py history --limit 20 --days 7
+
+# Export data to file
+python3 analytics_cli.py export --format csv --output searches.csv
+
+# Search for specific queries
+python3 analytics_cli.py search "climate change"
+```
+
+#### API Endpoints
+- `GET /api/analytics/dashboard` - Get analytics dashboard data
+- `GET /api/analytics/history` - Get search history with filters
+- `GET /api/analytics/export` - Export search data
+- `GET /api/analytics/stats` - Get quick statistics
+- `GET /api/analytics/trends` - Get search trends and patterns
+
+## Main API Endpoints
 
 - `POST /api/reactions` - Analyze article and get reactions
 - `POST /api/summarize` - Generate text summaries
+
+See the Analytics Features section above for analytics-specific endpoints.
 
 ## License
 
