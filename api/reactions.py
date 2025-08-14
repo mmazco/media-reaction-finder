@@ -267,5 +267,9 @@ if __name__ == '__main__':
     print("🚀 Starting Media Reaction Finder API on http://localhost:5002")
     app.run(debug=True, port=5002)
 
-# For Vercel deployment
-app = app
+# For Vercel deployment - export the app as handler
+def handler(event, context):
+    return app(event, context)
+
+# Also export app directly for Vercel
+application = app
