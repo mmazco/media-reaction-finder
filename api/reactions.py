@@ -80,31 +80,82 @@ def extract_article_metadata(url):
             'meta[name="publish_date"]',
             'meta[name="date"]',
             'meta[property="og:published_time"]',
-            'time[datetime]'
+            'meta[name="article:published"]',
+            'meta[itemprop="datePublished"]',
+            'time[datetime]',
+            'time[class*="publish"]',
+            'time[class*="date"]',
+            '[class*="publish-date"]',
+            '[class*="article-date"]'
         ]
         
         for selector in date_selectors:
-            date_element = soup.select_one(selector)
-            if date_element:
-                date_content = date_element.get('content') or date_element.get('datetime')
+            date_elements = soup.select(selector)
+            for date_element in date_elements:
+                date_content = None
+                # Try different attributes
+                for attr in ['content', 'datetime', 'data-date', 'data-timestamp']:
+                    if date_element.get(attr):
+                        date_content = date_element.get(attr)
+                        break
+                
+                # If no attribute found, try text content
+                if not date_content and date_element.text.strip():
+                    date_content = date_element.text.strip()
+                
                 if date_content:
                     try:
-                        # Parse various date formats
-                        if 'T' in date_content:
-                            date_obj = datetime.fromisoformat(date_content.replace('Z', '+00:00'))
-                        else:
-                            date_obj = datetime.strptime(date_content, '%Y-%m-%d')
+                        # Try different date formats
+                        date_obj = None
+                        date_formats = [
+                            '%Y-%m-%dT%H:%M:%S%z',  # ISO format with timezone
+                            '%Y-%m-%dT%H:%M:%S.%f%z',  # ISO format with microseconds
+                            '%Y-%m-%dT%H:%M:%S',  # ISO format without timezone
+                            '%Y-%m-%d %H:%M:%S',  # Common datetime format
+                            '%Y-%m-%d',  # Just date
+                            '%B %d, %Y',  # Month name, day, year
+                            '%d %B %Y',  # Day, month name, year
+                            '%Y/%m/%d',  # Date with slashes
+                            '%d/%m/%Y',  # Date with slashes (European)
+                            '%m/%d/%Y'   # Date with slashes (US)
+                        ]
                         
-                        # Validate date is not in the future
-                        current_date = datetime.now()
-                        if date_obj > current_date:
-                            # If date is in future, likely parsing error - skip this date
-                            continue
+                        # Clean the date string
+                        date_content = date_content.strip()
+                        if date_content.endswith('Z'):
+                            date_content = date_content[:-1] + '+00:00'
+                        
+                        # Try each format
+                        for fmt in date_formats:
+                            try:
+                                date_obj = datetime.strptime(date_content, fmt)
+                                break
+                            except:
+                                continue
+                        
+                        # If no format worked but we have a timestamp
+                        if not date_obj and date_content.isdigit():
+                            try:
+                                date_obj = datetime.fromtimestamp(int(date_content))
+                            except:
+                                pass
+                        
+                        if date_obj:
+                            # Validate date is not in the future
+                            current_date = datetime.now()
+                            if date_obj > current_date:
+                                continue
                             
-                        date_published = date_obj.strftime('%B %d, %Y')
-                        break
+                            date_published = date_obj.strftime('%B %d, %Y')
+                            break
                     except:
                         continue
+                
+                if date_published:
+                    break
+            
+            if date_published:
+                break
         
         # Extract article content for summarization
         content = ""

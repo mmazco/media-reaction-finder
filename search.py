@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 SERP_API_KEY = os.getenv("SERPAPI_API_KEY")
 
-def search_news(query, num_results=5):
+def search_news(query, num_results=5, user_ip=None):
     url = "https://serpapi.com/search"
     params = {
         "q": query,

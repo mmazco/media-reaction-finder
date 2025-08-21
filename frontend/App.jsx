@@ -240,14 +240,14 @@ export default function App() {
   // Dynamic styles based on dark mode
   const getStyles = () => {
     const baseColors = darkMode ? {
-      bg: '#121212',
+      bg: 'rgb(31, 30, 29)',
       cardBg: '#1e1e1e',
       text: '#ffffff',
       textSecondary: '#b3b3b3',
       border: '#333333',
       accent: '#ffffff'
     } : {
-      bg: '#ffffff',
+      bg: 'rgb(240, 238, 231)',
       cardBg: '#f8f8f8',
       text: '#1a1a1a',
       textSecondary: '#666',
@@ -285,15 +285,28 @@ export default function App() {
       position: 'absolute',
       top: '20px',
       right: '20px',
-      backgroundColor: 'transparent',
-      border: `2px solid ${baseColors.accent}`,
-      color: baseColors.accent,
-      padding: '6px 12px',
-      fontSize: '11px',
-      letterSpacing: '1px',
-      fontFamily: 'Arial, sans-serif',
-      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
       cursor: 'pointer',
+      padding: '5px',
+      transition: 'all 0.2s ease'
+    },
+    toggleSwitch: {
+      position: 'relative',
+      width: '40px',
+      height: '20px',
+      backgroundColor: darkMode ? '#ffffff' : '#1a1a1a',
+      borderRadius: '10px',
+      padding: '2px',
+      transition: 'all 0.2s ease'
+    },
+    toggleKnob: {
+      width: '16px',
+      height: '16px',
+      backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
+      borderRadius: '50%',
+      position: 'absolute',
+      left: darkMode ? '22px' : '2px',
       transition: 'all 0.2s ease'
     },
       content: {
@@ -628,19 +641,10 @@ export default function App() {
         ANALYTICS
       </div>
       
-      <div 
-        style={styles.darkModeToggle}
-        onClick={toggleDarkMode}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = darkMode ? '#ffffff' : '#1a1a1a';
-          e.target.style.color = darkMode ? '#121212' : '#ffffff';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-          e.target.style.color = darkMode ? '#ffffff' : '#1a1a1a';
-        }}
-      >
-        {darkMode ? 'LIGHT' : 'DARK'}
+      <div style={styles.darkModeToggle} onClick={toggleDarkMode}>
+        <div style={styles.toggleSwitch}>
+          <div style={styles.toggleKnob}></div>
+        </div>
       </div>
       
       <div style={styles.content}>
@@ -713,31 +717,39 @@ export default function App() {
 
         {(news.length > 0 || reddit.length > 0) && (
           <div style={styles.results}>
-            {news.length > 0 && (
-              <div style={styles.resultSection}>
-                <h2 style={styles.resultTitle}>Related News</h2>
-                {news.map((article, i) => (
-                  <div key={i} style={styles.resultItem}>
-                    <a href={article.url} target="_blank" rel="noreferrer" style={styles.link}>{article.title}</a>
-                    {article.summary && (
-                      <p style={styles.summary}>{article.summary}</p>
-                    )}
+            <div style={styles.resultSection}>
+              <h2 style={styles.resultTitle}>Related Content</h2>
+              {/* Filter out the origin URL from news results and combine with reddit results */}
+              {[
+                ...news.filter(article => article.url !== query).map(article => ({
+                  ...article,
+                  type: 'News'
+                })),
+                ...reddit.map(post => ({
+                  ...post,
+                  type: 'Reddit'
+                }))
+              ].map((item, i) => (
+                <div key={i} style={styles.resultItem}>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                    <span style={{
+                      fontSize: '12px',
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      backgroundColor: item.type === 'News' ? '#4ECDC4' : '#FF6B6B',
+                      color: '#fff',
+                      fontWeight: '500'
+                    }}>
+                      {item.type}
+                    </span>
+                    <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
                   </div>
-                ))}
-              </div>
-            )}
-
-            {reddit.length > 0 && (
-              <div style={styles.resultSection}>
-                <h2 style={styles.resultTitle}>Reddit Reactions</h2>
-                {reddit.map((post, i) => (
-                  <div key={i} style={styles.resultItem}>
-                    <a href={post.url} target="_blank" rel="noreferrer" style={styles.link}>{post.title}</a>
-                    <p style={styles.summary}>{post.summary}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+                  {item.summary && (
+                    <p style={styles.summary}>{item.summary}</p>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
