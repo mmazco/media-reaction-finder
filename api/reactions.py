@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from search import search_news
-from reddit import search_reddit_posts, get_title_from_url
-from summarize import summarize_text
-from analytics import analytics_bp
+from .search import search_news
+from .reddit import search_reddit_posts, get_title_from_url
+from .summarize import summarize_text
+from .analytics import analytics_bp
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -211,8 +211,11 @@ def get_reactions():
     Main endpoint to search for news and Reddit reactions
     """
     try:
+        print("Starting get_reactions endpoint...")
         data = request.get_json()
+        print(f"Received data: {data}")
         query = data.get('query', '')
+        print(f"Extracted query: {query}")
         
         if not query:
             return jsonify({'error': 'No query provided'}), 400
@@ -238,34 +241,51 @@ def get_reactions():
         
         # Search news
         print("📰 Searching news...")
-        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        news_results = search_news(query, user_ip=user_ip)
+        try:
+            user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+            print(f"User IP: {user_ip}")
+            news_results = search_news(query, user_ip=user_ip)
+            print(f"News search completed. Found {len(news_results) if news_results else 0} results")
+        except Exception as news_error:
+            print(f"Error during news search: {str(news_error)}")
+            news_results = []
         
         # Search Reddit - for URLs, pass the URL directly
         print("📣 Searching Reddit...")
-        
-        # Debug: Test Reddit credentials directly in main function
-        print("🔍 Testing Reddit API credentials...")
-        reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
-        reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET") 
-        reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
-        
-        print(f"Reddit credentials status:")
-        print(f"  Client ID: {'Present' if reddit_client_id else 'MISSING'}")
-        print(f"  Client Secret: {'Present' if reddit_client_secret else 'MISSING'}")
-        print(f"  User Agent: {'Present' if reddit_user_agent else 'MISSING'}")
-        
-        if reddit_client_id and reddit_client_secret and reddit_user_agent:
-            print(f"  Client ID (first 8 chars): {reddit_client_id[:8]}...")
-            print(f"  User Agent: {reddit_user_agent}")
-        
-        reddit_results = search_reddit_posts(query)
+        try:
+            # Debug: Test Reddit credentials directly in main function
+            print("🔍 Testing Reddit API credentials...")
+            reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
+            reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET") 
+            reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
+            
+            print(f"Reddit credentials status:")
+            print(f"  Client ID: {'Present' if reddit_client_id else 'MISSING'}")
+            print(f"  Client Secret: {'Present' if reddit_client_secret else 'MISSING'}")
+            print(f"  User Agent: {'Present' if reddit_user_agent else 'MISSING'}")
+            
+            if reddit_client_id and reddit_client_secret and reddit_user_agent:
+                print(f"  Client ID (first 8 chars): {reddit_client_id[:8]}...")
+                print(f"  User Agent: {reddit_user_agent}")
+            
+            print("Calling search_reddit_posts...")
+            reddit_results = search_reddit_posts(query)
+            print(f"Reddit search completed. Found {len(reddit_results) if reddit_results else 0} results")
+        except Exception as reddit_error:
+            print(f"Error during Reddit search: {str(reddit_error)}")
+            # Don't fail completely if Reddit search fails
+            reddit_results = []
         
         # Add summaries to Reddit posts
         for post in reddit_results:
-            if post.get("comments"):
-                combined = " ".join(post["comments"][:5])
-                post["summary"] = summarize_text(combined)
+            try:
+                if post.get("comments"):
+                    combined = " ".join(post["comments"][:5])
+                    print(f"Summarizing comments for post: {post.get('title', '')[:50]}...")
+                    post["summary"] = summarize_text(combined)
+            except Exception as summary_error:
+                print(f"Error summarizing post: {str(summary_error)}")
+                post["summary"] = "Error generating summary"
         
         # Format response to match frontend expectations
         response = {
