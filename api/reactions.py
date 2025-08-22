@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .search import search_news
-from .reddit import search_reddit_posts, get_title_from_url
-from .summarize import summarize_text
-from .analytics import analytics_bp
+from api.search import search_news
+from api.reddit import search_reddit_posts, get_title_from_url
+from api.summarize import summarize_text
+from api.analytics import analytics_bp
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import re
 from datetime import datetime
 from dotenv import load_dotenv
-from search_logger import SearchLogger
+from api.search_logger import SearchLogger
 
 # Load environment variables
 load_dotenv()
