@@ -40,30 +40,39 @@ def search_news(query, num_results=5, user_ip=None):
         # Calculate processing time
         processing_time = time.time() - start_time
         
-        # Log the search
-        search_logger.log_search(
-            query=query,
-            search_type="news",
-            user_ip=user_ip,
-            results=news_results,
-            processing_time=processing_time,
-            search_params=params,
-            serpapi_response=data
-        )
+        # Log the search (optional - don't fail if logging fails)
+        try:
+            search_logger.log_search(
+                query=query,
+                search_type="news",
+                user_ip=user_ip,
+                results=news_results,
+                processing_time=processing_time,
+                search_params=params,
+                serpapi_response=data
+            )
+        except Exception as log_error:
+            print(f"Warning: Failed to log search to database: {log_error}")
+            # Continue without failing the search
         
         return news_results
         
     except Exception as e:
-        # Log failed search
+        # Log failed search (optional - don't fail if logging fails)
         processing_time = time.time() - start_time
-        search_logger.log_search(
-            query=query,
-            search_type="news",
-            user_ip=user_ip,
-            results=[],
-            processing_time=processing_time,
-            search_params=params,
-            serpapi_response={"error": str(e)}
-        )
+        try:
+            search_logger.log_search(
+                query=query,
+                search_type="news",
+                user_ip=user_ip,
+                results=[],
+                processing_time=processing_time,
+                search_params=params,
+                serpapi_response={"error": str(e)}
+            )
+        except Exception as log_error:
+            print(f"Warning: Failed to log failed search to database: {log_error}")
+            # Continue without failing
+        
         print(f"Error in search_news: {e}")
         return []
