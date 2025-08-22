@@ -1,5 +1,4 @@
 {
-  "buildCommand": "pip install -e .",
   "rewrites": [
     {
       "source": "/api/reactions",
