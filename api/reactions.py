@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 import re
 from datetime import datetime
 from dotenv import load_dotenv
+from search_logger import SearchLogger
 
 # Load environment variables
 load_dotenv()
@@ -272,6 +273,56 @@ def get_reactions():
             'reddit': reddit_results,
             'article': article_metadata  # Include article metadata if URL was provided
         }
+        
+        # Log to SQLite
+        try:
+            logger = SearchLogger()
+            all_results = []
+            
+            # Store the main article if it's a URL search
+            if article_metadata:
+                print(f"Logging article metadata: {article_metadata}")  # Debug print
+                all_results.append({
+                    'title': article_metadata.get('title', ''),
+                    'url': query,
+                    'summary': article_metadata.get('summary', ''),
+                    'source': article_metadata.get('source', ''),
+                    'date': article_metadata.get('date', ''),
+                    'result_type': 'web'
+                })
+            
+            print(f"Logging {len(all_results)} results to SQLite")  # Debug print
+            
+            # Store news results
+            if news_results:
+                all_results.extend([{
+                    'title': article.get('title', ''),
+                    'url': article.get('url', ''),
+                    'summary': article.get('summary', ''),
+                    'source': article.get('source', urlparse(article.get('url', '')).netloc),
+                    'result_type': 'web'
+                } for article in news_results])
+            
+            # Store reddit results    
+            if reddit_results:
+                all_results.extend([{
+                    'title': post.get('title', ''),
+                    'url': post.get('url', ''),
+                    'summary': post.get('summary', ''),
+                    'source': 'Reddit',
+                    'result_type': 'reddit'
+                } for post in reddit_results])
+
+            # Log the search
+            logger.log_search(
+                query=query,
+                search_type='url' if query.startswith('http') else 'text',
+                user_ip=user_ip,
+                results=all_results
+            )
+        except Exception as e:
+            print(f"Error logging to SQLite: {e}")  # This will show us any errors
+            # Don't return error - allow the search to succeed even if logging fails
         
         return jsonify(response)
         
