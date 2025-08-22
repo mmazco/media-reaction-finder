@@ -64,3 +64,11 @@ logs/
 
 # Local testing
 .pytest_cache/
+
+# SQLite
+*.db
+.headers
+.mode
+FROM
+LEFT
+ORDER

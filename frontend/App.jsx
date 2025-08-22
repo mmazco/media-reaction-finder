@@ -627,16 +627,13 @@ export default function App() {
       </div>
       
       <div 
-        style={{...styles.darkModeToggle, right: '100px'}}
+        style={{
+          ...styles.archiveLabel,
+          left: '120px'  // Position it next to ARCHIVE button with some spacing
+        }}
         onClick={toggleAnalytics}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = darkMode ? '#ffffff' : '#1a1a1a';
-          e.target.style.color = darkMode ? '#121212' : '#ffffff';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = 'transparent';
-          e.target.style.color = darkMode ? '#ffffff' : '#1a1a1a';
-        }}
+        onMouseEnter={(e) => e.target.style.backgroundColor = darkMode ? '#333' : '#333'}
+        onMouseLeave={(e) => e.target.style.backgroundColor = darkMode ? '#ffffff' : '#1a1a1a'}
       >
         ANALYTICS
       </div>
