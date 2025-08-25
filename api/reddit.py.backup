@@ -62,8 +62,24 @@ def search_reddit_posts(query, limit=5):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                            "subreddit": str(post.subreddit),
+                            "score": post.score,
+                            "num_comments": post.num_comments,
+                            "comments": []
                         }
+
+                        if post.num_comments > 0:
+                            try:
+                                post.comment_limit = 5
+                                post.comment_sort = "best"
+                                post.comments.replace_more(limit=0)
+                                for comment in post.comments[:5]:
+                                    if hasattr(comment, "body") and comment.body:
+                                        post_data["comments"].append(
+                                            comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
+                                        )
+                            except:
+                                pass
 
                         results.append(post_data)
 
@@ -91,10 +107,26 @@ def search_reddit_posts(query, limit=5):
                             
                         try:
                             post_data = {
-                            "title": post.title,
-                            "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
-                        }
+                                "title": post.title,
+                                "url": f"https://reddit.com{post.permalink}",
+                                "subreddit": str(post.subreddit),
+                                "score": post.score,
+                                "num_comments": post.num_comments,
+                                "comments": []
+                            }
+
+                            if post.num_comments > 0:
+                                try:
+                                    post.comment_limit = 5
+                                    post.comment_sort = "best"
+                                    post.comments.replace_more(limit=0)
+                                    for comment in post.comments[:5]:
+                                        if hasattr(comment, "body") and comment.body:
+                                            post_data["comments"].append(
+                                                comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
+                                            )
+                                except:
+                                    pass
 
                             results.append(post_data)
 
@@ -120,8 +152,24 @@ def search_reddit_posts(query, limit=5):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                            "subreddit": str(post.subreddit),
+                            "score": post.score,
+                            "num_comments": post.num_comments,
+                            "comments": []
                         }
+
+                        if post.num_comments > 0:
+                            try:
+                                post.comment_limit = 5
+                                post.comment_sort = "best"
+                                post.comments.replace_more(limit=0)
+                                for comment in post.comments[:5]:
+                                    if hasattr(comment, "body") and comment.body:
+                                        post_data["comments"].append(
+                                            comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
+                                        )
+                            except:
+                                pass
 
                         results.append(post_data)
 

@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from api.search import search_news
-from api.reddit import search_reddit_posts, get_title_from_url
-from api.summarize import summarize_text
-from api.analytics import analytics_bp
+from search import search_news
+from reddit import search_reddit_posts, get_title_from_url
+from summarize import summarize_text
+from analytics import analytics_bp
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 import re
 from datetime import datetime
 from dotenv import load_dotenv
-from api.search_logger import SearchLogger
+from search_logger import SearchLogger
 
 # Load environment variables
 load_dotenv()
@@ -276,20 +276,9 @@ def get_reactions():
             # Don't fail completely if Reddit search fails
             reddit_results = []
         
-        # Add summaries to Reddit posts
-        for post in reddit_results:
-            try:
-                if post.get("comments"):
-                    combined = " ".join(post["comments"][:5])
-                    print(f"Summarizing comments for post: {post.get('title', '')[:50]}...")
-                    post["summary"] = summarize_text(combined)
-            except Exception as summary_error:
-                print(f"Error summarizing post: {str(summary_error)}")
-                post["summary"] = "Error generating summary"
-        
         # Format response to match frontend expectations
         response = {
-            'news': news_results,  # Frontend expects list of [title, link] tuples
+            'web': news_results,  # Frontend expects web search results
             'reddit': reddit_results,
             'article': article_metadata  # Include article metadata if URL was provided
         }

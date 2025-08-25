@@ -2,7 +2,7 @@ import os
 import requests
 import time
 from dotenv import load_dotenv
-from .search_logger import SearchLogger
+from search_logger import SearchLogger
 
 load_dotenv()
 SERP_API_KEY = os.getenv("SERPAPI_API_KEY")
