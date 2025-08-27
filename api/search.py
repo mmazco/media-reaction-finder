@@ -2,7 +2,12 @@ import os
 import requests
 import time
 from dotenv import load_dotenv
-from .search_logger import SearchLogger
+# For local development - use direct imports
+try:
+    from search_logger import SearchLogger
+except ImportError:
+    # For Vercel deployment - use relative imports
+    from .search_logger import SearchLogger
 
 load_dotenv()
 SERP_API_KEY = os.getenv("SERPAPI_API_KEY")

@@ -1,8 +1,18 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from .search import search_news
-from .reddit import search_reddit_posts, get_title_from_url
-from .summarize import summarize_text
+# For local development - use direct imports
+try:
+    from search import search_news
+    from reddit import search_reddit_posts, get_title_from_url
+    from summarize import summarize_text
+    from search_logger import SearchLogger
+except ImportError:
+    # For Vercel deployment - use relative imports
+    from .search import search_news
+    from .reddit import search_reddit_posts, get_title_from_url
+    from .summarize import summarize_text
+    from .search_logger import SearchLogger
+
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -10,7 +20,6 @@ from urllib.parse import urlparse
 import re
 from datetime import datetime
 from dotenv import load_dotenv
-from .search_logger import SearchLogger
 
 # Load environment variables
 load_dotenv()
