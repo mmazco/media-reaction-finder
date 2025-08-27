@@ -126,7 +126,7 @@ export default function App() {
       console.log('API Response:', data); // Debug log
       
       // Validate and clean the response data
-      const cleanNews = Array.isArray(data.news) ? data.news : [];
+      const cleanNews = Array.isArray(data.web) ? data.web : [];
       const cleanReddit = Array.isArray(data.reddit) ? data.reddit : [];
       const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
       
@@ -149,7 +149,7 @@ export default function App() {
           query: query,
           searchedAt: new Date().toISOString()
         };
-      } else if (query.trim() && (data.news?.length > 0 || data.reddit?.length > 0)) {
+      } else if (query.trim() && (data.web?.length > 0 || data.reddit?.length > 0)) {
         // Text search or URL search without full metadata
         if (query.startsWith('http')) {
           // URL search without full article metadata - try to extract domain for better display
@@ -206,7 +206,7 @@ export default function App() {
       if (historyItem) {
         // Store the complete results with the history item
         historyItem.cachedResults = {
-          news: cleanNews,
+          web: cleanNews,
           reddit: cleanReddit,
           article: cleanArticle
         };
@@ -561,7 +561,7 @@ export default function App() {
                   
                   // Restore cached results if available
                   if (item.cachedResults) {
-                    setNews(item.cachedResults.news || []);
+                    setNews(item.cachedResults.web || []);
                     setReddit(item.cachedResults.reddit || []);
                     setArticle(item.cachedResults.article || null);
                   } else {
@@ -720,7 +720,7 @@ export default function App() {
               {[
                 ...news.filter(article => article.url !== query).map(article => ({
                   ...article,
-                  type: 'News'
+                  type: 'Web'
                 })),
                 ...reddit.map(post => ({
                   ...post,
@@ -733,7 +733,7 @@ export default function App() {
                       fontSize: '12px',
                       padding: '2px 8px',
                       borderRadius: '4px',
-                      backgroundColor: item.type === 'News' ? '#4ECDC4' : '#FF6B6B',
+                      backgroundColor: item.type === 'Web' ? '#4ECDC4' : '#FF6B6B',
                       color: '#fff',
                       fontWeight: '500'
                     }}>

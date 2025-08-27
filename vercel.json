@@ -4,10 +4,7 @@
       "source": "/api/reactions",
       "destination": "/api/reactions.py"
     },
-    {
-      "source": "/api/analytics/(.*)",
-      "destination": "/api/analytics.py"
-    },
+
     {
       "source": "/api/summarize",
       "destination": "/api/reactions.py"

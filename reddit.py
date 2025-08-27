@@ -8,15 +8,38 @@ load_dotenv()
 
 def search_reddit_posts(query, limit=5):
     try:
+        # Debug: Check if credentials are available
+        client_id = os.getenv("REDDIT_CLIENT_ID")
+        client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+        user_agent = os.getenv("REDDIT_USER_AGENT")
+        
+        print(f"🔐 Reddit credentials check:")
+        print(f"  - Client ID: {'✓ Present' if client_id else '✗ Missing'}")
+        print(f"  - Client Secret: {'✓ Present' if client_secret else '✗ Missing'}")
+        print(f"  - User Agent: {'✓ Present' if user_agent else '✗ Missing'}")
+        
+        if not all([client_id, client_secret, user_agent]):
+            print("❌ Missing Reddit API credentials")
+            return []
+        
         reddit = praw.Reddit(
-            client_id=os.getenv("REDDIT_CLIENT_ID"),
-            client_secret=os.getenv("REDDIT_CLIENT_SECRET"),
-            user_agent=os.getenv("REDDIT_USER_AGENT"),
-            redirect_uri="http://localhost:8080",
+            client_id=client_id,
+            client_secret=client_secret,
+            user_agent=user_agent,
             check_for_async=False
         )
         
         reddit.read_only = True
+        
+        # Test Reddit connection
+        try:
+            # Simple test to verify authentication works
+            test_subreddit = reddit.subreddit("test")
+            print(f"✓ Reddit API connection test successful")
+        except Exception as auth_error:
+            print(f"❌ Reddit API authentication failed: {auth_error}")
+            return []
+        
         results = []
 
         # If query is a URL, prioritize URL search
@@ -39,24 +62,8 @@ def search_reddit_posts(query, limit=5):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "subreddit": str(post.subreddit),
-                            "score": post.score,
-                            "num_comments": post.num_comments,
-                            "comments": []
+                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
                         }
-
-                        if post.num_comments > 0:
-                            try:
-                                post.comment_limit = 5
-                                post.comment_sort = "best"
-                                post.comments.replace_more(limit=0)
-                                for comment in post.comments[:5]:
-                                    if hasattr(comment, "body") and comment.body:
-                                        post_data["comments"].append(
-                                            comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
-                                        )
-                            except:
-                                pass
 
                         results.append(post_data)
 
@@ -84,26 +91,10 @@ def search_reddit_posts(query, limit=5):
                             
                         try:
                             post_data = {
-                                "title": post.title,
-                                "url": f"https://reddit.com{post.permalink}",
-                                "subreddit": str(post.subreddit),
-                                "score": post.score,
-                                "num_comments": post.num_comments,
-                                "comments": []
-                            }
-
-                            if post.num_comments > 0:
-                                try:
-                                    post.comment_limit = 5
-                                    post.comment_sort = "best"
-                                    post.comments.replace_more(limit=0)
-                                    for comment in post.comments[:5]:
-                                        if hasattr(comment, "body") and comment.body:
-                                            post_data["comments"].append(
-                                                comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
-                                            )
-                                except:
-                                    pass
+                            "title": post.title,
+                            "url": f"https://reddit.com{post.permalink}",
+                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                        }
 
                             results.append(post_data)
 
@@ -129,24 +120,8 @@ def search_reddit_posts(query, limit=5):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "subreddit": str(post.subreddit),
-                            "score": post.score,
-                            "num_comments": post.num_comments,
-                            "comments": []
+                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
                         }
-
-                        if post.num_comments > 0:
-                            try:
-                                post.comment_limit = 5
-                                post.comment_sort = "best"
-                                post.comments.replace_more(limit=0)
-                                for comment in post.comments[:5]:
-                                    if hasattr(comment, "body") and comment.body:
-                                        post_data["comments"].append(
-                                            comment.body[:200] + "..." if len(comment.body) > 200 else comment.body
-                                        )
-                            except:
-                                pass
 
                         results.append(post_data)
 
