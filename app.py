@@ -3,7 +3,7 @@ from flask_cors import CORS
 from search import search_news
 from reddit import search_reddit_posts, get_title_from_url
 from summarize import summarize_text
-from api.analytics import analytics_bp
+# from api.analytics import analytics_bp
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -20,17 +20,43 @@ app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
 
 # Register analytics blueprint
-app.register_blueprint(analytics_bp)
+# app.register_blueprint(analytics_bp)
 
 def extract_article_metadata(url):
     """
     Extract title, source, date, and content from an article URL
     """
     try:
+        # More comprehensive headers to avoid bot detection
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'DNT': '1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Cache-Control': 'max-age=0'
         }
-        response = requests.get(url, headers=headers, timeout=10)
+        
+        # Add a session for better handling
+        session = requests.Session()
+        session.headers.update(headers)
+        
+        response = session.get(url, timeout=15, allow_redirects=True)
+        
+        # Check for specific error codes that indicate access restrictions
+        if response.status_code == 401:
+            print(f"⚠️  Access denied (401) for {url} - likely paywall or subscription required")
+        elif response.status_code == 403:
+            print(f"⚠️  Forbidden (403) for {url} - likely bot detection or regional restriction")
+        elif response.status_code == 429:
+            print(f"⚠️  Rate limited (429) for {url} - too many requests")
+        
         response.raise_for_status()
         
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -138,14 +164,49 @@ def extract_article_metadata(url):
             'url': url
         }
         
-    except Exception as e:
-        print(f"Error extracting article metadata: {e}")
+    except requests.exceptions.HTTPError as e:
+        error_msg = f"HTTP error extracting article: {e}"
+        print(error_msg)
+        
+        # Try to extract basic info from URL for better fallback
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.replace('www.', '')
+        
+        # Create a more informative error message based on status code
+        if hasattr(e.response, 'status_code'):
+            if e.response.status_code == 401:
+                error_msg = "Article requires subscription or login to access content."
+            elif e.response.status_code == 403:
+                error_msg = "Access to article content is restricted (bot detection or regional restrictions)."
+            elif e.response.status_code == 429:
+                error_msg = "Too many requests - article content temporarily unavailable."
+            else:
+                error_msg = f"Unable to access article content (HTTP {e.response.status_code})."
+        
         return {
-            'title': 'Article',
-            'source': 'Unknown Source', 
+            'title': f'Article from {domain}',
+            'source': domain.split('.')[0].capitalize() if domain else 'Unknown Source',
             'date': 'Date not available',
             'content': '',
-            'url': url
+            'url': url,
+            'error': error_msg
+        }
+        
+    except Exception as e:
+        error_msg = f"Error extracting article metadata: {e}"
+        print(error_msg)
+        
+        # Try to extract basic info from URL for better fallback
+        parsed_url = urlparse(url)
+        domain = parsed_url.netloc.replace('www.', '') if parsed_url.netloc else 'Unknown Source'
+        
+        return {
+            'title': f'Article from {domain}' if domain != 'Unknown Source' else 'Article',
+            'source': domain.split('.')[0].capitalize() if domain != 'Unknown Source' else 'Unknown Source',
+            'date': 'Date not available',
+            'content': '',
+            'url': url,
+            'error': error_msg
         }
 
 @app.route('/api/reactions', methods=['POST'])
@@ -175,7 +236,11 @@ def get_reactions():
                 summary_task = "Provide a concise 100-word summary of this article, highlighting the main points and key information."
                 article_metadata['summary'] = summarize_text(article_metadata['content'], summary_task)
             else:
-                article_metadata['summary'] = "Summary not available - unable to extract article content."
+                # Use error message if available, otherwise generic message
+                if 'error' in article_metadata:
+                    article_metadata['summary'] = article_metadata['error']
+                else:
+                    article_metadata['summary'] = "Summary not available - unable to extract article content."
                 
             print(f"🧠 Extracted article: {article_title}")
         

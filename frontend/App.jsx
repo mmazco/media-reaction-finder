@@ -9,6 +9,7 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [showCopyNotification, setShowCopyNotification] = useState(false);
 
 
   // Function to delete history items
@@ -29,6 +30,18 @@ export default function App() {
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode) {
       setDarkMode(JSON.parse(savedDarkMode));
+    }
+
+    // Check for URL parameters on initial load
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedQuery = urlParams.get('q');
+    if (sharedQuery) {
+      const decodedQuery = decodeURIComponent(sharedQuery);
+      setQuery(decodedQuery);
+      // Automatically perform search for shared URL
+      setTimeout(() => {
+        performSearch(decodedQuery);
+      }, 100);
     }
 
     // Close sidebar with Escape key
@@ -69,13 +82,31 @@ export default function App() {
     return colors[category] || colors['general'];
   };
 
-  const handleSearch = async () => {
+  // Function to update URL with search query
+  const updateURL = (searchQuery) => {
+    const url = new URL(window.location);
+    if (searchQuery && searchQuery.trim()) {
+      url.searchParams.set('q', encodeURIComponent(searchQuery));
+    } else {
+      url.searchParams.delete('q');
+    }
+    window.history.pushState({}, '', url);
+  };
+
+  // Function to generate shareable URL
+  const generateShareableURL = (searchQuery) => {
+    const baseURL = window.location.origin + window.location.pathname;
+    return `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
+  };
+
+  // Separate function to perform search (used by both handleSearch and URL parameter loading)
+  const performSearch = async (searchQuery) => {
     setLoading(true);
     try {
       const response = await fetch('/api/reactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ query: searchQuery })
       });
       
       if (!response.ok) {
@@ -106,15 +137,15 @@ export default function App() {
           source: cleanArticle.source,
           date: cleanArticle.date,
           url: cleanArticle.url,
-          query: query,
+          query: searchQuery,
           searchedAt: new Date().toISOString()
         };
-      } else if (query.trim() && (data.web?.length > 0 || data.reddit?.length > 0)) {
+      } else if (searchQuery.trim() && (data.web?.length > 0 || data.reddit?.length > 0)) {
         // Text search or URL search without full metadata
-        if (query.startsWith('http')) {
+        if (searchQuery.startsWith('http')) {
           // URL search without full article metadata - try to extract domain for better display
           try {
-            const url = new URL(query);
+            const url = new URL(searchQuery);
             const domain = url.hostname.replace('www.', '');
             historyItem = {
               id: Date.now(),
@@ -125,8 +156,8 @@ export default function App() {
                 month: 'long', 
                 day: 'numeric' 
               }),
-              url: query,
-              query: query,
+              url: searchQuery,
+              query: searchQuery,
               searchedAt: new Date().toISOString()
             };
           } catch {
@@ -140,8 +171,8 @@ export default function App() {
                 month: 'long', 
                 day: 'numeric' 
               }),
-              url: query,
-              query: query,
+              url: searchQuery,
+              query: searchQuery,
               searchedAt: new Date().toISOString()
             };
           }
@@ -149,15 +180,15 @@ export default function App() {
           // Text search with results
           historyItem = {
             id: Date.now(),
-            title: query.length > 40 ? query.substring(0, 40) + '...' : query,
+            title: searchQuery.length > 40 ? searchQuery.substring(0, 40) + '...' : searchQuery,
             source: 'Search Query',
             date: new Date().toLocaleDateString('en-US', { 
               year: 'numeric', 
               month: 'long', 
               day: 'numeric' 
             }),
-            url: query,
-            query: query,
+            url: searchQuery,
+            query: searchQuery,
             searchedAt: new Date().toISOString()
           };
         }
@@ -194,6 +225,53 @@ export default function App() {
       console.error('Error fetching reactions:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Main search handler that updates URL and performs search
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    // Update URL with search query
+    updateURL(query);
+    
+    // Perform the actual search
+    await performSearch(query);
+  };
+
+  // Function to handle sharing
+  const handleShare = async () => {
+    if (!query.trim()) return;
+    
+    const shareableURL = generateShareableURL(query);
+    
+    try {
+      // Try to use Web Share API if available (mobile devices)
+      if (navigator.share) {
+        await navigator.share({
+          title: 'Media Reaction Finder',
+          text: `Check out reactions to: ${article?.title || query}`,
+          url: shareableURL
+        });
+      } else {
+        // Fallback to copying to clipboard
+        await navigator.clipboard.writeText(shareableURL);
+        setShowCopyNotification(true);
+        setTimeout(() => setShowCopyNotification(false), 2000);
+      }
+    } catch (error) {
+      // If clipboard API fails, fallback to manual copy
+      console.error('Share failed:', error);
+      // Create a temporary input element to copy the URL
+      const tempInput = document.createElement('input');
+      tempInput.value = shareableURL;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempInput);
+      
+      setShowCopyNotification(true);
+      setTimeout(() => setShowCopyNotification(false), 2000);
     }
   };
 
@@ -483,6 +561,40 @@ export default function App() {
       marginTop: '10px',
       fontFamily: 'Georgia, serif',
       textAlign: 'left'
+    },
+      shareButton: {
+      marginTop: '20px',
+      padding: '10px 24px',
+      fontSize: '11px',
+      letterSpacing: '1px',
+      fontWeight: '600',
+      backgroundColor: darkMode ? '#333' : '#f0f0f0',
+      color: darkMode ? '#fff' : '#333',
+      border: `1px solid ${darkMode ? '#555' : '#ddd'}`,
+      cursor: 'pointer',
+      fontFamily: 'Arial, sans-serif',
+      transition: 'all 0.2s ease',
+      borderRadius: '4px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      justifyContent: 'center'
+    },
+      shareContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      marginTop: '20px'
+    },
+      copyNotification: {
+      fontSize: '12px',
+      color: darkMode ? '#4da6ff' : '#0066cc',
+      marginTop: '8px',
+      opacity: 0,
+      transition: 'opacity 0.3s ease'
+    },
+      copyNotificationVisible: {
+      opacity: 1
     }
     };
   };
@@ -516,8 +628,12 @@ export default function App() {
             >
               <div
                 onClick={async () => {
-                  setQuery(item.query || item.url);
+                  const searchQuery = item.query || item.url;
+                  setQuery(searchQuery);
                   setSidebarOpen(false);
+                  
+                  // Update URL when loading from history
+                  updateURL(searchQuery);
                   
                   // Restore cached results if available
                   if (item.cachedResults) {
@@ -527,7 +643,7 @@ export default function App() {
                   } else {
                     // Fallback: trigger a new search for older items without cache
                     setTimeout(() => {
-                      handleSearch();
+                      performSearch(searchQuery);
                     }, 100);
                   }
                 }}
@@ -607,6 +723,17 @@ export default function App() {
             style={styles.input}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
+          <div style={{
+            fontSize: '12px',
+            color: darkMode ? '#999' : '#666',
+            marginTop: '8px',
+            fontStyle: 'italic',
+            textAlign: 'left',
+            lineHeight: '1.4'
+          }}>
+            💡 Note: Some premium publications (WSJ, NYT, etc.) may require subscriptions to access content.
+            Try publicly accessible articles for best results.
+          </div>
           {!loading ? (
             <button 
               onClick={handleSearch} 
@@ -647,7 +774,17 @@ export default function App() {
               </div>
             </div>
             {article && article.summary && (
-              <div style={styles.summaryText}>
+              <div style={{
+                ...styles.summaryText,
+                ...(article.error ? {
+                  color: darkMode ? '#ff9999' : '#cc0000',
+                  fontStyle: 'italic',
+                  padding: '10px',
+                  backgroundColor: darkMode ? '#2a1a1a' : '#fff5f5',
+                  border: `1px solid ${darkMode ? '#4a2a2a' : '#ffcccc'}`,
+                  borderRadius: '4px'
+                } : {})
+              }}>
                 {article.summary}
               </div>
             )}
@@ -695,6 +832,29 @@ export default function App() {
                   )}
                 </div>
               ))}
+            </div>
+            
+            {/* Share functionality */}
+            <div style={styles.shareContainer}>
+              <button 
+                onClick={handleShare}
+                style={styles.shareButton}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = darkMode ? '#444' : '#e0e0e0';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = darkMode ? '#333' : '#f0f0f0';
+                }}
+              >
+                <span>🔗</span>
+                SHARE RESULTS
+              </button>
+              <div style={{
+                ...styles.copyNotification,
+                ...(showCopyNotification ? styles.copyNotificationVisible : {})
+              }}>
+                Link copied to clipboard!
+              </div>
             </div>
           </div>
         )}
