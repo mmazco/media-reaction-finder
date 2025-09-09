@@ -296,8 +296,10 @@ export default function App() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: 'center',
+      justifyContent: (news.length > 0 || reddit.length > 0 || article) ? 'flex-start' : 'center',
       padding: '20px',
+      paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
+        (window.innerWidth <= 768 ? '100px' : '80px') : '20px',
       position: 'relative',
       backgroundColor: baseColors.bg,
       color: baseColors.text

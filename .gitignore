@@ -72,3 +72,5 @@ logs/
 FROM
 LEFT
 ORDER
+.vercel
+.env*.local
