@@ -239,39 +239,36 @@ export default function App() {
     await performSearch(query);
   };
 
-  // Function to handle sharing
+  // Function to handle sharing - always copy to clipboard
   const handleShare = async () => {
     if (!query.trim()) return;
     
     const shareableURL = generateShareableURL(query);
     
     try {
-      // Try to use Web Share API if available (mobile devices)
-      if (navigator.share) {
-        await navigator.share({
-          title: 'Media Reaction Finder',
-          text: `Check out reactions to: ${article?.title || query}`,
-          url: shareableURL
-        });
-      } else {
-        // Fallback to copying to clipboard
-        await navigator.clipboard.writeText(shareableURL);
-        setShowCopyNotification(true);
-        setTimeout(() => setShowCopyNotification(false), 2000);
-      }
-    } catch (error) {
-      // If clipboard API fails, fallback to manual copy
-      console.error('Share failed:', error);
-      // Create a temporary input element to copy the URL
-      const tempInput = document.createElement('input');
-      tempInput.value = shareableURL;
-      document.body.appendChild(tempInput);
-      tempInput.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempInput);
-      
+      // Always copy to clipboard instead of using native share
+      await navigator.clipboard.writeText(shareableURL);
       setShowCopyNotification(true);
       setTimeout(() => setShowCopyNotification(false), 2000);
+    } catch (error) {
+      // If clipboard API fails, fallback to manual copy
+      console.error('Copy to clipboard failed:', error);
+      try {
+        // Create a temporary input element to copy the URL
+        const tempInput = document.createElement('input');
+        tempInput.value = shareableURL;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
+        
+        setShowCopyNotification(true);
+        setTimeout(() => setShowCopyNotification(false), 2000);
+      } catch (fallbackError) {
+        console.error('All copy methods failed:', fallbackError);
+        // Show error message if all methods fail
+        alert('Unable to copy link. Please copy manually: ' + shareableURL);
+      }
     }
   };
 
