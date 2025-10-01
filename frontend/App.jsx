@@ -801,9 +801,9 @@ export default function App() {
           <div style={styles.results}>
             <div style={styles.resultSection}>
               <h2 style={styles.resultTitle}>Related Content</h2>
-              {/* Filter out the origin URL from news results and combine with reddit results */}
+              {/* Combine web and reddit results (backend already filters same domain) */}
               {[
-                ...news.filter(article => article.url !== query).map(article => ({
+                ...news.map(article => ({
                   ...article,
                   type: 'Web'
                 })),
@@ -825,6 +825,16 @@ export default function App() {
                       {item.type}
                     </span>
                     <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                    {item.type === 'Reddit' && item.num_comments > 0 && (
+                      <span style={{
+                        fontSize: '11px',
+                        color: darkMode ? '#999' : '#666',
+                        marginLeft: 'auto',
+                        fontStyle: 'italic'
+                      }}>
+                        💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
+                      </span>
+                    )}
                   </div>
                   {item.summary && (
                     <p style={styles.summary}>{item.summary}</p>

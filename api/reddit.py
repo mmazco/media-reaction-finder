@@ -51,18 +51,27 @@ def search_reddit_posts(query, limit=5):
             
             try:
                 # First, try to find posts that link to this exact URL
+                # Fetch more than needed since we'll filter out low-engagement posts
                 url_search = reddit.subreddit("all").search(
                     f'url:"{stripped_url}"', 
-                    limit=limit,
+                    limit=limit * 3,  # Fetch 3x to account for filtering
                     sort="relevance"
                 )
                 
                 for post in url_search:
                     try:
+                        # Skip posts with no meaningful discussion (fewer than 2 comments)
+                        num_comments = post.num_comments if hasattr(post, 'num_comments') else 0
+                        if num_comments < 2:
+                            print(f"  ⏭️  Skipping post with {num_comments} comments: {post.title[:50]}...")
+                            continue
+                        
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                            "selftext": post.selftext if hasattr(post, 'selftext') else "",
+                            "num_comments": num_comments,
+                            "score": post.score if hasattr(post, 'score') else 0
                         }
 
                         results.append(post_data)
@@ -80,7 +89,7 @@ def search_reddit_posts(query, limit=5):
                 try:
                     text_url_search = reddit.subreddit("all").search(
                         stripped_url, 
-                        limit=limit - len(results),
+                        limit=(limit - len(results)) * 3,  # Fetch more to account for filtering
                         sort="relevance"
                     )
                     
@@ -88,12 +97,20 @@ def search_reddit_posts(query, limit=5):
                         # Skip if we already have this post
                         if any(r['url'] == f"https://reddit.com{post.permalink}" for r in results):
                             continue
+                        
+                        # Skip posts with no meaningful discussion (fewer than 2 comments)
+                        num_comments = post.num_comments if hasattr(post, 'num_comments') else 0
+                        if num_comments < 2:
+                            print(f"  ⏭️  Skipping post with {num_comments} comments: {post.title[:50]}...")
+                            continue
                             
                         try:
                             post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                            "selftext": post.selftext if hasattr(post, 'selftext') else "",
+                            "num_comments": num_comments,
+                            "score": post.score if hasattr(post, 'score') else 0
                         }
 
                             results.append(post_data)
@@ -108,22 +125,35 @@ def search_reddit_posts(query, limit=5):
         else:
             # For non-URL queries, do a regular text search
             try:
+                # Fetch more than needed since we'll filter out low-engagement posts
                 search_results = reddit.subreddit("all").search(
                     query, 
-                    limit=limit, 
+                    limit=limit * 3,  # Fetch 3x to account for filtering
                     sort="relevance", 
                     time_filter="month"
                 )
                 
                 for post in search_results:
                     try:
+                        # Skip posts with no meaningful discussion (fewer than 2 comments)
+                        num_comments = post.num_comments if hasattr(post, 'num_comments') else 0
+                        if num_comments < 2:
+                            print(f"  ⏭️  Skipping post with {num_comments} comments: {post.title[:50]}...")
+                            continue
+                        
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
-                            "selftext": post.selftext if hasattr(post, 'selftext') else ""
+                            "selftext": post.selftext if hasattr(post, 'selftext') else "",
+                            "num_comments": num_comments,
+                            "score": post.score if hasattr(post, 'score') else 0
                         }
 
                         results.append(post_data)
+                        
+                        # Stop if we have enough results
+                        if len(results) >= limit:
+                            break
 
                     except Exception as e:
                         print(f"Error processing post: {e}")
@@ -132,7 +162,8 @@ def search_reddit_posts(query, limit=5):
             except Exception as e:
                 print(f"Reddit search failed: {e}")
 
-        return results
+        # Return only the requested number of results (limit to 5)
+        return results[:limit]
 
     except Exception as e:
         print(f"Error initializing Reddit client: {e}")

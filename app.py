@@ -249,6 +249,20 @@ def get_reactions():
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         news_results = search_news(query, user_ip=user_ip)
         
+        # Filter out results from the same domain if query is a URL
+        if query.startswith('http'):
+            try:
+                query_domain = urlparse(query).netloc.replace('www.', '').lower()
+                # Filter out results from same domain and exact URL
+                news_results = [
+                    result for result in news_results 
+                    if result.get('url', '') != query and 
+                    urlparse(result.get('url', '')).netloc.replace('www.', '').lower() != query_domain
+                ]
+                print(f"🔍 Filtered out results from domain: {query_domain}")
+            except Exception as e:
+                print(f"Warning: Could not parse URL for filtering: {e}")
+        
         # Search Reddit - for URLs, pass the URL directly
         print("📣 Searching Reddit...")
         reddit_results = search_reddit_posts(query)
@@ -261,7 +275,7 @@ def get_reactions():
         
         # Format response to match frontend expectations
         response = {
-            'news': news_results,  # Frontend expects list of [title, link] tuples
+            'web': news_results,  # Frontend expects 'web' key for web search results
             'reddit': reddit_results,
             'article': article_metadata  # Include article metadata if URL was provided
         }
