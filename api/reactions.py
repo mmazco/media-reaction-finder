@@ -50,8 +50,24 @@ def extract_article_metadata(url):
         
         # Extract title
         title = None
-        if soup.title:
+        
+        # Try OpenGraph and meta tags first
+        og_title = soup.find('meta', property='og:title')
+        if og_title and og_title.get('content'):
+            title = og_title.get('content').strip()
+            print(f"✅ Found title from og:title: {title}")
+        
+        # Try h1 tag
+        if not title:
+            h1 = soup.find('h1')
+            if h1:
+                title = h1.get_text().strip()
+                print(f"✅ Found title from h1: {title}")
+        
+        # Fallback to page title
+        if not title and soup.title:
             title = soup.title.string.strip()
+            print(f"✅ Found title from <title> tag: {title}")
             # Clean title by removing site name after | or -
             if "|" in title:
                 title = title.split("|")[0].strip()
@@ -173,26 +189,42 @@ def extract_article_metadata(url):
             '.article-content',
             '.post-content',
             '.entry-content',
-            'main'
+            '.story-content',
+            '.article-body',
+            '.post-body',
+            'main',
+            '[class*="content"]',
+            '[class*="article"]',
+            '[class*="story"]'
         ]
         
+        print(f"🔍 Trying {len(content_selectors)} content selectors...")
         for selector in content_selectors:
             content_element = soup.select_one(selector)
             if content_element:
-                # Remove script and style elements
-                for script in content_element(["script", "style"]):
-                    script.decompose()
-                content = content_element.get_text()
-                break
+                # Remove script, style, nav, header, footer elements
+                for unwanted in content_element(["script", "style", "nav", "header", "footer", "aside", "form"]):
+                    unwanted.decompose()
+                extracted = content_element.get_text()
+                if len(extracted.strip()) > 200:  # Only accept if substantial content
+                    content = extracted
+                    print(f"✅ Found content with selector '{selector}': {len(content)} chars")
+                    break
+                else:
+                    print(f"⏭️  Selector '{selector}' found but too short: {len(extracted.strip())} chars")
         
         # Fallback to all paragraphs
-        if not content:
+        if not content or len(content.strip()) < 200:
+            print("🔄 Falling back to paragraph extraction...")
             paragraphs = soup.find_all('p')
             content = ' '.join([p.get_text() for p in paragraphs])
+            print(f"   Extracted from {len(paragraphs)} paragraphs: {len(content)} chars")
         
         # Clean and limit content
         content = re.sub(r'\s+', ' ', content).strip()
         content = content[:5000]  # Limit for API processing
+        
+        print(f"📊 Final content length after cleaning: {len(content)} chars")
         
         return {
             'title': title or 'Article',
@@ -236,13 +268,22 @@ def get_reactions():
             article_metadata = extract_article_metadata(query)
             article_title = article_metadata['title']
             
+            # Debug: Show what content was extracted
+            content_length = len(article_metadata.get('content', ''))
+            print(f"📄 Content extracted: {content_length} characters")
+            if content_length > 0:
+                print(f"   First 100 chars: {article_metadata['content'][:100]}...")
+            
             # Generate article summary if content is available
-            if article_metadata['content']:
-                print(f"📝 Generating article summary...")
+            if article_metadata.get('content') and len(article_metadata['content'].strip()) > 100:
+                print(f"📝 Generating article summary with OpenAI...")
                 summary_task = "Provide a concise 100-word summary of this article, highlighting the main points and key information."
                 article_metadata['summary'] = summarize_text(article_metadata['content'], summary_task)
+                print(f"   Summary result: {article_metadata['summary'][:100]}...")
             else:
-                article_metadata['summary'] = "Summary not available - unable to extract article content."
+                warning_msg = "Summary not available - unable to extract sufficient article content (may be paywalled or blocked)"
+                article_metadata['summary'] = warning_msg
+                print(f"⚠️  {warning_msg}")
                 
             print(f"🧠 Extracted article: {article_title}")
         
@@ -257,7 +298,7 @@ def get_reactions():
             print(f"Error during news search: {str(news_error)}")
             news_results = []
         
-        # Search Reddit - for URLs, pass the URL directly
+        # Search Reddit - for URLs, pass the URL and article title for hybrid search
         print("📣 Searching Reddit...")
         try:
             # Debug: Test Reddit credentials directly in main function
@@ -276,12 +317,44 @@ def get_reactions():
                 print(f"  User Agent: {reddit_user_agent}")
             
             print("Calling search_reddit_posts...")
-            reddit_results = search_reddit_posts(query)
+            # Pass article title for hybrid topic-based search
+            reddit_results = search_reddit_posts(query, article_title=article_title)
             print(f"Reddit search completed. Found {len(reddit_results) if reddit_results else 0} results")
         except Exception as reddit_error:
             print(f"Error during Reddit search: {str(reddit_error)}")
             # Don't fail completely if Reddit search fails
             reddit_results = []
+        
+        # Filter out results from the same domain (don't show same website)
+        if query.startswith('http'):
+            # Extract domain from URL
+            def get_domain(url):
+                try:
+                    parsed = urlparse(url)
+                    # Remove 'www.' prefix for comparison
+                    domain = parsed.netloc.lower().replace('www.', '')
+                    return domain
+                except:
+                    return ''
+            
+            query_domain = get_domain(query)
+            print(f"🔍 Original article domain: {query_domain}")
+            
+            # Filter web results - exclude same domain
+            original_web_count = len(news_results) if news_results else 0
+            news_results = [r for r in (news_results or []) 
+                           if get_domain(r.get('url', '')) != query_domain]
+            filtered_count = original_web_count - len(news_results)
+            if filtered_count > 0:
+                print(f"🔄 Filtered out {filtered_count} result(s) from same domain ({query_domain})")
+            
+            # Reddit results are fine - those are discussions, not articles from same site
+            # But still filter if someone literally posted to the same domain
+            original_reddit_count = len(reddit_results) if reddit_results else 0
+            reddit_results = [r for r in (reddit_results or []) 
+                             if get_domain(r.get('url', '')) != query_domain]
+            if original_reddit_count > len(reddit_results):
+                print(f"🔄 Filtered out {original_reddit_count - len(reddit_results)} Reddit result(s) from same domain")
         
         # Format response to match frontend expectations
         response = {

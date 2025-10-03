@@ -62,6 +62,15 @@ export default function App() {
     localStorage.setItem('darkMode', JSON.stringify(newDarkMode));
   };
 
+  // Reset to home state
+  const resetToHome = () => {
+    setQuery('');
+    setNews([]);
+    setReddit([]);
+    setArticle(null);
+    updateURL(''); // Clear URL parameters
+  };
+
 
 
   // Category color mapping
@@ -275,19 +284,21 @@ export default function App() {
   // Dynamic styles based on dark mode
   const getStyles = () => {
     const baseColors = darkMode ? {
-      bg: 'rgb(31, 30, 29)',
-      cardBg: '#1e1e1e',
+      bg: '#000000',
+      cardBg: '#1a1a1a',
       text: '#ffffff',
-      textSecondary: '#b3b3b3',
+      textSecondary: '#999999',
       border: '#333333',
-      accent: '#ffffff'
+      accent: '#ffffff',
+      accentAlt: '#cccccc'
     } : {
       bg: 'rgb(240, 238, 231)',
-      cardBg: '#f8f8f8',
-      text: '#1a1a1a',
-      textSecondary: '#666',
-      border: '#e0e0e0',
-      accent: '#1a1a1a'
+      cardBg: '#f5f5f5',
+      text: '#000000',
+      textSecondary: '#666666',
+      border: '#d0d0d0',
+      accent: '#000000',
+      accentAlt: '#333333'
     };
 
     return {
@@ -356,7 +367,9 @@ export default function App() {
       fontWeight: 'normal',
       marginBottom: '20px',
       color: baseColors.text,
-      fontFamily: 'Georgia, serif'
+      fontFamily: 'Georgia, serif',
+      cursor: 'pointer',
+      transition: 'opacity 0.2s ease'
     },
       subtitle: {
       fontSize: '16px',
@@ -395,8 +408,8 @@ export default function App() {
       fontSize: '12px',
       letterSpacing: '1.5px',
       fontWeight: '600',
-      backgroundColor: '#1a1a1a',
-      color: '#ffffff',
+      backgroundColor: darkMode ? '#ffffff' : '#000000',
+      color: darkMode ? '#000000' : '#ffffff',
       border: 'none',
       cursor: 'pointer',
       fontFamily: 'Arial, sans-serif',
@@ -417,8 +430,8 @@ export default function App() {
       display: 'inline-block',
       width: '20px',
       height: '20px',
-      border: '2px solid #f3f3f3',
-      borderTop: '2px solid #666',
+      border: `2px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+      borderTop: `2px solid ${darkMode ? '#fff' : '#000'}`,
       borderRadius: '50%',
       animation: 'spin 1s linear infinite'
     },
@@ -442,7 +455,7 @@ export default function App() {
       borderRadius: '5px'
     },
       link: {
-      color: darkMode ? '#4da6ff' : '#0066cc',
+      color: darkMode ? '#ffffff' : '#000000',
       textDecoration: 'none',
       fontSize: '16px',
       fontWeight: '500'
@@ -709,26 +722,227 @@ export default function App() {
       </div>
       
       <div style={styles.content}>
-        <h1 style={styles.title}>Media Reaction Finder</h1>
-        <p style={styles.subtitle}>Discover public discourse around any published article, media and content</p>
+        <h1 
+          style={styles.title}
+          onClick={resetToHome}
+          onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.target.style.opacity = '1'}
+        >
+          Media Reaction Finder
+        </h1>
+        <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
+        
+        {/* Example Articles Section */}
+        {!loading && !article && news.length === 0 && reddit.length === 0 && (
+          <div style={{
+            marginBottom: '30px',
+            marginTop: '30px',
+            width: '100vw',
+            marginLeft: 'calc(-50vw + 50%)',
+            marginRight: 'calc(-50vw + 50%)'
+          }}>
+            <div style={{
+              fontSize: '13px',
+              color: darkMode ? '#999' : '#666',
+              marginBottom: '15px',
+              fontWeight: '600',
+              letterSpacing: '0.5px',
+              textAlign: 'center'
+            }}>
+              PREVIOUS SEARCHES:
+            </div>
+            <div style={{
+              display: 'flex',
+              gap: '15px',
+              flexWrap: 'nowrap',
+              justifyContent: 'center',
+              overflowX: 'auto',
+              paddingBottom: '10px',
+              paddingLeft: '20px',
+              paddingRight: '20px'
+            }}>
+              {/* Example 1: Tech News */}
+              <div
+                onClick={() => {
+                  const exampleUrl = 'https://www.theguardian.com/technology/2025/jul/21/openai-signs-deal-with-uk-to-find-government-uses-for-its-models';
+                  setQuery(exampleUrl);
+                  updateURL(exampleUrl);
+                  performSearch(exampleUrl);
+                }}
+                style={{
+                  flex: '0 0 280px',
+                  minWidth: '280px',
+                  padding: '20px',
+                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
+                  borderRadius: '0px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'left'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: darkMode ? '#ffffff' : '#000000',
+                  marginBottom: '8px',
+                  fontFamily: 'Arial, sans-serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-title">
+                  News
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#666666',
+                  lineHeight: '1.4',
+                  fontStyle: 'italic',
+                  fontFamily: 'Georgia, serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-desc">
+                  OpenAI UK Government Deal
+                </div>
+              </div>
+
+              {/* Example 2: Blog Post */}
+              <div
+                onClick={() => {
+                  const exampleUrl = 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth';
+                  setQuery(exampleUrl);
+                  updateURL(exampleUrl);
+                  performSearch(exampleUrl);
+                }}
+                style={{
+                  flex: '0 0 280px',
+                  minWidth: '280px',
+                  padding: '20px',
+                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
+                  borderRadius: '0px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'left'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: darkMode ? '#ffffff' : '#000000',
+                  marginBottom: '8px',
+                  fontFamily: 'Arial, sans-serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-title">
+                  Blog
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#666666',
+                  lineHeight: '1.4',
+                  fontStyle: 'italic',
+                  fontFamily: 'Georgia, serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-desc">
+                  How Does a Blind Model See the Earth
+                </div>
+              </div>
+
+              {/* Example 3: Essay by Dario Amodei */}
+              <div
+                onClick={() => {
+                  const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
+                  setQuery(exampleUrl);
+                  updateURL(exampleUrl);
+                  performSearch(exampleUrl);
+                }}
+                style={{
+                  flex: '0 0 280px',
+                  minWidth: '280px',
+                  padding: '20px',
+                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
+                  borderRadius: '0px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'left'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
+                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
+                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                }}
+              >
+                <div style={{
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: darkMode ? '#ffffff' : '#000000',
+                  marginBottom: '8px',
+                  fontFamily: 'Arial, sans-serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-title">
+                  Essay
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  color: '#666666',
+                  lineHeight: '1.4',
+                  fontStyle: 'italic',
+                  fontFamily: 'Georgia, serif',
+                  transition: 'color 0.2s ease'
+                }}
+                className="card-desc">
+                  Machines of Loving Grace - Dario Amodei
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         <div style={styles.form}>
-          <label style={styles.label}>Insert URL</label>
+          <label style={styles.label}>Insert URL or Topic</label>
           <input
             type="text"
-            placeholder="https://example.com/article"
+            placeholder="https://example.com/article or search topic"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             style={styles.input}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
           <div style={{
-            fontSize: '12px',
+            fontSize: '14px',
             color: darkMode ? '#999' : '#666',
             marginTop: '8px',
             fontStyle: 'italic',
             textAlign: 'left',
-            lineHeight: '1.4'
+            lineHeight: '1.5'
           }}>
             💡 Note: Some premium publications (WSJ, NYT, etc.) may require subscriptions to access content.
             Try publicly accessible articles for best results.
