@@ -80,15 +80,7 @@ cd frontend
 npm run dev
 ```
 
-3. Open https://media-reaction-finder.vercel.app/
-
-## Deployment
-
-This application is configured for deployment on Vercel:
-
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+3. Open https://media-reaction-finder.replit.app/
 
 ## Usage
 
