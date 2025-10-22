@@ -723,7 +723,10 @@ export default function App() {
       
       <div style={styles.content}>
         <h1 
-          style={styles.title}
+          style={{
+            ...styles.title,
+            marginTop: (news.length > 0 || reddit.length > 0 || article) ? '60px' : '0'
+          }}
           onClick={resetToHome}
           onMouseEnter={(e) => e.target.style.opacity = '0.7'}
           onMouseLeave={(e) => e.target.style.opacity = '1'}
