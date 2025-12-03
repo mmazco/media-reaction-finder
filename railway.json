@@ -5,7 +5,7 @@
     "buildCommand": "cd frontend && npm install && npm run build && cd .. && cp -r frontend/dist/* ./"
   },
   "deploy": {
-    "startCommand": "python3 app.py",
+    "startCommand": "gunicorn app:app --bind 0.0.0.0:$PORT",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
