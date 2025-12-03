@@ -70,6 +70,34 @@ class SearchLogger:
             )
         ''')
         
+        # Create curated_collections table for topic-based bookmarks
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS curated_collections (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                tag TEXT NOT NULL,
+                tag_display_name TEXT,
+                icon TEXT,
+                description TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
+        # Create curated_articles table for bookmarked articles
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS curated_articles (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                collection_id INTEGER,
+                title TEXT NOT NULL,
+                url TEXT NOT NULL UNIQUE,
+                source TEXT,
+                authors TEXT,
+                date TEXT,
+                summary TEXT,
+                added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (collection_id) REFERENCES curated_collections (id)
+            )
+        ''')
+        
         conn.commit()
         conn.close()
     
@@ -402,3 +430,176 @@ class SearchLogger:
             return output.getvalue()
         else:
             raise ValueError("Unsupported format. Use 'json' or 'csv'")
+    
+    # ==================== CURATED COLLECTIONS ====================
+    
+    def create_collection(self, tag, display_name=None, icon=None, description=None):
+        """Create a new curated collection/topic tag"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            INSERT INTO curated_collections (tag, tag_display_name, icon, description)
+            VALUES (?, ?, ?, ?)
+        ''', (tag.lower(), display_name or tag.title(), icon, description))
+        
+        collection_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        
+        return collection_id
+    
+    def get_collection_by_tag(self, tag):
+        """Get a collection by its tag name"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT id, tag, tag_display_name, icon, description, created_at
+            FROM curated_collections
+            WHERE tag = ?
+        ''', (tag.lower(),))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            return {
+                'id': row[0],
+                'tag': row[1],
+                'display_name': row[2],
+                'icon': row[3],
+                'description': row[4],
+                'created_at': row[5]
+            }
+        return None
+    
+    def add_article_to_collection(self, collection_tag, title, url, source=None, authors=None, date=None, summary=None):
+        """Add an article to a curated collection"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Get or create collection
+        collection = self.get_collection_by_tag(collection_tag)
+        if not collection:
+            collection_id = self.create_collection(collection_tag)
+        else:
+            collection_id = collection['id']
+        
+        try:
+            cursor.execute('''
+                INSERT OR REPLACE INTO curated_articles 
+                (collection_id, title, url, source, authors, date, summary)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (collection_id, title, url, source, authors, date, summary))
+            
+            article_id = cursor.lastrowid
+            conn.commit()
+        except sqlite3.IntegrityError:
+            # Article URL already exists
+            article_id = None
+        finally:
+            conn.close()
+        
+        return article_id
+    
+    def get_all_collections(self):
+        """Get all curated collections with article counts"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                c.id, c.tag, c.tag_display_name, c.icon, c.description, c.created_at,
+                COUNT(a.id) as article_count
+            FROM curated_collections c
+            LEFT JOIN curated_articles a ON c.id = a.collection_id
+            GROUP BY c.id
+            ORDER BY c.tag_display_name
+        ''')
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        return [{
+            'id': row[0],
+            'tag': row[1],
+            'display_name': row[2],
+            'icon': row[3],
+            'description': row[4],
+            'created_at': row[5],
+            'article_count': row[6]
+        } for row in rows]
+    
+    def get_collection_articles(self, collection_tag):
+        """Get all articles in a collection"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT 
+                a.id, a.title, a.url, a.source, a.authors, a.date, a.summary, a.added_at,
+                c.tag, c.tag_display_name, c.icon
+            FROM curated_articles a
+            JOIN curated_collections c ON a.collection_id = c.id
+            WHERE c.tag = ?
+            ORDER BY a.added_at DESC
+        ''', (collection_tag.lower(),))
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        return [{
+            'id': row[0],
+            'title': row[1],
+            'url': row[2],
+            'source': row[3],
+            'authors': row[4],
+            'date': row[5],
+            'summary': row[6],
+            'added_at': row[7],
+            'collection_tag': row[8],
+            'collection_name': row[9],
+            'collection_icon': row[10]
+        } for row in rows]
+    
+    def get_shared_archive(self, limit=50):
+        """Get shared search archive for all users"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT DISTINCT
+                s.id, s.query, s.search_type, s.timestamp, s.results_count,
+                sr.title, sr.source
+            FROM searches s
+            LEFT JOIN search_results sr ON s.id = sr.search_id AND sr.position = 1
+            WHERE s.search_type = 'url'
+            ORDER BY s.timestamp DESC
+            LIMIT ?
+        ''', (limit,))
+        
+        rows = cursor.fetchall()
+        conn.close()
+        
+        return [{
+            'id': row[0],
+            'url': row[1],
+            'search_type': row[2],
+            'timestamp': row[3],
+            'results_count': row[4],
+            'title': row[5] or 'Untitled',
+            'source': row[6] or 'Unknown'
+        } for row in rows]
+    
+    def remove_article_from_collection(self, article_id):
+        """Remove an article from a collection"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute('DELETE FROM curated_articles WHERE id = ?', (article_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        return cursor.rowcount > 0

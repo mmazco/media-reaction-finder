@@ -455,9 +455,10 @@ def health():
     })
 
 if __name__ == '__main__':
-    # Run the Flask app on port 5002 to avoid conflicts
-    print("🚀 Starting Media Reaction Finder API on http://localhost:5002")
-    app.run(debug=True, port=5002)
+    # Use PORT environment variable for Railway, fallback to 5002 for local dev
+    port = int(os.environ.get('PORT', 5002))
+    print(f"🚀 Starting Media Reaction Finder API on port {port}")
+    app.run(debug=False, host='0.0.0.0', port=port)
 
-# For Vercel deployment
+# For deployment
 app = app
