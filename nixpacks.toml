@@ -1,0 +1,21 @@
+# Nixpacks configuration for Railway
+# This project needs both Python and Node.js
+
+[phases.setup]
+nixPkgs = ["python311", "nodejs_20"]
+
+[phases.install]
+cmds = [
+    "pip install -r requirements.txt",
+    "cd frontend && npm install"
+]
+
+[phases.build]
+cmds = [
+    "cd frontend && npm run build",
+    "cp -r frontend/dist/* ./"
+]
+
+[start]
+cmd = "gunicorn app:app --bind 0.0.0.0:${PORT:-8080}"
+
