@@ -10,6 +10,10 @@ export default function App() {
   const [searchHistory, setSearchHistory] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
+  const [collections, setCollections] = useState([]);
+  const [selectedCollection, setSelectedCollection] = useState(null);
+  const [collectionArticles, setCollectionArticles] = useState([]);
+  const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
 
 
   // Function to delete history items
@@ -18,6 +22,33 @@ export default function App() {
     const updatedHistory = searchHistory.filter(item => item.id !== id);
     setSearchHistory(updatedHistory);
     localStorage.setItem('searchHistory', JSON.stringify(updatedHistory));
+  };
+
+  // Fetch curated collections from API
+  const fetchCollections = async () => {
+    try {
+      const response = await fetch('/api/collections');
+      if (response.ok) {
+        const data = await response.json();
+        setCollections(data.collections || []);
+      }
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+    }
+  };
+
+  // Fetch articles for a specific collection
+  const fetchCollectionArticles = async (tag) => {
+    try {
+      const response = await fetch(`/api/collections/${tag}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCollectionArticles(data.articles || []);
+        setSelectedCollection(data.collection);
+      }
+    } catch (error) {
+      console.error('Error fetching collection articles:', error);
+    }
   };
 
   // Load search history and dark mode from localStorage on component mount
@@ -31,6 +62,9 @@ export default function App() {
     if (savedDarkMode) {
       setDarkMode(JSON.parse(savedDarkMode));
     }
+
+    // Fetch curated collections
+    fetchCollections();
 
     // Check for URL parameters on initial load
     const urlParams = new URLSearchParams(window.location.search);
@@ -626,82 +660,248 @@ export default function App() {
         ...styles.sidebar,
         ...(sidebarOpen ? styles.sidebarOpen : {})
       }}>
-        <div style={styles.sidebarHeader}>Search Archive</div>
-        {searchHistory.length > 0 ? (
-          searchHistory.map((item) => (
-            <div
-              key={item.id}
-              style={{
-                ...styles.historyItem,
-                position: 'relative'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
-            >
-              <div
-                onClick={async () => {
-                  const searchQuery = item.query || item.url;
-                  setQuery(searchQuery);
-                  setSidebarOpen(false);
-                  
-                  // Update URL when loading from history
-                  updateURL(searchQuery);
-                  
-                  // Restore cached results if available
-                  if (item.cachedResults) {
-                    setNews(item.cachedResults.web || []);
-                    setReddit(item.cachedResults.reddit || []);
-                    setArticle(item.cachedResults.article || null);
-                  } else {
-                    // Fallback: trigger a new search for older items without cache
-                    setTimeout(() => {
-                      performSearch(searchQuery);
-                    }, 100);
-                  }
-                }}
-                style={{cursor: 'pointer', paddingRight: '35px'}}
-              >
-                <div style={styles.historyTitle}>{item.title}</div>
-                <div style={styles.historySource}>{item.source}</div>
-                <div style={styles.historyDate}>{item.date}</div>
+        {/* Sidebar Tabs */}
+        <div style={{
+          display: 'flex',
+          borderBottom: `1px solid ${darkMode ? '#333' : '#ddd'}`,
+          marginBottom: '15px'
+        }}>
+          <button
+            onClick={() => {
+              setSidebarTab('collections');
+              setSelectedCollection(null);
+              setCollectionArticles([]);
+            }}
+            style={{
+              flex: 1,
+              padding: '10px',
+              border: 'none',
+              background: sidebarTab === 'collections' ? (darkMode ? '#333' : '#e8e8e8') : 'transparent',
+              color: darkMode ? '#fff' : '#000',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: sidebarTab === 'collections' ? '600' : '400',
+              fontFamily: 'Arial, sans-serif'
+            }}
+          >
+            Collections
+          </button>
+          <button
+            onClick={() => setSidebarTab('history')}
+            style={{
+              flex: 1,
+              padding: '10px',
+              border: 'none',
+              background: sidebarTab === 'history' ? (darkMode ? '#333' : '#e8e8e8') : 'transparent',
+              color: darkMode ? '#fff' : '#000',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: sidebarTab === 'history' ? '600' : '400',
+              fontFamily: 'Arial, sans-serif'
+            }}
+          >
+            My History
+          </button>
+        </div>
+
+        {/* Collections Tab */}
+        {sidebarTab === 'collections' && !selectedCollection && (
+          <>
+            <div style={{...styles.sidebarHeader, marginBottom: '15px'}}>Curated Collections</div>
+            {collections.length > 0 ? (
+              collections.map((collection) => (
+                <div
+                  key={collection.id}
+                  onClick={() => fetchCollectionArticles(collection.tag)}
+                  style={{
+                    ...styles.historyItem,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
+                >
+                  <span style={{fontSize: '24px'}}>{collection.icon}</span>
+                  <div style={{flex: 1}}>
+                    <div style={styles.historyTitle}>{collection.display_name}</div>
+                    <div style={styles.historyDate}>
+                      {collection.article_count} article{collection.article_count !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  <span style={{color: darkMode ? '#666' : '#999'}}>→</span>
+                </div>
+              ))
+            ) : (
+              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
+                No collections yet
               </div>
-              <button
-                onClick={(e) => deleteHistoryItem(item.id, e)}
-                style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  background: 'transparent',
-                  border: 'none',
-                  color: darkMode ? '#666' : '#999',
-                  cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '5px',
-                  width: '25px',
-                  height: '25px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = darkMode ? '#333' : '#ddd';
-                  e.target.style.color = darkMode ? '#fff' : '#333';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.color = darkMode ? '#666' : '#999';
-                }}
-              >
-                ×
-              </button>
+            )}
+          </>
+        )}
+
+        {/* Collection Articles View */}
+        {sidebarTab === 'collections' && selectedCollection && (
+          <>
+            <button
+              onClick={() => {
+                setSelectedCollection(null);
+                setCollectionArticles([]);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: darkMode ? '#999' : '#666',
+                cursor: 'pointer',
+                fontSize: '13px',
+                padding: '5px 0',
+                marginBottom: '10px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px'
+              }}
+            >
+              ← Back to Collections
+            </button>
+            <div style={{...styles.sidebarHeader, display: 'flex', alignItems: 'center', gap: '10px'}}>
+              <span style={{fontSize: '24px'}}>{selectedCollection.icon}</span>
+              {selectedCollection.display_name}
             </div>
-          ))
-        ) : (
-          <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
-            No search history yet
-          </div>
+            {selectedCollection.description && (
+              <div style={{
+                color: darkMode ? '#999' : '#666',
+                fontSize: '13px',
+                marginBottom: '15px',
+                fontStyle: 'italic'
+              }}>
+                {selectedCollection.description}
+              </div>
+            )}
+            {collectionArticles.length > 0 ? (
+              collectionArticles.map((article) => (
+                <div
+                  key={article.id}
+                  style={styles.historyItem}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
+                >
+                  <div
+                    onClick={() => {
+                      setQuery(article.url);
+                      setSidebarOpen(false);
+                      updateURL(article.url);
+                      performSearch(article.url);
+                    }}
+                    style={{cursor: 'pointer'}}
+                  >
+                    <div style={styles.historyTitle}>{article.title}</div>
+                    <div style={styles.historySource}>{article.source}</div>
+                    {article.authors && (
+                      <div style={{...styles.historyDate, marginTop: '2px'}}>By {article.authors}</div>
+                    )}
+                    <div style={styles.historyDate}>{article.date}</div>
+                    {article.summary && (
+                      <div style={{
+                        fontSize: '12px',
+                        color: darkMode ? '#888' : '#777',
+                        marginTop: '8px',
+                        lineHeight: '1.4'
+                      }}>
+                        {article.summary.substring(0, 150)}...
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
+                No articles in this collection yet
+              </div>
+            )}
+          </>
+        )}
+
+        {/* History Tab */}
+        {sidebarTab === 'history' && (
+          <>
+            <div style={styles.sidebarHeader}>Your Search History</div>
+            {searchHistory.length > 0 ? (
+              searchHistory.map((item) => (
+                <div
+                  key={item.id}
+                  style={{
+                    ...styles.historyItem,
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
+                >
+                  <div
+                    onClick={async () => {
+                      const searchQuery = item.query || item.url;
+                      setQuery(searchQuery);
+                      setSidebarOpen(false);
+                      
+                      // Update URL when loading from history
+                      updateURL(searchQuery);
+                      
+                      // Restore cached results if available
+                      if (item.cachedResults) {
+                        setNews(item.cachedResults.web || []);
+                        setReddit(item.cachedResults.reddit || []);
+                        setArticle(item.cachedResults.article || null);
+                      } else {
+                        // Fallback: trigger a new search for older items without cache
+                        setTimeout(() => {
+                          performSearch(searchQuery);
+                        }, 100);
+                      }
+                    }}
+                    style={{cursor: 'pointer', paddingRight: '35px'}}
+                  >
+                    <div style={styles.historyTitle}>{item.title}</div>
+                    <div style={styles.historySource}>{item.source}</div>
+                    <div style={styles.historyDate}>{item.date}</div>
+                  </div>
+                  <button
+                    onClick={(e) => deleteHistoryItem(item.id, e)}
+                    style={{
+                      position: 'absolute',
+                      top: '10px',
+                      right: '10px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: darkMode ? '#666' : '#999',
+                      cursor: 'pointer',
+                      fontSize: '18px',
+                      padding: '5px',
+                      width: '25px',
+                      height: '25px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderRadius: '50%',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = darkMode ? '#333' : '#ddd';
+                      e.target.style.color = darkMode ? '#fff' : '#333';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = darkMode ? '#666' : '#999';
+                    }}
+                  >
+                    ×
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
+                No search history yet
+              </div>
+            )}
+          </>
         )}
       </div>
       

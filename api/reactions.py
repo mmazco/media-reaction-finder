@@ -444,6 +444,83 @@ def summarize():
         print(f"Error in summarize endpoint: {e}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/collections', methods=['GET'])
+def get_collections():
+    """
+    Get all curated collections with article counts
+    """
+    try:
+        logger = SearchLogger()
+        collections = logger.get_all_collections()
+        return jsonify({'collections': collections})
+    except Exception as e:
+        print(f"Error getting collections: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/collections/<tag>', methods=['GET'])
+def get_collection(tag):
+    """
+    Get articles in a specific collection
+    """
+    try:
+        logger = SearchLogger()
+        collection = logger.get_collection_by_tag(tag)
+        if not collection:
+            return jsonify({'error': 'Collection not found'}), 404
+        
+        articles = logger.get_collection_articles(tag)
+        return jsonify({
+            'collection': collection,
+            'articles': articles
+        })
+    except Exception as e:
+        print(f"Error getting collection {tag}: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/collections/<tag>/add', methods=['POST'])
+def add_to_collection(tag):
+    """
+    Add an article to a curated collection
+    """
+    try:
+        data = request.get_json()
+        url = data.get('url')
+        title = data.get('title')
+        source = data.get('source')
+        authors = data.get('authors')
+        date = data.get('date')
+        summary = data.get('summary')
+        
+        if not url or not title:
+            return jsonify({'error': 'URL and title are required'}), 400
+        
+        logger = SearchLogger()
+        article_id = logger.add_article_to_collection(
+            tag, title, url, source, authors, date, summary
+        )
+        
+        if article_id:
+            return jsonify({'success': True, 'article_id': article_id})
+        else:
+            return jsonify({'error': 'Article already exists in collection'}), 409
+    except Exception as e:
+        print(f"Error adding to collection: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/archive', methods=['GET'])
+def get_archive():
+    """
+    Get shared search archive for all users
+    """
+    try:
+        limit = request.args.get('limit', 50, type=int)
+        logger = SearchLogger()
+        archive = logger.get_shared_archive(limit=limit)
+        return jsonify({'archive': archive})
+    except Exception as e:
+        print(f"Error getting archive: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/health', methods=['GET'])
 def health():
     """

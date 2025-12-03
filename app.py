@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from search import search_news
 from reddit import search_reddit_posts, get_title_from_url
@@ -15,9 +15,16 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
-# Enable CORS for the frontend running on localhost:5173, 5174, 5175, 5176
-CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
+# Set up Flask with static file serving for production
+app = Flask(__name__, static_folder='.', static_url_path='')
+
+# Enable CORS - more permissive in production
+if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
+    # Production: allow all origins
+    CORS(app, allow_headers=['Content-Type'], methods=['GET', 'POST'])
+else:
+    # Development: restrict to localhost
+    CORS(app, origins=['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'], allow_headers=['Content-Type'], methods=['GET', 'POST'])
 
 # Register analytics blueprint
 # app.register_blueprint(analytics_bp)
@@ -320,6 +327,21 @@ def health():
         'status': 'healthy',
         'message': 'Media Reaction Finder API is running'
     })
+
+# Serve static files and SPA routing
+@app.route('/')
+def serve_index():
+    """Serve the main index.html"""
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:path>')
+def serve_static(path):
+    """Serve static files or fallback to index.html for SPA routing"""
+    # Check if it's a static asset
+    if os.path.exists(path):
+        return send_from_directory('.', path)
+    # Fallback to index.html for SPA routing
+    return send_from_directory('.', 'index.html')
 
 if __name__ == '__main__':
     # Use PORT environment variable for Railway, fallback to 5002 for local dev
