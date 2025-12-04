@@ -5,13 +5,19 @@ from dotenv import load_dotenv
 from api.search_logger import SearchLogger
 
 load_dotenv()
-SERP_API_KEY = os.getenv("SERPAPI_API_KEY")
+# Support both naming conventions for the SerpAPI key
+SERP_API_KEY = os.getenv("SERPAPI_API_KEY") or os.getenv("SERPAPI_KEY")
 
 # Initialize search logger
 search_logger = SearchLogger()
 
 def search_news(query, num_results=5, user_ip=None):
     start_time = time.time()
+    
+    # Check if API key is available
+    if not SERP_API_KEY:
+        print("⚠️  SERPAPI_API_KEY not set - web search will be disabled")
+        return []
     
     url = "https://serpapi.com/search"
     params = {
