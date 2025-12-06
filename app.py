@@ -405,6 +405,26 @@ def health():
         'message': 'Media Reaction Finder API is running'
     })
 
+@app.route('/api/debug-keys', methods=['GET'])
+def debug_keys():
+    """
+    Debug endpoint to check if API keys are configured (does not expose actual keys)
+    """
+    serpapi_key = os.getenv("SERPAPI_API_KEY") or os.getenv("SERPAPI_KEY")
+    reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
+    reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+    reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
+    openai_key = os.getenv("OPENAI_API_KEY")
+    
+    return jsonify({
+        'SERPAPI_API_KEY': 'configured' if serpapi_key else 'MISSING',
+        'REDDIT_CLIENT_ID': 'configured' if reddit_client_id else 'MISSING',
+        'REDDIT_CLIENT_SECRET': 'configured' if reddit_client_secret else 'MISSING',
+        'REDDIT_USER_AGENT': 'configured' if reddit_user_agent else 'MISSING',
+        'OPENAI_API_KEY': 'configured' if openai_key else 'MISSING',
+        'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
+    })
+
 # Serve static files and SPA routing
 @app.route('/')
 def serve_index():

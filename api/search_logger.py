@@ -539,11 +539,11 @@ class SearchLogger:
         cursor.execute('''
             SELECT 
                 a.id, a.title, a.url, a.source, a.authors, a.date, a.summary, a.added_at,
-                c.tag, c.tag_display_name, c.icon
+                c.tag, c.tag_display_name, c.icon, COALESCE(a.curators_pick, 0)
             FROM curated_articles a
             JOIN curated_collections c ON a.collection_id = c.id
             WHERE c.tag = ?
-            ORDER BY a.added_at DESC
+            ORDER BY COALESCE(a.curators_pick, 0) DESC, a.added_at DESC
         ''', (collection_tag.lower(),))
         
         rows = cursor.fetchall()
@@ -560,7 +560,8 @@ class SearchLogger:
             'added_at': row[7],
             'collection_tag': row[8],
             'collection_name': row[9],
-            'collection_icon': row[10]
+            'collection_icon': row[10],
+            'curators_pick': bool(row[11])
         } for row in rows]
     
     def get_shared_archive(self, limit=50):

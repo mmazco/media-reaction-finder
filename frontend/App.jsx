@@ -14,6 +14,7 @@ export default function App() {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
+  const [showCollectionsPage, setShowCollectionsPage] = useState(false); // Collections page view
 
 
   // Function to delete history items
@@ -343,53 +344,12 @@ export default function App() {
       alignItems: 'center',
       justifyContent: (news.length > 0 || reddit.length > 0 || article) ? 'flex-start' : 'center',
       padding: '20px',
+      paddingLeft: '76px', // Account for left sidebar (56px + 20px)
       paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
         (window.innerWidth <= 768 ? '100px' : '80px') : '20px',
       position: 'relative',
       backgroundColor: baseColors.bg,
       color: baseColors.text
-    },
-      archiveLabel: {
-      position: 'absolute',
-      top: '20px',
-      left: '20px',
-      backgroundColor: baseColors.accent,
-      color: darkMode ? '#121212' : '#ffffff',
-      padding: '6px 16px',
-      fontSize: '11px',
-      letterSpacing: '1px',
-      fontFamily: 'Arial, sans-serif',
-      fontWeight: '600',
-      cursor: 'pointer',
-      transition: 'background-color 0.2s ease'
-    },
-      darkModeToggle: {
-      position: 'absolute',
-      top: '20px',
-      right: '20px',
-      display: 'flex',
-      alignItems: 'center',
-      cursor: 'pointer',
-      padding: '5px',
-      transition: 'all 0.2s ease'
-    },
-    toggleSwitch: {
-      position: 'relative',
-      width: '40px',
-      height: '20px',
-      backgroundColor: darkMode ? '#ffffff' : '#1a1a1a',
-      borderRadius: '10px',
-      padding: '2px',
-      transition: 'all 0.2s ease'
-    },
-    toggleKnob: {
-      width: '16px',
-      height: '16px',
-      backgroundColor: darkMode ? '#1a1a1a' : '#ffffff',
-      borderRadius: '50%',
-      position: 'absolute',
-      left: darkMode ? '22px' : '2px',
-      transition: 'all 0.2s ease'
     },
       content: {
       maxWidth: '700px',
@@ -503,9 +463,9 @@ export default function App() {
       sidebar: {
       position: 'fixed',
       top: 0,
-      left: 0,
+      left: '56px',
       height: '100vh',
-      width: '350px',
+      width: '320px',
       backgroundColor: baseColors.bg,
       borderRight: `1px solid ${baseColors.border}`,
       transform: 'translateX(-100%)',
@@ -561,8 +521,8 @@ export default function App() {
       overlay: {
       position: 'fixed',
       top: 0,
-      left: 0,
-      width: '100vw',
+      left: '56px',
+      width: 'calc(100vw - 56px)',
       height: '100vh',
       backgroundColor: 'rgba(0, 0, 0, 0.3)',
       zIndex: 999
@@ -655,269 +615,601 @@ export default function App() {
         <div style={styles.overlay} onClick={() => setSidebarOpen(false)} />
       )}
       
-      {/* Sidebar */}
+      {/* History Sidebar */}
       <div style={{
         ...styles.sidebar,
         ...(sidebarOpen ? styles.sidebarOpen : {})
       }}>
-        {/* Sidebar Tabs */}
-        <div style={{
-          display: 'flex',
-          borderBottom: `1px solid ${darkMode ? '#333' : '#ddd'}`,
-          marginBottom: '15px'
-        }}>
-          <button
-            onClick={() => {
-              setSidebarTab('collections');
-              setSelectedCollection(null);
-              setCollectionArticles([]);
-            }}
-            style={{
-              flex: 1,
-              padding: '10px',
-              border: 'none',
-              background: sidebarTab === 'collections' ? (darkMode ? '#333' : '#e8e8e8') : 'transparent',
-              color: darkMode ? '#fff' : '#000',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: sidebarTab === 'collections' ? '600' : '400',
-              fontFamily: 'Arial, sans-serif'
-            }}
-          >
-            Collections
-          </button>
-          <button
-            onClick={() => setSidebarTab('history')}
-            style={{
-              flex: 1,
-              padding: '10px',
-              border: 'none',
-              background: sidebarTab === 'history' ? (darkMode ? '#333' : '#e8e8e8') : 'transparent',
-              color: darkMode ? '#fff' : '#000',
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: sidebarTab === 'history' ? '600' : '400',
-              fontFamily: 'Arial, sans-serif'
-            }}
-          >
-            My History
-          </button>
-        </div>
-
-        {/* Collections Tab */}
-        {sidebarTab === 'collections' && !selectedCollection && (
-          <>
-            <div style={{...styles.sidebarHeader, marginBottom: '15px'}}>Curated Collections</div>
-            {collections.length > 0 ? (
-              collections.map((collection) => (
-                <div
-                  key={collection.id}
-                  onClick={() => fetchCollectionArticles(collection.tag)}
-                  style={{
-                    ...styles.historyItem,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
-                >
-                  <span style={{fontSize: '24px'}}>{collection.icon}</span>
-                  <div style={{flex: 1}}>
-                    <div style={styles.historyTitle}>{collection.display_name}</div>
-                    <div style={styles.historyDate}>
-                      {collection.article_count} article{collection.article_count !== 1 ? 's' : ''}
-                    </div>
-                  </div>
-                  <span style={{color: darkMode ? '#666' : '#999'}}>→</span>
-                </div>
-              ))
-            ) : (
-              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
-                No collections yet
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Collection Articles View */}
-        {sidebarTab === 'collections' && selectedCollection && (
-          <>
-            <button
-              onClick={() => {
-                setSelectedCollection(null);
-                setCollectionArticles([]);
-              }}
+        {searchHistory.length > 0 ? (
+          searchHistory.map((item) => (
+            <div
+              key={item.id}
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: darkMode ? '#999' : '#666',
-                cursor: 'pointer',
-                fontSize: '13px',
-                padding: '5px 0',
-                marginBottom: '10px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '5px'
+                ...styles.historyItem,
+                position: 'relative'
               }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
             >
-              ← Back to Collections
-            </button>
-            <div style={{...styles.sidebarHeader, display: 'flex', alignItems: 'center', gap: '10px'}}>
-              <span style={{fontSize: '24px'}}>{selectedCollection.icon}</span>
-              {selectedCollection.display_name}
-            </div>
-            {selectedCollection.description && (
-              <div style={{
-                color: darkMode ? '#999' : '#666',
-                fontSize: '13px',
-                marginBottom: '15px',
-                fontStyle: 'italic'
-              }}>
-                {selectedCollection.description}
+              <div
+                onClick={async () => {
+                  const searchQuery = item.query || item.url;
+                  setQuery(searchQuery);
+                  setSidebarOpen(false);
+                  
+                  // Update URL when loading from history
+                  updateURL(searchQuery);
+                  
+                  // Restore cached results if available
+                  if (item.cachedResults) {
+                    setNews(item.cachedResults.web || []);
+                    setReddit(item.cachedResults.reddit || []);
+                    setArticle(item.cachedResults.article || null);
+                  } else {
+                    // Fallback: trigger a new search for older items without cache
+                    setTimeout(() => {
+                      performSearch(searchQuery);
+                    }, 100);
+                  }
+                }}
+                style={{cursor: 'pointer', paddingRight: '35px'}}
+              >
+                <div style={styles.historyTitle}>{item.title}</div>
+                <div style={styles.historySource}>{item.source}</div>
+                <div style={styles.historyDate}>{item.date}</div>
               </div>
-            )}
-            {collectionArticles.length > 0 ? (
-              collectionArticles.map((article) => (
-                <div
-                  key={article.id}
-                  style={styles.historyItem}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
-                >
-                  <div
-                    onClick={() => {
-                      setQuery(article.url);
-                      setSidebarOpen(false);
-                      updateURL(article.url);
-                      performSearch(article.url);
-                    }}
-                    style={{cursor: 'pointer'}}
-                  >
-                    <div style={styles.historyTitle}>{article.title}</div>
-                    <div style={styles.historySource}>{article.source}</div>
-                    {article.authors && (
-                      <div style={{...styles.historyDate, marginTop: '2px'}}>By {article.authors}</div>
-                    )}
-                    <div style={styles.historyDate}>{article.date}</div>
-                    {article.summary && (
+              <button
+                onClick={(e) => deleteHistoryItem(item.id, e)}
+                style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  background: 'transparent',
+                  border: 'none',
+                  color: darkMode ? '#666' : '#999',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  padding: '5px',
+                  width: '25px',
+                  height: '25px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '50%',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = darkMode ? '#333' : '#ddd';
+                  e.target.style.color = darkMode ? '#fff' : '#333';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                  e.target.style.color = darkMode ? '#666' : '#999';
+                }}
+              >
+                ×
+              </button>
+            </div>
+          ))
+        ) : (
+          <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
+            No search history yet
+          </div>
+        )}
+      </div>
+
+      {/* Collections Page Overlay */}
+      {showCollectionsPage && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: '56px',
+          width: 'calc(100vw - 56px)',
+          height: '100vh',
+          backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+          zIndex: 1000,
+          overflowY: 'auto',
+          padding: '0'
+        }}>
+          {/* Collections Header */}
+          <div style={{
+            position: 'sticky',
+            top: 0,
+            backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+            padding: '20px 30px',
+            borderBottom: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              fontFamily: 'Georgia, serif',
+              color: darkMode ? '#fff' : '#000',
+              margin: 0
+            }}>
+              {selectedCollection ? selectedCollection.display_name : 'Collections'}
+            </h2>
+          </div>
+
+          {/* Collections Content */}
+          <div style={{
+            maxWidth: '900px',
+            margin: '0 auto',
+            padding: '30px 20px'
+          }}>
+            {!selectedCollection ? (
+              /* Collections List */
+              <>
+                <p style={{
+                  color: darkMode ? '#999' : '#666',
+                  fontSize: '15px',
+                  marginBottom: '30px',
+                  fontStyle: 'italic',
+                  fontFamily: 'Georgia, serif',
+                  textAlign: 'center'
+                }}>
+                  Curated articles on topics that matter
+                </p>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
+                  gap: '16px'
+                }}>
+                  {['palestine', 'culture', 'ai', 'internet', 'politics']
+                    .map(tag => collections.find(c => c.tag.toLowerCase() === tag))
+                    .filter(Boolean)
+                    .map((collection) => (
+                    <div
+                      key={collection.id}
+                      onClick={() => fetchCollectionArticles(collection.tag)}
+                      style={{
+                        padding: '24px',
+                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                        borderRadius: '8px',
+                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = darkMode 
+                          ? '0 8px 24px rgba(0,0,0,0.4)' 
+                          : '0 8px 24px rgba(0,0,0,0.1)';
+                        e.currentTarget.style.borderColor = darkMode ? '#444' : '#bbb';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '18px',
+                        fontWeight: '600',
+                        color: darkMode ? '#fff' : '#000',
+                        marginBottom: '8px',
+                        fontFamily: 'Arial, sans-serif'
+                      }}>
+                        {collection.display_name}
+                      </div>
+                      <div style={{
+                        fontSize: '13px',
+                        color: darkMode ? '#999' : '#666',
+                        marginBottom: '12px',
+                        fontStyle: 'italic'
+                      }}>
+                        {collection.description}
+                      </div>
                       <div style={{
                         fontSize: '12px',
-                        color: darkMode ? '#888' : '#777',
-                        marginTop: '8px',
-                        lineHeight: '1.4'
+                        color: darkMode ? '#666' : '#999',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
                       }}>
-                        {article.summary.substring(0, 150)}...
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                          <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        {collection.article_count} article{collection.article_count !== 1 ? 's' : ''}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))
+              </>
             ) : (
-              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
-                No articles in this collection yet
-              </div>
-            )}
-          </>
-        )}
-
-        {/* History Tab */}
-        {sidebarTab === 'history' && (
-          <>
-            <div style={styles.sidebarHeader}>Your Search History</div>
-            {searchHistory.length > 0 ? (
-              searchHistory.map((item) => (
-                <div
-                  key={item.id}
-                  style={{
-                    ...styles.historyItem,
-                    position: 'relative'
+              /* Articles in Collection */
+              <>
+                <button
+                  onClick={() => {
+                    setSelectedCollection(null);
+                    setCollectionArticles([]);
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: darkMode ? '#999' : '#666',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    marginBottom: '20px',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
                 >
-                  <div
-                    onClick={async () => {
-                      const searchQuery = item.query || item.url;
-                      setQuery(searchQuery);
-                      setSidebarOpen(false);
-                      
-                      // Update URL when loading from history
-                      updateURL(searchQuery);
-                      
-                      // Restore cached results if available
-                      if (item.cachedResults) {
-                        setNews(item.cachedResults.web || []);
-                        setReddit(item.cachedResults.reddit || []);
-                        setArticle(item.cachedResults.article || null);
-                      } else {
-                        // Fallback: trigger a new search for older items without cache
-                        setTimeout(() => {
-                          performSearch(searchQuery);
-                        }, 100);
-                      }
-                    }}
-                    style={{cursor: 'pointer', paddingRight: '35px'}}
-                  >
-                    <div style={styles.historyTitle}>{item.title}</div>
-                    <div style={styles.historySource}>{item.source}</div>
-                    <div style={styles.historyDate}>{item.date}</div>
-                  </div>
-                  <button
-                    onClick={(e) => deleteHistoryItem(item.id, e)}
-                    style={{
-                      position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: darkMode ? '#666' : '#999',
-                      cursor: 'pointer',
-                      fontSize: '18px',
-                      padding: '5px',
-                      width: '25px',
-                      height: '25px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      borderRadius: '50%',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.target.style.backgroundColor = darkMode ? '#333' : '#ddd';
-                      e.target.style.color = darkMode ? '#fff' : '#333';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                      e.target.style.color = darkMode ? '#666' : '#999';
-                    }}
-                  >
-                    ×
-                  </button>
+                  ← All Collections
+                </button>
+                {selectedCollection.description && (
+                  <p style={{
+                    color: darkMode ? '#999' : '#666',
+                    fontSize: '15px',
+                    marginBottom: '25px',
+                    fontStyle: 'italic',
+                    fontFamily: 'Georgia, serif'
+                  }}>
+                    {selectedCollection.description}
+                  </p>
+                )}
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}>
+                  {collectionArticles.length > 0 ? (
+                    collectionArticles.map((article) => (
+                      <div
+                        key={article.id}
+                        style={{
+                          padding: '20px 24px',
+                          backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                          borderRadius: '8px',
+                          border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                          transition: 'all 0.2s ease',
+                          position: 'relative'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = darkMode ? '#444' : '#bbb';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                        }}
+                      >
+                        {article.curators_pick && (
+                          <div style={{
+                            display: 'inline-block',
+                            backgroundColor: darkMode ? '#2d4a3e' : '#e8f5e9',
+                            color: darkMode ? '#81c784' : '#2e7d32',
+                            fontSize: '10px',
+                            fontWeight: '700',
+                            letterSpacing: '0.5px',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            marginBottom: '10px',
+                            fontFamily: 'Arial, sans-serif',
+                            textTransform: 'uppercase'
+                          }}>
+                            ★ Recommended
+                          </div>
+                        )}
+                        <div style={{
+                          fontSize: '17px',
+                          fontWeight: '600',
+                          color: darkMode ? '#fff' : '#000',
+                          marginBottom: '8px',
+                          lineHeight: '1.4',
+                          fontFamily: 'Georgia, serif'
+                        }}>
+                          {article.title}
+                        </div>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px',
+                          marginBottom: '10px',
+                          flexWrap: 'wrap'
+                        }}>
+                          {article.source && (
+                            <span style={{
+                              fontSize: '13px',
+                              color: darkMode ? '#4da6ff' : '#0066cc',
+                              fontWeight: '500'
+                            }}>
+                              {article.source}
+                            </span>
+                          )}
+                          {article.authors && (
+                            <>
+                              <span style={{color: darkMode ? '#555' : '#ccc'}}>•</span>
+                              <span style={{
+                                fontSize: '13px',
+                                color: darkMode ? '#888' : '#666'
+                              }}>
+                                {article.authors}
+                              </span>
+                            </>
+                          )}
+                          {article.date && (
+                            <>
+                              <span style={{color: darkMode ? '#555' : '#ccc'}}>•</span>
+                              <span style={{
+                                fontSize: '12px',
+                                color: darkMode ? '#666' : '#888',
+                                fontStyle: 'italic'
+                              }}>
+                                {article.date}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                        {article.summary && (
+                          <p style={{
+                            fontSize: '14px',
+                            color: darkMode ? '#aaa' : '#555',
+                            lineHeight: '1.6',
+                            marginBottom: '16px',
+                            fontFamily: 'Georgia, serif'
+                          }}>
+                            {article.summary.length > 200 
+                              ? article.summary.substring(0, 200) + '...' 
+                              : article.summary}
+                          </p>
+                        )}
+                        <div style={{
+                          display: 'flex',
+                          gap: '12px',
+                          flexWrap: 'wrap'
+                        }}>
+                          <button
+                            onClick={() => {
+                              setQuery(article.url);
+                              setShowCollectionsPage(false);
+                              setSelectedCollection(null);
+                              setCollectionArticles([]);
+                              updateURL(article.url);
+                              performSearch(article.url);
+                            }}
+                            style={{
+                              padding: '10px 20px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              letterSpacing: '0.5px',
+                              backgroundColor: darkMode ? '#fff' : '#000',
+                              color: darkMode ? '#000' : '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontFamily: 'Arial, sans-serif',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.opacity = '0.85';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.opacity = '1';
+                            }}
+                          >
+                            VIEW REACTIONS
+                          </button>
+                          <button
+                            onClick={() => window.open(article.url, '_blank')}
+                            style={{
+                              padding: '10px 20px',
+                              fontSize: '12px',
+                              fontWeight: '600',
+                              letterSpacing: '0.5px',
+                              backgroundColor: 'transparent',
+                              color: darkMode ? '#999' : '#666',
+                              border: `1px solid ${darkMode ? '#444' : '#ccc'}`,
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              fontFamily: 'Arial, sans-serif',
+                              transition: 'all 0.2s ease'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = darkMode ? '#666' : '#999';
+                              e.currentTarget.style.color = darkMode ? '#fff' : '#000';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = darkMode ? '#444' : '#ccc';
+                              e.currentTarget.style.color = darkMode ? '#999' : '#666';
+                            }}
+                          >
+                            VIEW ORIGINAL
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{
+                      padding: '40px',
+                      textAlign: 'center',
+                      color: darkMode ? '#666' : '#888',
+                      fontStyle: 'italic'
+                    }}>
+                      No articles in this collection yet
+                    </div>
+                  )}
                 </div>
-              ))
-            ) : (
-              <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
-                No search history yet
-              </div>
+              </>
             )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
       
-      <div 
-        style={styles.archiveLabel}
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-        onMouseEnter={(e) => e.target.style.backgroundColor = darkMode ? '#333' : '#333'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = darkMode ? '#ffffff' : '#1a1a1a'}
-      >
-        ARCHIVE
-      </div>
+      {/* Left Icon Sidebar */}
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        height: '100vh',
+        width: '56px',
+        backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
+        borderRight: `1px solid ${darkMode ? '#222' : '#333'}`,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '16px',
+        zIndex: 1001,
+        gap: '4px'
+      }}>
+        {/* Search Icon */}
+        <div 
+          onClick={() => {
+            // Close any open views first
+            setSidebarOpen(false);
+            setShowCollectionsPage(false);
+            setSelectedCollection(null);
+            setCollectionArticles([]);
+            // Scroll to top and focus search input
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+              document.querySelector('input[type="text"]')?.focus();
+            }, 100);
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Search"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+        </div>
 
-      
-      <div style={styles.darkModeToggle} onClick={toggleDarkMode}>
-        <div style={styles.toggleSwitch}>
-          <div style={styles.toggleKnob}></div>
+        {/* History Icon (Clock with counterclockwise arrow) */}
+        <div 
+          onClick={() => {
+            // Close collections page if open
+            setShowCollectionsPage(false);
+            setSelectedCollection(null);
+            setCollectionArticles([]);
+            // Toggle history sidebar
+            setSidebarOpen(!sidebarOpen);
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Search History"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M12 7v5l4 2"></path>
+          </svg>
+        </div>
+
+        {/* Bookmark/Collections Icon */}
+        <div 
+          onClick={() => {
+            // Close history sidebar if open
+            setSidebarOpen(false);
+            // Toggle collections page
+            if (showCollectionsPage) {
+              setShowCollectionsPage(false);
+              setSelectedCollection(null);
+              setCollectionArticles([]);
+            } else {
+              setShowCollectionsPage(true);
+            }
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Collections"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+
+        {/* Dark Mode Icon */}
+        <div 
+          onClick={toggleDarkMode}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title={darkMode ? "Light Mode" : "Dark Mode"}
+        >
+          {darkMode ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          )}
+        </div>
+
+        {/* GitHub Icon */}
+        <div 
+          onClick={() => window.open('https://github.com/mmazco/media-reaction-finder', '_blank')}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="GitHub"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#888">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
         </div>
       </div>
       
