@@ -383,7 +383,7 @@ export default function App() {
       subtitle: {
       fontSize: '16px',
       color: baseColors.textSecondary,
-      marginBottom: '50px',
+      marginBottom: '0px',
       fontStyle: 'italic',
       fontFamily: 'Georgia, serif'
     },
@@ -1447,36 +1447,32 @@ export default function App() {
         </h1>
         <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
         
-        {/* Example Articles Section */}
+        {/* Compact Previous Searches Section - Above search form */}
         {!loading && !article && news.length === 0 && reddit.length === 0 && (
           <div style={{
-            marginBottom: '30px',
-            marginTop: '30px',
-            width: '100vw',
-            marginLeft: 'calc(-50vw + 50%)',
-            marginRight: 'calc(-50vw + 50%)'
+            marginTop: '40px',
+            marginBottom: '40px',
+            width: '100%',
+            maxWidth: '700px',
+            textAlign: 'center'
           }}>
             <div style={{
-              fontSize: '13px',
-              color: darkMode ? '#999' : '#666',
-              marginBottom: '15px',
+              fontSize: '11px',
+              color: darkMode ? '#666' : '#999',
+              marginBottom: '12px',
               fontWeight: '600',
-              letterSpacing: '0.5px',
-              textAlign: 'center'
+              letterSpacing: '1px',
+              textTransform: 'uppercase'
             }}>
-              PREVIOUS SEARCHES:
+              Search examples
             </div>
             <div style={{
               display: 'flex',
-              gap: '15px',
-              flexWrap: 'nowrap',
-              justifyContent: 'center',
-              overflowX: 'auto',
-              paddingBottom: '10px',
-              paddingLeft: '20px',
-              paddingRight: '20px'
+              gap: '10px',
+              flexWrap: 'wrap',
+              justifyContent: 'center'
             }}>
-              {/* Example 1: Tech News */}
+              {/* Example 1 */}
               <div
                 onClick={() => {
                   const exampleUrl = 'https://www.theguardian.com/technology/2025/jul/21/openai-signs-deal-with-uk-to-find-government-uses-for-its-models';
@@ -1485,52 +1481,40 @@ export default function App() {
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  flex: '0 0 280px',
-                  minWidth: '280px',
-                  padding: '20px',
-                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
-                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
-                  borderRadius: '0px',
+                  padding: '10px 14px',
+                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                  borderRadius: '6px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
                 }}
               >
                 <div style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: '600',
-                  color: darkMode ? '#ffffff' : '#000000',
-                  marginBottom: '8px',
-                  fontFamily: 'Arial, sans-serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-title">
-                  News
+                  color: darkMode ? '#fff' : '#000',
+                  marginBottom: '2px'
+                }}>
+                  OpenAI UK Deal
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  color: '#666666',
-                  lineHeight: '1.4',
-                  fontStyle: 'italic',
-                  fontFamily: 'Georgia, serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-desc">
-                  OpenAI UK Government Deal
+                  fontSize: '11px',
+                  color: darkMode ? '#888' : '#666'
+                }}>
+                  The Guardian
                 </div>
               </div>
 
-              {/* Example 2: Blog Post */}
+              {/* Example 2 */}
               <div
                 onClick={() => {
                   const exampleUrl = 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth';
@@ -1539,52 +1523,40 @@ export default function App() {
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  flex: '0 0 280px',
-                  minWidth: '280px',
-                  padding: '20px',
-                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
-                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
-                  borderRadius: '0px',
+                  padding: '10px 14px',
+                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                  borderRadius: '6px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
                 }}
               >
                 <div style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: '600',
-                  color: darkMode ? '#ffffff' : '#000000',
-                  marginBottom: '8px',
-                  fontFamily: 'Arial, sans-serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-title">
-                  Blog
+                  color: darkMode ? '#fff' : '#000',
+                  marginBottom: '2px'
+                }}>
+                  Blind Model & Earth
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  color: '#666666',
-                  lineHeight: '1.4',
-                  fontStyle: 'italic',
-                  fontFamily: 'Georgia, serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-desc">
-                  How Does a Blind Model See the Earth
+                  fontSize: '11px',
+                  color: darkMode ? '#888' : '#666'
+                }}>
+                  Substack
                 </div>
               </div>
 
-              {/* Example 3: Essay by Dario Amodei */}
+              {/* Example 3 */}
               <div
                 onClick={() => {
                   const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
@@ -1593,54 +1565,43 @@ export default function App() {
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  flex: '0 0 280px',
-                  minWidth: '280px',
-                  padding: '20px',
-                  backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
-                  border: `2px solid ${darkMode ? '#ffffff' : '#000000'}`,
-                  borderRadius: '0px',
+                  padding: '10px 14px',
+                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                  borderRadius: '6px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#000000' : '#ffffff';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#000000' : '#ffffff';
+                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = darkMode ? '#000000' : 'rgb(240, 238, 231)';
-                  e.currentTarget.querySelector('.card-title').style.color = darkMode ? '#ffffff' : '#000000';
-                  e.currentTarget.querySelector('.card-desc').style.color = darkMode ? '#666666' : '#666666';
+                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
                 }}
               >
                 <div style={{
-                  fontSize: '14px',
+                  fontSize: '13px',
                   fontWeight: '600',
-                  color: darkMode ? '#ffffff' : '#000000',
-                  marginBottom: '8px',
-                  fontFamily: 'Arial, sans-serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-title">
-                  Essay
+                  color: darkMode ? '#fff' : '#000',
+                  marginBottom: '2px'
+                }}>
+                  Machines of Loving Grace
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  color: '#666666',
-                  lineHeight: '1.4',
-                  fontStyle: 'italic',
-                  fontFamily: 'Georgia, serif',
-                  transition: 'color 0.2s ease'
-                }}
-                className="card-desc">
-                  Machines of Loving Grace - Dario Amodei
+                  fontSize: '11px',
+                  color: darkMode ? '#888' : '#666'
+                }}>
+                  Dario Amodei
                 </div>
               </div>
             </div>
           </div>
         )}
-        
+
+        {/* Search Form */}
         <div style={styles.form}>
           <label style={styles.label}>Insert URL or Topic</label>
           <input
