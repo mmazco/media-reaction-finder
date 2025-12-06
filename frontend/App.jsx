@@ -84,16 +84,12 @@ export default function App() {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         setSidebarOpen(false);
-        setMobileMenuOpen(false);
       }
     };
 
     // Handle window resize for mobile detection
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
-        setMobileMenuOpen(false);
-      }
     };
 
     document.addEventListener('keydown', handleEscape);
