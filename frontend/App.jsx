@@ -372,16 +372,16 @@ export default function App() {
       textAlign: 'center'
     },
       title: {
-      fontSize: '48px',
+      fontSize: isMobile ? '32px' : '48px',
       fontWeight: 'normal',
-      marginBottom: '20px',
+      marginBottom: isMobile ? '12px' : '20px',
       color: baseColors.text,
       fontFamily: 'Georgia, serif',
       cursor: 'pointer',
       transition: 'opacity 0.2s ease'
     },
       subtitle: {
-      fontSize: '16px',
+      fontSize: isMobile ? '14px' : '16px',
       color: baseColors.textSecondary,
       marginBottom: '0px',
       fontStyle: 'italic',
@@ -1450,8 +1450,8 @@ export default function App() {
         {/* Compact Previous Searches Section - Above search form */}
         {!loading && !article && news.length === 0 && reddit.length === 0 && (
           <div style={{
-            marginTop: '40px',
-            marginBottom: '40px',
+            marginTop: isMobile ? '25px' : '40px',
+            marginBottom: isMobile ? '25px' : '40px',
             width: '100%',
             maxWidth: '700px',
             textAlign: 'center'
