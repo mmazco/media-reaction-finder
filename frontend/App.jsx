@@ -1278,20 +1278,21 @@ export default function App() {
                 }}
               >
                 <div style={{
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  color: darkMode ? '#888' : '#666',
+                  marginBottom: '4px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  News
+                </div>
+                <div style={{
                   fontSize: '15px',
                   fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '4px',
                   fontFamily: 'Georgia, serif'
                 }}>
                   Faith in Silicon Valley
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: darkMode ? '#888' : '#666',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  Vanity Fair
                 </div>
               </div>
 
@@ -1322,20 +1323,21 @@ export default function App() {
                 }}
               >
                 <div style={{
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  color: darkMode ? '#888' : '#666',
+                  marginBottom: '4px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  Blog
+                </div>
+                <div style={{
                   fontSize: '15px',
                   fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '4px',
                   fontFamily: 'Georgia, serif'
                 }}>
                   Blind Model & Earth
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: darkMode ? '#888' : '#666',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  Substack
                 </div>
               </div>
 
@@ -1366,20 +1368,21 @@ export default function App() {
                 }}
               >
                 <div style={{
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  color: darkMode ? '#888' : '#666',
+                  marginBottom: '4px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  Essay
+                </div>
+                <div style={{
                   fontSize: '15px',
                   fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '4px',
                   fontFamily: 'Georgia, serif'
                 }}>
                   Machines of Loving Grace
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  color: darkMode ? '#888' : '#666',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  Dario Amodei
                 </div>
               </div>
             </div>
