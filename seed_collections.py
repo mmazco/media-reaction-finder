@@ -14,7 +14,7 @@ def seed_collections():
     # Create collections (no emojis) - Order: Palestine, Culture, AI, Internet, Politics
     collections_to_create = [
         ('palestine', 'Palestine', '', "Coverage on Israel's genocide in Gaza and embracing Palestinian culture"),
-        ('culture', 'Culture', '', 'Views on contemporary culture implications and cultural economics'),
+        ('culture', 'Culture', '', 'Arts, music, and cultural commentary'),
         ('ai', 'AI', '', 'Artificial intelligence news and developments'),
         ('internet', 'Internet', '', 'Digital culture and online trends'),
         ('politics', 'Politics', '', 'Political news and analysis'),

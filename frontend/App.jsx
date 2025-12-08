@@ -15,8 +15,6 @@ export default function App() {
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
   const [showCollectionsPage, setShowCollectionsPage] = useState(false); // Collections page view
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Mobile burger menu
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
 
   // Function to delete history items
@@ -83,26 +81,13 @@ export default function App() {
 
     // Close sidebar with Escape key
     const handleEscape = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && sidebarOpen) {
         setSidebarOpen(false);
-        setMobileMenuOpen(false);
-      }
-    };
-
-    // Handle window resize for mobile detection
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-      if (window.innerWidth > 768) {
-        setMobileMenuOpen(false);
       }
     };
 
     document.addEventListener('keydown', handleEscape);
-    window.addEventListener('resize', handleResize);
-    return () => {
-      document.removeEventListener('keydown', handleEscape);
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [sidebarOpen]);
 
   // Toggle dark mode
@@ -359,9 +344,9 @@ export default function App() {
       alignItems: 'center',
       justifyContent: (news.length > 0 || reddit.length > 0 || article) ? 'flex-start' : 'center',
       padding: '20px',
-      paddingLeft: isMobile ? '20px' : '76px', // Account for left sidebar on desktop only
+      paddingLeft: '76px', // Account for left sidebar (56px + 20px)
       paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
-        (isMobile ? '70px' : '80px') : (isMobile ? '60px' : '20px'),
+        (window.innerWidth <= 768 ? '100px' : '80px') : '20px',
       position: 'relative',
       backgroundColor: baseColors.bg,
       color: baseColors.text
@@ -372,18 +357,18 @@ export default function App() {
       textAlign: 'center'
     },
       title: {
-      fontSize: isMobile ? '32px' : '48px',
+      fontSize: '48px',
       fontWeight: 'normal',
-      marginBottom: isMobile ? '12px' : '20px',
+      marginBottom: '20px',
       color: baseColors.text,
       fontFamily: 'Georgia, serif',
       cursor: 'pointer',
       transition: 'opacity 0.2s ease'
     },
       subtitle: {
-      fontSize: isMobile ? '14px' : '16px',
+      fontSize: '16px',
       color: baseColors.textSecondary,
-      marginBottom: '0px',
+      marginBottom: '50px',
       fontStyle: 'italic',
       fontFamily: 'Georgia, serif'
     },
@@ -477,10 +462,10 @@ export default function App() {
     },
       sidebar: {
       position: 'fixed',
-      top: isMobile ? '50px' : 0,
-      left: isMobile ? 0 : '56px',
-      height: isMobile ? 'calc(100vh - 50px)' : '100vh',
-      width: isMobile ? '280px' : '320px',
+      top: 0,
+      left: '56px',
+      height: '100vh',
+      width: '320px',
       backgroundColor: baseColors.bg,
       borderRight: `1px solid ${baseColors.border}`,
       transform: 'translateX(-100%)',
@@ -535,10 +520,10 @@ export default function App() {
     },
       overlay: {
       position: 'fixed',
-      top: isMobile ? '50px' : 0,
-      left: isMobile ? 0 : '56px',
-      width: isMobile ? '100vw' : 'calc(100vw - 56px)',
-      height: isMobile ? 'calc(100vh - 50px)' : '100vh',
+      top: 0,
+      left: '56px',
+      width: 'calc(100vw - 56px)',
+      height: '100vh',
       backgroundColor: 'rgba(0, 0, 0, 0.3)',
       zIndex: 999
     },
@@ -717,10 +702,10 @@ export default function App() {
       {showCollectionsPage && (
         <div style={{
           position: 'fixed',
-          top: isMobile ? '50px' : 0,
-          left: isMobile ? 0 : '56px',
-          width: isMobile ? '100vw' : 'calc(100vw - 56px)',
-          height: isMobile ? 'calc(100vh - 50px)' : '100vh',
+          top: 0,
+          left: '56px',
+          width: 'calc(100vw - 56px)',
+          height: '100vh',
           backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
           zIndex: 1000,
           overflowY: 'auto',
@@ -883,8 +868,7 @@ export default function App() {
                           backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                           borderRadius: '8px',
                           border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                          transition: 'all 0.2s ease',
-                          position: 'relative'
+                          transition: 'all 0.2s ease'
                         }}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.borderColor = darkMode ? '#444' : '#bbb';
@@ -893,7 +877,7 @@ export default function App() {
                           e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
                         }}
                       >
-                        {article.curators_pick && (
+                        {article.recommended && (
                           <div style={{
                             display: 'inline-block',
                             backgroundColor: darkMode ? '#2d4a3e' : '#e8f5e9',
@@ -1055,383 +1039,178 @@ export default function App() {
         </div>
       )}
       
-      {/* Mobile Header with Burger Menu */}
-      {isMobile && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '50px',
-          backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
-          borderBottom: `1px solid ${darkMode ? '#222' : '#333'}`,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 16px',
-          zIndex: 1001
-        }}>
-          {/* Burger Menu Button */}
-          <div 
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px'
-            }}
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              {mobileMenuOpen ? (
-                <>
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </>
-              ) : (
-                <>
-                  <line x1="3" y1="12" x2="21" y2="12"></line>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <line x1="3" y1="18" x2="21" y2="18"></line>
-                </>
-              )}
-            </svg>
-          </div>
-          
-          {/* Dark Mode Toggle */}
-          <div 
-            onClick={toggleDarkMode}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px'
-            }}
-          >
-            {darkMode ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
-            )}
-          </div>
+      {/* Left Icon Sidebar */}
+      <div style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        height: '100vh',
+        width: '56px',
+        backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
+        borderRight: `1px solid ${darkMode ? '#222' : '#333'}`,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingTop: '16px',
+        zIndex: 1001,
+        gap: '4px'
+      }}>
+        {/* Search Icon */}
+        <div 
+          onClick={() => {
+            // Close any open views first
+            setSidebarOpen(false);
+            setShowCollectionsPage(false);
+            setSelectedCollection(null);
+            setCollectionArticles([]);
+            // Scroll to top and focus search input
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(() => {
+              document.querySelector('input[type="text"]')?.focus();
+            }, 100);
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Search"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
         </div>
-      )}
 
-      {/* Mobile Menu Dropdown */}
-      {isMobile && mobileMenuOpen && (
-        <>
-          <div 
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(0,0,0,0.5)',
-              zIndex: 1000
-            }}
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div style={{
-            position: 'fixed',
-            top: '50px',
-            left: 0,
-            right: 0,
-            backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
-            borderBottom: `1px solid ${darkMode ? '#222' : '#333'}`,
-            zIndex: 1002,
-            padding: '8px 0'
-          }}>
-            {/* Search */}
-            <div 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setSidebarOpen(false);
-                setShowCollectionsPage(false);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-                setTimeout(() => {
-                  document.querySelector('input[type="text"]')?.focus();
-                }, 100);
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 20px',
-                cursor: 'pointer',
-                color: '#888',
-                fontSize: '14px',
-                fontFamily: 'Arial, sans-serif'
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="M21 21l-4.35-4.35"></path>
-              </svg>
-              Search
-            </div>
-            
-            {/* History */}
-            <div 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setShowCollectionsPage(false);
-                setSidebarOpen(true);
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 20px',
-                cursor: 'pointer',
-                color: '#888',
-                fontSize: '14px',
-                fontFamily: 'Arial, sans-serif'
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                <path d="M3 3v5h5"></path>
-                <path d="M12 7v5l4 2"></path>
-              </svg>
-              History
-            </div>
-            
-            {/* Collections */}
-            <div 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                setSidebarOpen(false);
-                setShowCollectionsPage(true);
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 20px',
-                cursor: 'pointer',
-                color: '#888',
-                fontSize: '14px',
-                fontFamily: 'Arial, sans-serif'
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-              </svg>
-              Collections
-            </div>
-            
-            {/* GitHub */}
-            <div 
-              onClick={() => {
-                setMobileMenuOpen(false);
-                window.open('https://github.com/mmazco/media-reaction-finder', '_blank');
-              }}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '12px 20px',
-                cursor: 'pointer',
-                color: '#888',
-                fontSize: '14px',
-                fontFamily: 'Arial, sans-serif'
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="#888">
-                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-              </svg>
-              GitHub
-            </div>
-          </div>
-        </>
-      )}
+        {/* History Icon (Clock with counterclockwise arrow) */}
+        <div 
+          onClick={() => {
+            // Close collections page if open
+            setShowCollectionsPage(false);
+            setSelectedCollection(null);
+            setCollectionArticles([]);
+            // Toggle history sidebar
+            setSidebarOpen(!sidebarOpen);
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Search History"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+            <path d="M12 7v5l4 2"></path>
+          </svg>
+        </div>
 
-      {/* Left Icon Sidebar - Desktop Only */}
-      {!isMobile && (
-        <div style={{
-          position: 'fixed',
-          left: 0,
-          top: 0,
-          height: '100vh',
-          width: '56px',
-          backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
-          borderRight: `1px solid ${darkMode ? '#222' : '#333'}`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          paddingTop: '16px',
-          zIndex: 1001,
-          gap: '4px'
-        }}>
-          {/* Search Icon */}
-          <div 
-            onClick={() => {
-              setSidebarOpen(false);
+        {/* Bookmark/Collections Icon */}
+        <div 
+          onClick={() => {
+            // Close history sidebar if open
+            setSidebarOpen(false);
+            // Toggle collections page
+            if (showCollectionsPage) {
               setShowCollectionsPage(false);
               setSelectedCollection(null);
               setCollectionArticles([]);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-              setTimeout(() => {
-                document.querySelector('input[type="text"]')?.focus();
-              }, 100);
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title="Search"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="11" cy="11" r="8"></circle>
-              <path d="M21 21l-4.35-4.35"></path>
-            </svg>
-          </div>
-
-          {/* History Icon */}
-          <div 
-            onClick={() => {
-              setShowCollectionsPage(false);
-              setSelectedCollection(null);
-              setCollectionArticles([]);
-              setSidebarOpen(!sidebarOpen);
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title="Search History"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-              <path d="M3 3v5h5"></path>
-              <path d="M12 7v5l4 2"></path>
-            </svg>
-          </div>
-
-          {/* Bookmark/Collections Icon */}
-          <div 
-            onClick={() => {
-              setSidebarOpen(false);
-              if (showCollectionsPage) {
-                setShowCollectionsPage(false);
-                setSelectedCollection(null);
-                setCollectionArticles([]);
-              } else {
-                setShowCollectionsPage(true);
-              }
-            }}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title="Collections"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </div>
-
-          {/* Dark Mode Icon */}
-          <div 
-            onClick={toggleDarkMode}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title={darkMode ? "Light Mode" : "Dark Mode"}
-          >
-            {darkMode ? (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="5"></circle>
-                <line x1="12" y1="1" x2="12" y2="3"></line>
-                <line x1="12" y1="21" x2="12" y2="23"></line>
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                <line x1="1" y1="12" x2="3" y2="12"></line>
-                <line x1="21" y1="12" x2="23" y2="12"></line>
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-              </svg>
-            ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-              </svg>
-            )}
-          </div>
-
-          {/* GitHub Icon */}
-          <div 
-            onClick={() => window.open('https://github.com/mmazco/media-reaction-finder', '_blank')}
-            style={{
-              width: '40px',
-              height: '40px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: 'pointer',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s ease'
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-            title="GitHub"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#888">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-          </div>
+            } else {
+              setShowCollectionsPage(true);
+            }
+          }}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="Collections"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
         </div>
-      )}
+
+        {/* Dark Mode Icon */}
+        <div 
+          onClick={toggleDarkMode}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title={darkMode ? "Light Mode" : "Dark Mode"}
+        >
+          {darkMode ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          )}
+        </div>
+
+        {/* GitHub Icon */}
+        <div 
+          onClick={() => window.open('https://github.com/mmazco/media-reaction-finder', '_blank')}
+          style={{
+            width: '40px',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            borderRadius: '8px',
+            transition: 'background-color 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+          title="GitHub"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#888">
+            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+          </svg>
+        </div>
+      </div>
       
       <div style={styles.content}>
         <h1 
@@ -1447,44 +1226,44 @@ export default function App() {
         </h1>
         <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
         
-        {/* Compact Previous Searches Section - Above search form */}
+        {/* Search Examples Section */}
         {!loading && !article && news.length === 0 && reddit.length === 0 && (
           <div style={{
-            marginTop: isMobile ? '25px' : '40px',
-            marginBottom: isMobile ? '25px' : '40px',
+            marginBottom: '40px',
+            marginTop: '40px',
             width: '100%',
-            maxWidth: '700px',
-            textAlign: 'center'
+            maxWidth: '700px'
           }}>
             <div style={{
               fontSize: '11px',
               color: darkMode ? '#666' : '#999',
-              marginBottom: '12px',
+              marginBottom: '16px',
               fontWeight: '600',
               letterSpacing: '1px',
+              textAlign: 'center',
               textTransform: 'uppercase'
             }}>
-              Search examples
+              Search Examples
             </div>
             <div style={{
               display: 'flex',
-              gap: '10px',
+              gap: '12px',
               flexWrap: 'wrap',
               justifyContent: 'center'
             }}>
-              {/* Example 1 */}
+              {/* Example 1: News */}
               <div
                 onClick={() => {
-                  const exampleUrl = 'https://www.theguardian.com/technology/2025/jul/21/openai-signs-deal-with-uk-to-find-government-uses-for-its-models';
+                  const exampleUrl = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion';
                   setQuery(exampleUrl);
                   updateURL(exampleUrl);
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  padding: '10px 14px',
+                  padding: '14px 20px',
                   backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                   border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
@@ -1499,22 +1278,24 @@ export default function App() {
                 }}
               >
                 <div style={{
-                  fontSize: '13px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '2px'
+                  marginBottom: '4px',
+                  fontFamily: 'Georgia, serif'
                 }}>
-                  OpenAI UK Deal
+                  Faith in Silicon Valley
                 </div>
                 <div style={{
-                  fontSize: '11px',
-                  color: darkMode ? '#888' : '#666'
+                  fontSize: '13px',
+                  color: darkMode ? '#888' : '#666',
+                  fontFamily: 'Arial, sans-serif'
                 }}>
-                  The Guardian
+                  Vanity Fair
                 </div>
               </div>
 
-              {/* Example 2 */}
+              {/* Example 2: Blog */}
               <div
                 onClick={() => {
                   const exampleUrl = 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth';
@@ -1523,10 +1304,10 @@ export default function App() {
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  padding: '10px 14px',
+                  padding: '14px 20px',
                   backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                   border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
@@ -1541,22 +1322,24 @@ export default function App() {
                 }}
               >
                 <div style={{
-                  fontSize: '13px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '2px'
+                  marginBottom: '4px',
+                  fontFamily: 'Georgia, serif'
                 }}>
                   Blind Model & Earth
                 </div>
                 <div style={{
-                  fontSize: '11px',
-                  color: darkMode ? '#888' : '#666'
+                  fontSize: '13px',
+                  color: darkMode ? '#888' : '#666',
+                  fontFamily: 'Arial, sans-serif'
                 }}>
                   Substack
                 </div>
               </div>
 
-              {/* Example 3 */}
+              {/* Example 3: Essay */}
               <div
                 onClick={() => {
                   const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
@@ -1565,10 +1348,10 @@ export default function App() {
                   performSearch(exampleUrl);
                 }}
                 style={{
-                  padding: '10px 14px',
+                  padding: '14px 20px',
                   backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                   border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '6px',
+                  borderRadius: '12px',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   textAlign: 'left'
@@ -1583,16 +1366,18 @@ export default function App() {
                 }}
               >
                 <div style={{
-                  fontSize: '13px',
-                  fontWeight: '600',
+                  fontSize: '15px',
+                  fontWeight: '700',
                   color: darkMode ? '#fff' : '#000',
-                  marginBottom: '2px'
+                  marginBottom: '4px',
+                  fontFamily: 'Georgia, serif'
                 }}>
                   Machines of Loving Grace
                 </div>
                 <div style={{
-                  fontSize: '11px',
-                  color: darkMode ? '#888' : '#666'
+                  fontSize: '13px',
+                  color: darkMode ? '#888' : '#666',
+                  fontFamily: 'Arial, sans-serif'
                 }}>
                   Dario Amodei
                 </div>
@@ -1600,8 +1385,7 @@ export default function App() {
             </div>
           </div>
         )}
-
-        {/* Search Form */}
+        
         <div style={styles.form}>
           <label style={styles.label}>Insert URL or Topic</label>
           <input
