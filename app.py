@@ -18,6 +18,39 @@ load_dotenv()
 # Set up Flask with static file serving for production
 app = Flask(__name__, static_folder='.', static_url_path='')
 
+def seed_collections_on_startup():
+    """Seed collections if they don't exist (for fresh deployments)"""
+    try:
+        logger = SearchLogger()
+        existing = logger.get_all_collections()
+        
+        # Only seed if no collections exist
+        if len(existing) == 0:
+            print("🌱 Seeding collections for fresh deployment...")
+            
+            # Create collections
+            collections = [
+                ('palestine', 'Palestine', '', "Coverage on Israel's genocide in Gaza and embracing Palestinian culture"),
+                ('culture', 'Culture', '', 'Arts, music, and cultural commentary'),
+                ('ai', 'AI', '', 'Artificial intelligence news and developments'),
+                ('internet', 'Internet', '', 'Digital culture and online trends'),
+                ('politics', 'Politics', '', 'Political news and analysis'),
+            ]
+            
+            for tag, display_name, icon, description in collections:
+                if not logger.get_collection_by_tag(tag):
+                    logger.create_collection(tag, display_name, icon, description)
+                    print(f"  ✅ Created '{display_name}' collection")
+            
+            print("🌱 Collections seeded successfully!")
+        else:
+            print(f"📚 Found {len(existing)} existing collections")
+    except Exception as e:
+        print(f"⚠️ Error seeding collections: {e}")
+
+# Seed collections on startup
+seed_collections_on_startup()
+
 # Enable CORS - more permissive in production
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
     # Production: allow all origins
