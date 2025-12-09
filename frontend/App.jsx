@@ -756,7 +756,9 @@ export default function App() {
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-                  gap: '16px'
+                  gap: '16px',
+                  position: 'relative',
+                  zIndex: 1
                 }}>
                   {['palestine', 'culture', 'ai', 'internet', 'politics']
                     .map(tag => collections.find(c => c.tag.toLowerCase() === tag))
@@ -764,14 +766,19 @@ export default function App() {
                     .map((collection) => (
                     <div
                       key={collection.id}
-                      onClick={() => fetchCollectionArticles(collection.tag)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fetchCollectionArticles(collection.tag);
+                      }}
                       style={{
                         padding: '24px',
                         backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                         borderRadius: '8px',
                         border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
                         cursor: 'pointer',
-                        transition: 'all 0.2s ease'
+                        transition: 'all 0.2s ease',
+                        position: 'relative',
+                        zIndex: 1
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-2px)';
