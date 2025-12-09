@@ -42,7 +42,43 @@ def seed_collections_on_startup():
                     logger.create_collection(tag, display_name, icon, description)
                     print(f"  ✅ Created '{display_name}' collection")
             
-            print("🌱 Collections seeded successfully!")
+            # Add sample articles to collections
+            sample_articles = {
+                'palestine': [
+                    ('The eugenist history of the Zionist movement', 'https://palestinenexus.com/articles/eugenicism', 'Palestine Nexus', None, None, 'From the late 19th century through the 1950s, Zionist leaders adopted a selective immigration policy.', True),
+                    ('Portrait of a Campus in Crisis', 'https://jewishcurrents.org/portrait-of-a-campus-in-crisis', 'Jewish Currents', None, None, 'An examination of campus dynamics amid the Israel-Palestine conflict.', True),
+                    ('There Is No Peace in Gaza', 'https://www.newyorker.com/news/essay/there-is-no-peace-in-gaza', 'The New Yorker', None, None, 'An essay examining the ongoing conflict and humanitarian situation in Gaza.', False),
+                ],
+                'ai': [
+                    ('AI 2027: Predictions and Trajectories', 'https://ai-2027.com/', 'AI 2027', None, None, 'Forecasting the development and impact of AI through 2027.', True),
+                    ('Amanda Askell Publications', 'https://askell.io/publications/', 'Askell.io', 'Amanda Askell', None, 'Research publications on AI alignment, ethics, and language models.', True),
+                    ('Claude Character Research', 'https://www.anthropic.com/research/claude-character', 'Anthropic', None, None, "Anthropic's research on developing Claude's character and values.", False),
+                ],
+                'culture': [
+                    ('Models.com Feature', 'https://models.com/oftheminute/?p=168720', 'Models.com', None, None, 'Fashion and modeling industry spotlight and cultural commentary.', True),
+                    ("Christianity in Silicon Valley", 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion', 'Vanity Fair', None, None, 'Examining the rise of Christianity in Silicon Valley tech culture.', False),
+                ],
+                'politics': [
+                    ('Building a Prosocial Media Ecosystem', 'https://www.noemamag.com/building-a-prosocial-media-ecosystem/', 'Noema Magazine', None, None, 'Exploring how to create media platforms that promote positive social outcomes.', True),
+                ],
+                'internet': [
+                    ('Internet Archive Reaches Trillion', 'https://blog.archive.org/trillion', 'Internet Archive', None, None, 'The Internet Archive celebrates a major milestone in preserving digital history.', False),
+                ],
+            }
+            
+            for tag, articles in sample_articles.items():
+                for title, url, source, authors, date, summary, recommended in articles:
+                    logger.add_article_to_collection(tag, title, url, source, authors, date, summary)
+                    if recommended:
+                        # Mark as recommended
+                        import sqlite3
+                        conn = sqlite3.connect(logger.db_path)
+                        cursor = conn.cursor()
+                        cursor.execute('UPDATE curated_articles SET recommended = 1 WHERE url = ?', (url,))
+                        conn.commit()
+                        conn.close()
+            
+            print("🌱 Collections and articles seeded successfully!")
         else:
             print(f"📚 Found {len(existing)} existing collections")
     except Exception as e:
