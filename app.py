@@ -18,6 +18,32 @@ load_dotenv()
 # Set up Flask with static file serving for production
 app = Flask(__name__, static_folder='.', static_url_path='')
 
+def update_recommended_articles():
+    """Update recommended flags on existing articles (runs every startup)"""
+    import sqlite3
+    try:
+        logger = SearchLogger()
+        recommended_urls = [
+            'https://palestinenexus.com/articles/eugenicism',
+            'https://jewishcurrents.org/portrait-of-a-campus-in-crisis',
+            'https://substack.com/home/post/p-166396887',
+            'https://ai-2027.com/',
+            'https://askell.io/publications/',
+            'https://ii.inc/web/blog/post/tle',
+            'https://models.com/oftheminute/?p=168720',
+            'https://substack.com/@trishestalks/p-176272631',
+            'https://www.noemamag.com/building-a-prosocial-media-ecosystem/',
+        ]
+        conn = sqlite3.connect(logger.db_path)
+        cursor = conn.cursor()
+        for url in recommended_urls:
+            cursor.execute('UPDATE curated_articles SET recommended = 1 WHERE url = ?', (url,))
+        conn.commit()
+        conn.close()
+        print("⭐ Updated recommended articles")
+    except Exception as e:
+        print(f"⚠️ Error updating recommended: {e}")
+
 def seed_collections_on_startup():
     """Seed collections if they don't exist (for fresh deployments)"""
     try:
@@ -95,6 +121,7 @@ def seed_collections_on_startup():
 
 # Seed collections on startup
 seed_collections_on_startup()
+update_recommended_articles()
 
 # Enable CORS - more permissive in production
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):

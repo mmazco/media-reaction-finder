@@ -624,7 +624,7 @@ export default function App() {
           searchHistory.map((item) => (
             <div
               key={item.id}
-              style={{
+            style={{
                 ...styles.historyItem,
                 position: 'relative'
               }}
@@ -658,16 +658,16 @@ export default function App() {
                 <div style={styles.historySource}>{item.source}</div>
                 <div style={styles.historyDate}>{item.date}</div>
               </div>
-              <button
+          <button
                 onClick={(e) => deleteHistoryItem(item.id, e)}
-                style={{
+            style={{
                   position: 'absolute',
                   top: '10px',
                   right: '10px',
                   background: 'transparent',
-                  border: 'none',
+              border: 'none',
                   color: darkMode ? '#666' : '#999',
-                  cursor: 'pointer',
+              cursor: 'pointer',
                   fontSize: '18px',
                   padding: '5px',
                   width: '25px',
@@ -688,7 +688,7 @@ export default function App() {
                 }}
               >
                 ×
-              </button>
+          </button>
             </div>
           ))
         ) : (
@@ -696,7 +696,7 @@ export default function App() {
             No search history yet
           </div>
         )}
-      </div>
+        </div>
 
       {/* Collections Page Overlay */}
       {showCollectionsPage && (
@@ -744,16 +744,6 @@ export default function App() {
             {!selectedCollection ? (
               /* Collections List */
               <>
-                <p style={{
-                  color: darkMode ? '#999' : '#666',
-                  fontSize: '15px',
-                  marginBottom: '30px',
-                  fontStyle: 'italic',
-                  fontFamily: 'Georgia, serif',
-                  textAlign: 'center'
-                }}>
-                  Curated articles on topics that matter
-                </p>
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -765,13 +755,13 @@ export default function App() {
                     .map(tag => collections.find(c => c.tag.toLowerCase() === tag))
                     .filter(Boolean)
                     .map((collection) => (
-                    <div
-                      key={collection.id}
+                <div
+                  key={collection.id}
                       onClick={(e) => {
                         e.stopPropagation();
                         fetchCollectionArticles(collection.tag);
                       }}
-                      style={{
+                  style={{
                         padding: '24px',
                         backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                         borderRadius: '8px',
@@ -802,7 +792,7 @@ export default function App() {
                         fontFamily: 'Arial, sans-serif'
                       }}>
                         {collection.display_name}
-                      </div>
+                    </div>
                       <div style={{
                         fontSize: '13px',
                         color: darkMode ? '#999' : '#666',
@@ -810,7 +800,7 @@ export default function App() {
                         fontStyle: 'italic'
                       }}>
                         {collection.description}
-                      </div>
+                  </div>
                       <div style={{
                         fontSize: '12px',
                         color: darkMode ? '#666' : '#999',
@@ -823,54 +813,54 @@ export default function App() {
                           <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
                         {collection.article_count} article{collection.article_count !== 1 ? 's' : ''}
-                      </div>
-                    </div>
+                </div>
+              </div>
                   ))}
                 </div>
               </>
             ) : (
               /* Articles in Collection */
-              <>
-                <button
-                  onClick={() => {
-                    setSelectedCollection(null);
-                    setCollectionArticles([]);
-                  }}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    color: darkMode ? '#999' : '#666',
-                    cursor: 'pointer',
-                    fontSize: '13px',
+          <>
+            <button
+              onClick={() => {
+                setSelectedCollection(null);
+                setCollectionArticles([]);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: darkMode ? '#999' : '#666',
+                cursor: 'pointer',
+                fontSize: '13px',
                     marginBottom: '20px',
                     padding: '0',
-                    display: 'flex',
-                    alignItems: 'center',
+                display: 'flex',
+                alignItems: 'center',
                     gap: '6px'
-                  }}
-                >
+              }}
+            >
                   ← All Collections
-                </button>
-                {selectedCollection.description && (
+            </button>
+            {selectedCollection.description && (
                   <p style={{
-                    color: darkMode ? '#999' : '#666',
+                color: darkMode ? '#999' : '#666',
                     fontSize: '15px',
                     marginBottom: '25px',
                     fontStyle: 'italic',
                     fontFamily: 'Georgia, serif'
-                  }}>
-                    {selectedCollection.description}
+              }}>
+                {selectedCollection.description}
                   </p>
-                )}
+            )}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '16px'
                 }}>
-                  {collectionArticles.length > 0 ? (
-                    collectionArticles.map((article) => (
-                      <div
-                        key={article.id}
+            {collectionArticles.length > 0 ? (
+              collectionArticles.map((article) => (
+                <div
+                  key={article.id}
                         style={{
                           padding: '20px 24px',
                           backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
@@ -971,14 +961,14 @@ export default function App() {
                           flexWrap: 'wrap'
                         }}>
                           <button
-                            onClick={() => {
-                              setQuery(article.url);
+                    onClick={() => {
+                      setQuery(article.url);
                               setShowCollectionsPage(false);
                               setSelectedCollection(null);
                               setCollectionArticles([]);
-                              updateURL(article.url);
-                              performSearch(article.url);
-                            }}
+                      updateURL(article.url);
+                      performSearch(article.url);
+                    }}
                             style={{
                               padding: '10px 20px',
                               fontSize: '12px',
@@ -1005,7 +995,7 @@ export default function App() {
                             onClick={() => window.open(article.url, '_blank')}
                             style={{
                               padding: '10px 20px',
-                              fontSize: '12px',
+                        fontSize: '12px',
                               fontWeight: '600',
                               letterSpacing: '0.5px',
                               backgroundColor: 'transparent',
@@ -1027,19 +1017,19 @@ export default function App() {
                           >
                             VIEW ORIGINAL
                           </button>
-                        </div>
-                      </div>
-                    ))
-                  ) : (
+                  </div>
+                </div>
+              ))
+            ) : (
                     <div style={{
                       padding: '40px',
                       textAlign: 'center',
                       color: darkMode ? '#666' : '#888',
                       fontStyle: 'italic'
                     }}>
-                      No articles in this collection yet
-                    </div>
-                  )}
+                No articles in this collection yet
+              </div>
+            )}
                 </div>
               </>
             )}
@@ -1077,7 +1067,7 @@ export default function App() {
               document.querySelector('input[type="text"]')?.focus();
             }, 100);
           }}
-          style={{
+                  style={{
             width: '40px',
             height: '40px',
             display: 'flex',
@@ -1138,7 +1128,7 @@ export default function App() {
               setShowCollectionsPage(false);
               setSelectedCollection(null);
               setCollectionArticles([]);
-            } else {
+                      } else {
               setShowCollectionsPage(true);
             }
           }}
@@ -1159,17 +1149,17 @@ export default function App() {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
           </svg>
-        </div>
+                  </div>
 
         {/* Dark Mode Icon */}
         <div 
           onClick={toggleDarkMode}
-          style={{
+                    style={{
             width: '40px',
             height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
             cursor: 'pointer',
             borderRadius: '8px',
             transition: 'background-color 0.2s ease'
@@ -1194,9 +1184,9 @@ export default function App() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
-          )}
-        </div>
-
+        )}
+      </div>
+      
         {/* GitHub Icon */}
         <div 
           onClick={() => window.open('https://github.com/mmazco/media-reaction-finder', '_blank')}
