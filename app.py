@@ -43,20 +43,29 @@ def seed_collections_on_startup():
                     print(f"  ✅ Created '{display_name}' collection")
             
             # Add sample articles to collections
+            # Format: (title, url, source, authors, date, summary, recommended)
             sample_articles = {
                 'palestine': [
                     ('The eugenist history of the Zionist movement', 'https://palestinenexus.com/articles/eugenicism', 'Palestine Nexus', None, None, 'From the late 19th century through the 1950s, Zionist leaders adopted a selective immigration policy.', True),
                     ('Portrait of a Campus in Crisis', 'https://jewishcurrents.org/portrait-of-a-campus-in-crisis', 'Jewish Currents', None, None, 'An examination of campus dynamics amid the Israel-Palestine conflict.', True),
+                    ('Palestinians Are on Their Own', 'https://substack.com/home/post/p-166396887', 'Substack', None, None, 'Analysis of the current political situation facing Palestinians.', True),
                     ('There Is No Peace in Gaza', 'https://www.newyorker.com/news/essay/there-is-no-peace-in-gaza', 'The New Yorker', None, None, 'An essay examining the ongoing conflict and humanitarian situation in Gaza.', False),
+                    ('Israel\'s Genocide Continues Unabated', 'https://www.amnesty.org/en/latest/news/2025/11/israels-genocide-against-palestinians-in-gaza-continues-unabated-despite-ceasefire/', 'Amnesty International', None, None, 'Amnesty International reports on ongoing violations despite ceasefire.', False),
+                    ('The Israel Lobby Is Melting Down', 'https://mondoweiss.net/2025/12/the-israel-lobby-is-melting-down-before-our-eyes/', 'Mondoweiss', None, None, 'Analysis of shifting political dynamics around Israel advocacy.', False),
+                    ('Politics of Counting Gaza\'s Dead', 'https://arena.org.au/politics-of-counting-gazas-dead/', 'Arena', None, None, 'Examining the politics and challenges of documenting casualties in Gaza.', False),
                 ],
                 'ai': [
                     ('AI 2027: Predictions and Trajectories', 'https://ai-2027.com/', 'AI 2027', None, None, 'Forecasting the development and impact of AI through 2027.', True),
                     ('Amanda Askell Publications', 'https://askell.io/publications/', 'Askell.io', 'Amanda Askell', None, 'Research publications on AI alignment, ethics, and language models.', True),
+                    ('Transfer Learning for Efficiency', 'https://ii.inc/web/blog/post/tle', 'ii.inc', None, None, 'Technical research on transfer learning efficiency in AI systems.', True),
+                    ('How Does a Blind Model See the Earth', 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth', 'Outside Text', None, None, 'Exploring how AI models without vision understand spatial concepts.', False),
                     ('Claude Character Research', 'https://www.anthropic.com/research/claude-character', 'Anthropic', None, None, "Anthropic's research on developing Claude's character and values.", False),
+                    ('Chromaverse', 'https://dotdotdash.com/labs/chromaverse', 'dotdotdash', None, None, 'Interactive AI art and visualization project.', False),
                 ],
                 'culture': [
                     ('Models.com Feature', 'https://models.com/oftheminute/?p=168720', 'Models.com', None, None, 'Fashion and modeling industry spotlight and cultural commentary.', True),
-                    ("Christianity in Silicon Valley", 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion', 'Vanity Fair', None, None, 'Examining the rise of Christianity in Silicon Valley tech culture.', False),
+                    ('Trishes Talks', 'https://substack.com/@trishestalks/p-176272631', 'Substack', 'Trishes', None, 'Cultural commentary and discussions on current trends.', True),
+                    ('Christianity in Silicon Valley', 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion', 'Vanity Fair', None, None, 'Examining the rise of Christianity in Silicon Valley tech culture.', False),
                 ],
                 'politics': [
                     ('Building a Prosocial Media Ecosystem', 'https://www.noemamag.com/building-a-prosocial-media-ecosystem/', 'Noema Magazine', None, None, 'Exploring how to create media platforms that promote positive social outcomes.', True),
