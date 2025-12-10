@@ -94,9 +94,16 @@ class SearchLogger:
                 date TEXT,
                 summary TEXT,
                 added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                recommended INTEGER DEFAULT 0,
                 FOREIGN KEY (collection_id) REFERENCES curated_collections (id)
             )
         ''')
+        
+        # Add recommended column if it doesn't exist (migration for existing databases)
+        try:
+            cursor.execute('ALTER TABLE curated_articles ADD COLUMN recommended INTEGER DEFAULT 0')
+        except sqlite3.OperationalError:
+            pass  # Column already exists
         
         conn.commit()
         conn.close()
