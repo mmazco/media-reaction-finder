@@ -738,7 +738,8 @@ export default function App() {
           <div style={{
             maxWidth: '900px',
             margin: '0 auto',
-            padding: '30px 20px'
+            padding: '30px 20px',
+            position: 'relative'
           }}>
             {!selectedCollection ? (
               /* Collections List */
