@@ -269,6 +269,34 @@ def extract_article_metadata(url):
         content = re.sub(r'\s+', ' ', content).strip()
         content = content[:5000]  # Limit for API processing
         
+        # Check if content extraction likely failed due to bot detection
+        # (status 200 but empty or very minimal content)
+        if len(content) < 200:
+            parsed_url = urlparse(url)
+            domain = parsed_url.netloc.replace('www.', '')
+            
+            # Known premium publishers that often block cloud IPs
+            premium_publishers = ['vanityfair.com', 'wired.com', 'newyorker.com', 'nytimes.com', 
+                                  'wsj.com', 'bloomberg.com', 'ft.com', 'economist.com', 
+                                  'washingtonpost.com', 'theathletic.com']
+            
+            is_premium = any(pub in domain for pub in premium_publishers)
+            
+            if is_premium:
+                print(f"⚠️  Premium publisher detected ({domain}) - content extraction limited")
+                error_msg = f"This article from {domain} may require a subscription or is blocking automated access. The title and reactions are still available."
+            else:
+                error_msg = "Article content could not be fully extracted. This may be due to paywall, JavaScript rendering, or access restrictions."
+            
+            return {
+                'title': title or 'Article',
+                'source': source or domain or 'Unknown Source',
+                'date': date_published or 'Date not available',
+                'content': content,  # Keep whatever we got
+                'url': url,
+                'error': error_msg
+            }
+        
         return {
             'title': title or 'Article',
             'source': source or 'Unknown Source',
@@ -350,6 +378,32 @@ def check_cached_reactions():
     except Exception as e:
         print(f"Error checking cached search: {e}")
         return jsonify({'cached': False, 'results': None})
+
+@app.route('/api/reactions/clear-cache', methods=['POST'])
+def clear_search_cache():
+    """
+    Clear cached search results for a specific query.
+    Useful when a scrape fails and you want to retry.
+    """
+    try:
+        data = request.get_json()
+        query = data.get('query', '')
+        
+        if not query:
+            return jsonify({'error': 'Query is required'}), 400
+        
+        logger = SearchLogger()
+        cleared = logger.clear_search_cache(query)
+        
+        if cleared:
+            print(f"✅ Cache cleared for: {query[:50]}...")
+            return jsonify({'success': True, 'message': 'Cache cleared successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'No cache found for this query'})
+            
+    except Exception as e:
+        print(f"Error clearing cache: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/reactions', methods=['POST'])
 def get_reactions():

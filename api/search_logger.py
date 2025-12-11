@@ -709,3 +709,25 @@ class SearchLogger:
         conn.close()
         
         return True
+    
+    def clear_search_cache(self, query):
+        """Clear cached search results for a specific query/URL"""
+        import hashlib
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        # Delete from cached_searches
+        cursor.execute('DELETE FROM cached_searches WHERE query_hash = ?', (query_hash,))
+        deleted_searches = cursor.rowcount
+        
+        # Also delete from cached_commentary if exists
+        cursor.execute('DELETE FROM cached_commentary WHERE query_hash = ?', (query_hash,))
+        deleted_commentary = cursor.rowcount
+        
+        conn.commit()
+        conn.close()
+        
+        print(f"🗑️ Cleared cache for query: {query[:50]}... (searches: {deleted_searches}, commentary: {deleted_commentary})")
+        return deleted_searches + deleted_commentary > 0
