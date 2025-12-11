@@ -134,3 +134,4 @@ See the Analytics Features section above for analytics-specific endpoints.
 ## License
 
 MIT License
+# X (Twitter) icon added to sidebar
