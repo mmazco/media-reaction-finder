@@ -1566,8 +1566,21 @@ export default function App() {
               fontStyle: 'italic',
               fontFamily: 'Georgia, serif'
             }}>
-              Generate an AI audio analysis of the discourse around this content - what people are saying, key themes, and broader implications.
+              Generate an audio analysis of your content - what people are saying, key themes, and broader implications.
             </p>
+            
+            {/* Disclaimer */}
+            <div style={{
+              fontSize: '11px',
+              color: darkMode ? '#666' : '#999',
+              marginBottom: '15px',
+              padding: '8px 12px',
+              backgroundColor: darkMode ? '#111' : '#f0f0f0',
+              borderRadius: '4px',
+              borderLeft: `3px solid ${darkMode ? '#444' : '#ccc'}`
+            }}>
+              ⚠️ AI-generated analysis may contain inaccuracies. Please verify any specific claims or attributions.
+            </div>
             
             {!metaAudio && !metaLoading && !metaText && (
               <button

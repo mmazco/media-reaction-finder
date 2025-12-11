@@ -70,14 +70,20 @@ REDDIT DISCUSSIONS:
 {reddit_context}
 
 Generate a 150-200 word meta-commentary that:
-1. Briefly introduces what the article is about (1-2 sentences)
+1. Briefly introduces what the article is about (1-2 sentences) - USE ONLY the title and information provided above
 2. Synthesizes how people are reacting online - what themes emerge from the discussions?
 3. Identifies any notable tensions, agreements, or surprising takes
 4. Concludes with the broader implications or what this discourse reveals
 
-Write in a conversational, podcast-style tone suitable for audio. Use natural spoken language.
-Do NOT use bullet points, headers, or markdown formatting.
-Do NOT start with "This article..." - be more engaging.
+IMPORTANT RULES:
+- ONLY use names, facts, and details that are explicitly provided in the context above
+- If the author's name appears in the title, use that exact name
+- Do NOT invent or guess names, titles, or affiliations
+- If you're unsure about a detail, describe it generally rather than guessing
+- Write in a conversational, podcast-style tone suitable for audio
+- Use natural spoken language
+- Do NOT use bullet points, headers, or markdown formatting
+- Do NOT start with "This article..." - be more engaging
 
 The commentary should feel like a brief but insightful audio briefing someone would listen to."""
 
@@ -85,11 +91,11 @@ The commentary should feel like a brief but insightful audio briefing someone wo
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a thoughtful media analyst who synthesizes article content and online discourse into engaging audio commentaries."},
+                {"role": "system", "content": "You are a careful and accurate media analyst who synthesizes article content and online discourse into engaging audio commentaries. You ONLY state facts that are explicitly provided in the context - never invent names, titles, or affiliations. If unsure, use general descriptions instead of guessing."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=400,
-            temperature=0.7
+            temperature=0.5  # Lower temperature for more factual output
         )
         
         commentary = response.choices[0].message.content
