@@ -1587,14 +1587,7 @@ export default function App() {
             {article && article.summary && (
               <div style={{
                 ...styles.summaryText,
-                ...(article.error ? {
-                  color: darkMode ? '#ff9999' : '#cc0000',
-                  fontStyle: 'italic',
-                  padding: '10px',
-                  backgroundColor: darkMode ? '#2a1a1a' : '#fff5f5',
-                  border: `1px solid ${darkMode ? '#4a2a2a' : '#ffcccc'}`,
-                  borderRadius: '4px'
-                } : {})
+                color: darkMode ? '#999' : '#666'
               }}>
                 {article.summary}
               </div>
