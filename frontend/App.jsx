@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+// v2.1.0 - Simplified error message styling
 
 export default function App() {
   const navigate = useNavigate();
