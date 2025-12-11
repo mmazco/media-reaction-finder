@@ -322,10 +322,40 @@ def extract_article_metadata(url):
             'error': error_msg
         }
 
+@app.route('/api/reactions/check', methods=['POST'])
+def check_cached_reactions():
+    """
+    Check if cached search results exist for a query.
+    Returns cached results if available, otherwise returns null.
+    """
+    try:
+        data = request.get_json()
+        query = data.get('query', '')
+        
+        if not query:
+            return jsonify({'cached': False, 'results': None})
+        
+        logger = SearchLogger()
+        cached = logger.get_cached_search(query)
+        
+        if cached:
+            print(f"✅ Found cached search results for: {query[:50]}...")
+            return jsonify({
+                'cached': True,
+                'results': cached
+            })
+        
+        return jsonify({'cached': False, 'results': None})
+        
+    except Exception as e:
+        print(f"Error checking cached search: {e}")
+        return jsonify({'cached': False, 'results': None})
+
 @app.route('/api/reactions', methods=['POST'])
 def get_reactions():
     """
-    Main endpoint to search for news and Reddit reactions
+    Main endpoint to search for news and Reddit reactions.
+    Now with caching - checks cache first, returns cached results if available.
     """
     try:
         data = request.get_json()
@@ -333,6 +363,14 @@ def get_reactions():
         
         if not query:
             return jsonify({'error': 'No query provided'}), 400
+        
+        # Check cache first
+        logger = SearchLogger()
+        cached = logger.get_cached_search(query)
+        if cached:
+            print(f"✅ Returning cached search results for: {query[:50]}...")
+            cached['cached'] = True
+            return jsonify(cached)
         
         # Extract article metadata if URL is provided
         article_metadata = None
@@ -390,8 +428,16 @@ def get_reactions():
         response = {
             'web': news_results,  # Frontend expects 'web' key for web search results
             'reddit': reddit_results,
-            'article': article_metadata  # Include article metadata if URL was provided
+            'article': article_metadata,  # Include article metadata if URL was provided
+            'cached': False
         }
+        
+        # Cache the results for future requests
+        try:
+            logger.cache_search(query, response)
+            print(f"💾 Cached search results for: {query[:50]}...")
+        except Exception as cache_error:
+            print(f"⚠️ Failed to cache search results: {cache_error}")
         
         return jsonify(response)
         

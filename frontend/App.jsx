@@ -227,6 +227,47 @@ export default function App() {
 
   // Separate function to perform search (used by both handleSearch and URL parameter loading)
   const performSearch = async (searchQuery) => {
+    // First, check if we have cached results (for shared links)
+    try {
+      const cacheCheck = await fetch('/api/reactions/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchQuery })
+      });
+      
+      if (cacheCheck.ok) {
+        const cacheData = await cacheCheck.json();
+        if (cacheData.cached && cacheData.results) {
+          console.log('✅ Using cached search results - no loading UI needed!');
+          const data = cacheData.results;
+          
+          // Set results directly without loading state
+          const cleanNews = Array.isArray(data.web) ? data.web : [];
+          const cleanReddit = Array.isArray(data.reddit) ? data.reddit : [];
+          const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
+          
+          setNews(cleanNews);
+          setReddit(cleanReddit);
+          setArticle(cleanArticle);
+          
+          // Reset and check for cached commentary
+          setMetaAudio(null);
+          setMetaText('');
+          setMetaError(null);
+          setShowTranscript(false);
+          
+          if (cleanArticle && (cleanNews.length > 0 || cleanReddit.length > 0)) {
+            checkCachedCommentary(cleanArticle);
+          }
+          
+          return; // Early return - no need to proceed with full search
+        }
+      }
+    } catch (cacheError) {
+      console.log('Cache check failed, proceeding with full search:', cacheError);
+    }
+    
+    // Not cached - show loading UI and perform full search
     setLoading(true);
     try {
       const response = await fetch('/api/reactions', {

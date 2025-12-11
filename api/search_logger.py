@@ -118,6 +118,17 @@ class SearchLogger:
             )
         ''')
         
+        # Create cached_searches table for storing search results
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cached_searches (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                query_hash TEXT UNIQUE,
+                query TEXT,
+                results_json TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         conn.commit()
         conn.close()
     
@@ -657,6 +668,43 @@ class SearchLogger:
             (query_hash, query, text, audio_base64, mime_type)
             VALUES (?, ?, ?, ?, ?)
         ''', (query_hash, query, text, audio_base64, mime_type))
+        conn.commit()
+        conn.close()
+        
+        return True
+    
+    # ==================== SEARCH RESULTS CACHE ====================
+    
+    def get_cached_search(self, query):
+        """Get cached search results for a query/URL"""
+        import hashlib
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT results_json FROM cached_searches
+            WHERE query_hash = ?
+        ''', (query_hash,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            return json.loads(row[0])
+        return None
+    
+    def cache_search(self, query, results):
+        """Cache search results for a query/URL"""
+        import hashlib
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR REPLACE INTO cached_searches 
+            (query_hash, query, results_json)
+            VALUES (?, ?, ?)
+        ''', (query_hash, query, json.dumps(results)))
         conn.commit()
         conn.close()
         
