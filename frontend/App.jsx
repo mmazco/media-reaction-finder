@@ -121,6 +121,31 @@ export default function App() {
     navigate('/'); // Navigate to home
   };
 
+  // Check for cached meta commentary
+  const checkCachedCommentary = async (articleData) => {
+    if (!articleData) return;
+    
+    try {
+      const response = await fetch('/api/meta-commentary/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ article: articleData })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.cached && data.audio) {
+          console.log('✅ Found cached commentary');
+          setMetaText(data.text || '');
+          const mimeType = data.mime_type || 'audio/mp3';
+          setMetaAudio(`data:${mimeType};base64,${data.audio}`);
+        }
+      }
+    } catch (error) {
+      console.log('No cached commentary found');
+    }
+  };
+
   // Generate meta commentary audio
   const generateMetaCommentary = async () => {
     setMetaLoading(true);
@@ -226,6 +251,17 @@ export default function App() {
       setReddit(cleanReddit);
       setArticle(cleanArticle);
       console.log('Article set to:', cleanArticle); // Debug log
+      
+      // Reset meta commentary state for new search
+      setMetaAudio(null);
+      setMetaText('');
+      setMetaError(null);
+      setShowTranscript(false);
+      
+      // Check for cached commentary if we have results
+      if (cleanArticle && (cleanNews.length > 0 || cleanReddit.length > 0)) {
+        checkCachedCommentary(cleanArticle);
+      }
       
       // Save to search history - for URLs use article data, for text queries create basic entry
       let historyItem = null;

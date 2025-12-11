@@ -531,6 +531,37 @@ def debug_keys():
         'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
     })
 
+@app.route('/api/meta-commentary/check', methods=['POST'])
+def check_cached_commentary():
+    """
+    Check if cached commentary exists for an article.
+    Returns the cached audio if available, otherwise returns null.
+    """
+    try:
+        data = request.get_json()
+        article = data.get('article', {})
+        
+        cache_key = article.get('url') or article.get('title', '')
+        
+        if cache_key:
+            logger = SearchLogger()
+            cached = logger.get_cached_commentary(cache_key)
+            
+            if cached and cached.get('audio'):
+                print(f"✅ Found cached commentary for: {cache_key[:50]}...")
+                return jsonify({
+                    'text': cached['text'],
+                    'audio': cached['audio'],
+                    'mime_type': cached['mime_type'],
+                    'cached': True
+                })
+        
+        return jsonify({'cached': False, 'audio': None})
+        
+    except Exception as e:
+        print(f"❌ Error checking cached commentary: {e}")
+        return jsonify({'cached': False, 'audio': None})
+
 @app.route('/api/meta-commentary', methods=['POST'])
 def meta_commentary():
     """
