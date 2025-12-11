@@ -4,6 +4,7 @@ from search import search_news
 from reddit import search_reddit_posts, get_title_from_url
 from summarize import summarize_text
 from api.search_logger import SearchLogger
+from api.meta_commentary import generate_audio_commentary
 import os
 import requests
 from bs4 import BeautifulSoup
@@ -529,6 +530,51 @@ def debug_keys():
         'OPENAI_API_KEY': 'configured' if openai_key else 'MISSING',
         'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
     })
+
+@app.route('/api/meta-commentary', methods=['POST'])
+def meta_commentary():
+    """
+    Generate AI meta-commentary on article discourse with audio.
+    
+    Expects JSON body with:
+    - article: object with title, source, summary
+    - web: array of web search results
+    - reddit: array of reddit discussions
+    
+    Returns:
+    - text: the generated commentary
+    - audio: base64-encoded audio (mp3)
+    - mime_type: audio mime type
+    """
+    try:
+        print("🎙️ Starting meta-commentary generation...")
+        data = request.get_json()
+        
+        article = data.get('article', {})
+        web_results = data.get('web', [])
+        reddit_results = data.get('reddit', [])
+        
+        print(f"📝 Article: {article.get('title', 'No title')[:50]}...")
+        print(f"🌐 Web results: {len(web_results)}")
+        print(f"👽 Reddit results: {len(reddit_results)}")
+        
+        # Generate audio commentary
+        result = generate_audio_commentary(article, web_results, reddit_results)
+        
+        print(f"✅ Commentary generated: {len(result.get('text', ''))} chars")
+        print(f"🔊 Audio generated: {'Yes' if result.get('audio') else 'No'}")
+        
+        return jsonify({
+            'text': result.get('text', ''),
+            'audio': result.get('audio'),
+            'mime_type': result.get('mime_type', 'audio/mp3')
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in meta-commentary endpoint: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 # Serve static files and SPA routing
 @app.route('/')
