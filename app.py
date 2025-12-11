@@ -284,9 +284,9 @@ def extract_article_metadata(url):
             
             if is_premium:
                 print(f"⚠️  Premium publisher detected ({domain}) - content extraction limited")
-                error_msg = f"This article from {domain} may require a subscription or is blocking automated access. The title and reactions are still available."
+                error_msg = f"Summary not available — {domain} blocks automated content extraction from cloud servers. Reactions and discussions below are still available."
             else:
-                error_msg = "Article content could not be fully extracted. This may be due to paywall, JavaScript rendering, or access restrictions."
+                error_msg = "Summary not available — article content could not be extracted (possible paywall, JavaScript rendering, or access restrictions). Reactions below are still available."
             
             return {
                 'title': title or 'Article',
@@ -451,7 +451,7 @@ Highlight the main points and key information. Use the author's name from the ti
                 if 'error' in article_metadata:
                     article_metadata['summary'] = article_metadata['error']
                 else:
-                    article_metadata['summary'] = "Summary not available - unable to extract article content."
+                    article_metadata['summary'] = "Summary not available — this publisher may block automated content extraction. Reactions and discussions are still available below."
                 
             print(f"🧠 Extracted article: {article_title}")
         
