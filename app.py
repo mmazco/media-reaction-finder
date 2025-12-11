@@ -384,7 +384,13 @@ def get_reactions():
             # Generate article summary if content is available
             if article_metadata['content']:
                 print(f"📝 Generating article summary...")
-                summary_task = "Provide a concise 100-word summary of this article, highlighting the main points and key information."
+                # Include title in context so LLM knows the author's name
+                summary_task = f"""Provide a concise 100-word summary of this article.
+
+ARTICLE TITLE: {article_title}
+SOURCE: {article_metadata.get('source', 'Unknown')}
+
+Highlight the main points and key information. Use the author's name from the title if present - do NOT guess or invent names."""
                 article_metadata['summary'] = summarize_text(article_metadata['content'], summary_task)
             else:
                 # Use error message if available, otherwise generic message

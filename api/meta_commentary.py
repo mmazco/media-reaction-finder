@@ -27,9 +27,20 @@ def generate_meta_commentary(article, web_results, reddit_results):
     # Build context from article
     article_context = ""
     if article:
+        title = article.get('title', 'Unknown')
+        # Extract author name from title if present (common format: "Author Name — Title" or "Author Name -")
+        author = "Unknown"
+        if " — " in title:
+            author = title.split(" — ")[0].strip()
+        elif " - " in title and not title.startswith("http"):
+            parts = title.split(" - ")
+            if len(parts[0].split()) <= 4:  # Likely an author name if short
+                author = parts[0].strip()
+        
         article_context = f"""
 ARTICLE:
-Title: {article.get('title', 'Unknown')}
+Title: {title}
+Author: {author} (USE THIS NAME - do not guess or change it)
 Source: {article.get('source', 'Unknown')}
 Summary: {article.get('summary', 'No summary available')}
 """
