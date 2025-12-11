@@ -6,12 +6,14 @@ try:
     from reddit import search_reddit_posts, get_title_from_url
     from summarize import summarize_text
     from search_logger import SearchLogger
+    from meta_commentary import generate_audio_commentary
 except ImportError:
     # For Vercel deployment - use relative imports
     from .search import search_news
     from .reddit import search_reddit_posts, get_title_from_url
     from .summarize import summarize_text
     from .search_logger import SearchLogger
+    from .meta_commentary import generate_audio_commentary
 
 import os
 import requests
@@ -520,6 +522,57 @@ def get_archive():
     except Exception as e:
         print(f"Error getting archive: {e}")
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/meta-commentary', methods=['POST'])
+def meta_commentary():
+    """
+    Generate AI meta-commentary on article discourse with audio.
+    
+    Expects JSON body with:
+    - article: object with title, source, summary
+    - web: array of web search results
+    - reddit: array of reddit discussions
+    
+    Returns:
+    - text: the generated commentary
+    - audio: base64-encoded audio (mp3)
+    - mime_type: audio mime type
+    """
+    try:
+        print("🎙️ Starting meta-commentary generation...")
+        data = request.get_json()
+        
+        article = data.get('article', {})
+        web_results = data.get('web', [])
+        reddit_results = data.get('reddit', [])
+        
+        # Validate we have something to analyze
+        if not article and not web_results and not reddit_results:
+            return jsonify({'error': 'No content provided for analysis'}), 400
+        
+        # Generate commentary and audio
+        result = generate_audio_commentary(article, web_results, reddit_results)
+        
+        if result.get('error') and not result.get('audio'):
+            # Text was generated but audio failed
+            return jsonify({
+                'text': result.get('text', ''),
+                'audio': None,
+                'error': result.get('error_message', 'Audio generation failed')
+            })
+        
+        return jsonify({
+            'text': result.get('text', ''),
+            'audio': result.get('audio'),
+            'mime_type': result.get('mime_type', 'audio/mp3')
+        })
+        
+    except Exception as e:
+        print(f"❌ Error in meta-commentary endpoint: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
 
 @app.route('/api/health', methods=['GET'])
 def health():

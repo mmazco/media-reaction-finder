@@ -15,6 +15,13 @@ export default function App() {
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
   const [showCollectionsPage, setShowCollectionsPage] = useState(false); // Collections page view
+  
+  // Meta Commentary state
+  const [metaAudio, setMetaAudio] = useState(null);
+  const [metaText, setMetaText] = useState('');
+  const [metaLoading, setMetaLoading] = useState(false);
+  const [metaError, setMetaError] = useState(null);
+  const [showTranscript, setShowTranscript] = useState(false);
 
 
   // Function to delete history items
@@ -103,7 +110,55 @@ export default function App() {
     setNews([]);
     setReddit([]);
     setArticle(null);
+    setMetaAudio(null);
+    setMetaText('');
+    setMetaError(null);
+    setShowTranscript(false);
     updateURL(''); // Clear URL parameters
+  };
+
+  // Generate meta commentary audio
+  const generateMetaCommentary = async () => {
+    setMetaLoading(true);
+    setMetaError(null);
+    setMetaAudio(null);
+    setMetaText('');
+    
+    try {
+      const response = await fetch('/api/meta-commentary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          article: article,
+          web: news,
+          reddit: reddit
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.error && !data.audio) {
+        setMetaError(data.error);
+        if (data.text) {
+          setMetaText(data.text);
+        }
+      } else {
+        setMetaText(data.text || '');
+        if (data.audio) {
+          const mimeType = data.mime_type || 'audio/mp3';
+          setMetaAudio(`data:${mimeType};base64,${data.audio}`);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating meta commentary:', error);
+      setMetaError('Failed to generate commentary. Please try again.');
+    } finally {
+      setMetaLoading(false);
+    }
   };
 
 
@@ -1472,51 +1527,299 @@ export default function App() {
 
 
 
+        {/* Meta Commentary Section */}
+        {(news.length > 0 || reddit.length > 0) && (
+          <div style={{
+            marginTop: '30px',
+            padding: '20px',
+            backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+            borderRadius: '8px',
+            border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+            textAlign: 'left'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '15px'
+            }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#fff' : '#000'} strokeWidth="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: darkMode ? '#fff' : '#000',
+                fontFamily: 'Georgia, serif'
+              }}>
+                Meta Commentary
+              </span>
+            </div>
+            
+            <p style={{
+              fontSize: '14px',
+              color: darkMode ? '#999' : '#666',
+              marginBottom: '15px',
+              fontStyle: 'italic',
+              fontFamily: 'Georgia, serif'
+            }}>
+              Generate an AI audio analysis of the discourse around this content - what people are saying, key themes, and broader implications.
+            </p>
+            
+            {!metaAudio && !metaLoading && !metaText && (
+              <button
+                onClick={generateMetaCommentary}
+                style={{
+                  padding: '12px 24px',
+                  fontSize: '12px',
+                  letterSpacing: '1px',
+                  fontWeight: '600',
+                  backgroundColor: darkMode ? '#fff' : '#000',
+                  color: darkMode ? '#000' : '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Arial, sans-serif',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'opacity 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.85'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                GENERATE COMMENTARY
+              </button>
+            )}
+            
+            {metaLoading && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: `2px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                  borderTop: `2px solid ${darkMode ? '#fff' : '#000'}`,
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }}></div>
+                <span style={{
+                  fontSize: '14px',
+                  color: darkMode ? '#999' : '#666',
+                  fontStyle: 'italic'
+                }}>
+                  Generating meta commentary...
+                </span>
+              </div>
+            )}
+            
+            {metaError && (
+              <div style={{
+                padding: '12px',
+                backgroundColor: darkMode ? '#2a1a1a' : '#fff5f5',
+                border: `1px solid ${darkMode ? '#4a2a2a' : '#ffcccc'}`,
+                borderRadius: '6px',
+                color: darkMode ? '#ff9999' : '#cc0000',
+                fontSize: '14px',
+                marginBottom: '10px'
+              }}>
+                {metaError}
+              </div>
+            )}
+            
+            {metaAudio && (
+              <div style={{ marginBottom: '15px' }}>
+                <audio 
+                  controls 
+                  src={metaAudio}
+                  style={{
+                    width: '100%',
+                    height: '40px',
+                    borderRadius: '6px'
+                  }}
+                />
+              </div>
+            )}
+            
+            {metaText && (
+              <div>
+                <button
+                  onClick={() => setShowTranscript(!showTranscript)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: darkMode ? '#4da6ff' : '#0066cc',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    padding: '0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                >
+                  {showTranscript ? '▼' : '▶'} {showTranscript ? 'Hide' : 'Show'} Transcript
+                </button>
+                {showTranscript && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '15px',
+                    backgroundColor: darkMode ? '#0d0d0d' : '#fff',
+                    borderRadius: '6px',
+                    border: `1px solid ${darkMode ? '#222' : '#e0e0e0'}`,
+                    fontSize: '14px',
+                    lineHeight: '1.7',
+                    color: darkMode ? '#ccc' : '#444',
+                    fontFamily: 'Georgia, serif'
+                  }}>
+                    {metaText}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
         {(news.length > 0 || reddit.length > 0) && (
           <div style={styles.results}>
-            <div style={styles.resultSection}>
-              <h2 style={styles.resultTitle}>Related Content</h2>
-              {/* Combine web and reddit results (backend already filters same domain) */}
-              {[
-                ...news.map(article => ({
-                  ...article,
-                  type: 'Web'
-                })),
-                ...reddit.map(post => ({
-                  ...post,
-                  type: 'Reddit'
-                }))
-              ].map((item, i) => (
-                <div key={i} style={styles.resultItem}>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
-                    <span style={{
-                      fontSize: '12px',
-                      padding: '2px 8px',
-                      borderRadius: '4px',
-                      backgroundColor: item.type === 'Web' ? '#4ECDC4' : '#FF6B6B',
-                      color: '#fff',
-                      fontWeight: '500'
-                    }}>
-                      {item.type}
-                    </span>
-                    <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
-                    {item.type === 'Reddit' && item.num_comments > 0 && (
-                      <span style={{
-                        fontSize: '11px',
-                        color: darkMode ? '#999' : '#666',
-                        marginLeft: 'auto',
+            {/* Split Reddit results by match type */}
+            {(() => {
+              const directReactions = reddit.filter(r => r.match_type === 'url_exact');
+              const topicReddit = reddit.filter(r => r.match_type !== 'url_exact');
+              const topicDiscussions = [
+                ...topicReddit.map(post => ({ ...post, type: 'Reddit' })),
+                ...news.map(article => ({ ...article, type: 'Web' }))
+              ];
+              
+              return (
+                <>
+                  {/* Direct Reactions Section */}
+                  {directReactions.length > 0 && (
+                    <div style={styles.resultSection}>
+                      <h2 style={{
+                        ...styles.resultTitle,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                      }}>
+                        Direct Reactions
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: darkMode ? '#666' : '#999',
+                          fontFamily: 'Arial, sans-serif'
+                        }}>
+                          ({directReactions.length})
+                        </span>
+                      </h2>
+                      <p style={{
+                        fontSize: '13px',
+                        color: darkMode ? '#888' : '#777',
+                        marginBottom: '15px',
                         fontStyle: 'italic'
                       }}>
-                        💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
-                      </span>
-                    )}
-                  </div>
-                  {item.summary && (
-                    <p style={styles.summary}>{item.summary}</p>
+                        Posts that directly link to or discuss this specific article
+                      </p>
+                      {directReactions.map((item, i) => (
+                        <div key={`direct-${i}`} style={styles.resultItem}>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                            <span style={{
+                              fontSize: '12px',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              backgroundColor: '#FF6B6B',
+                              color: '#fff',
+                              fontWeight: '500'
+                            }}>
+                              Reddit
+                            </span>
+                            <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                            {item.num_comments > 0 && (
+                              <span style={{
+                                fontSize: '11px',
+                                color: darkMode ? '#999' : '#666',
+                                marginLeft: 'auto',
+                                fontStyle: 'italic'
+                              }}>
+                                💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          {item.summary && (
+                            <p style={styles.summary}>{item.summary}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   )}
-                </div>
-              ))}
-            </div>
+
+                  {/* Topic Discussions Section */}
+                  {topicDiscussions.length > 0 && (
+                    <div style={styles.resultSection}>
+                      <h2 style={{
+                        ...styles.resultTitle,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px'
+                      }}>
+                        Topic Discussions
+                        <span style={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: darkMode ? '#666' : '#999',
+                          fontFamily: 'Arial, sans-serif'
+                        }}>
+                          ({topicDiscussions.length})
+                        </span>
+                      </h2>
+                      <p style={{
+                        fontSize: '13px',
+                        color: darkMode ? '#888' : '#777',
+                        marginBottom: '15px',
+                        fontStyle: 'italic'
+                      }}>
+                        Broader conversations about the topic
+                      </p>
+                      {topicDiscussions.map((item, i) => (
+                        <div key={`topic-${i}`} style={styles.resultItem}>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                            <span style={{
+                              fontSize: '12px',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              backgroundColor: item.type === 'Web' ? '#4ECDC4' : '#FF6B6B',
+                              color: '#fff',
+                              fontWeight: '500'
+                            }}>
+                              {item.type}
+                            </span>
+                            <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                            {item.type === 'Reddit' && item.num_comments > 0 && (
+                              <span style={{
+                                fontSize: '11px',
+                                color: darkMode ? '#999' : '#666',
+                                marginLeft: 'auto',
+                                fontStyle: 'italic'
+                              }}>
+                                💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
+                              </span>
+                            )}
+                          </div>
+                          {item.summary && (
+                            <p style={styles.summary}>{item.summary}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
             
             {/* Share functionality */}
             <div style={styles.shareContainer}>
