@@ -105,6 +105,19 @@ class SearchLogger:
         except sqlite3.OperationalError:
             pass  # Column already exists
         
+        # Create cached_commentary table for storing generated audio commentary
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS cached_commentary (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                query_hash TEXT UNIQUE,
+                query TEXT,
+                text TEXT,
+                audio_base64 TEXT,
+                mime_type TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        
         conn.commit()
         conn.close()
     
@@ -611,3 +624,40 @@ class SearchLogger:
         conn.close()
         
         return cursor.rowcount > 0
+    
+    # ==================== COMMENTARY CACHE ====================
+    
+    def get_cached_commentary(self, query):
+        """Get cached commentary for a query/URL"""
+        import hashlib
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT text, audio_base64, mime_type FROM cached_commentary
+            WHERE query_hash = ?
+        ''', (query_hash,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        if row:
+            return {'text': row[0], 'audio': row[1], 'mime_type': row[2]}
+        return None
+    
+    def cache_commentary(self, query, text, audio_base64, mime_type):
+        """Cache commentary for a query/URL"""
+        import hashlib
+        query_hash = hashlib.md5(query.encode()).hexdigest()
+        
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT OR REPLACE INTO cached_commentary 
+            (query_hash, query, text, audio_base64, mime_type)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (query_hash, query, text, audio_base64, mime_type))
+        conn.commit()
+        conn.close()
+        
+        return True

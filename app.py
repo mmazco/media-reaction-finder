@@ -535,6 +535,7 @@ def debug_keys():
 def meta_commentary():
     """
     Generate AI meta-commentary on article discourse with audio.
+    Uses caching to avoid regenerating audio for the same article.
     
     Expects JSON body with:
     - article: object with title, source, summary
@@ -545,6 +546,7 @@ def meta_commentary():
     - text: the generated commentary
     - audio: base64-encoded audio (mp3)
     - mime_type: audio mime type
+    - cached: boolean indicating if result was from cache
     """
     try:
         print("🎙️ Starting meta-commentary generation...")
@@ -554,20 +556,52 @@ def meta_commentary():
         web_results = data.get('web', [])
         reddit_results = data.get('reddit', [])
         
+        # Use article URL as cache key (most reliable identifier)
+        cache_key = article.get('url') or article.get('title', '')
+        
+        if cache_key:
+            logger = SearchLogger()
+            
+            # Check cache first
+            cached = logger.get_cached_commentary(cache_key)
+            if cached and cached.get('audio'):
+                print(f"✅ Returning cached commentary for: {cache_key[:50]}...")
+                return jsonify({
+                    'text': cached['text'],
+                    'audio': cached['audio'],
+                    'mime_type': cached['mime_type'],
+                    'cached': True
+                })
+        
         print(f"📝 Article: {article.get('title', 'No title')[:50]}...")
         print(f"🌐 Web results: {len(web_results)}")
         print(f"👽 Reddit results: {len(reddit_results)}")
         
-        # Generate audio commentary
+        # Generate new audio commentary
         result = generate_audio_commentary(article, web_results, reddit_results)
         
         print(f"✅ Commentary generated: {len(result.get('text', ''))} chars")
         print(f"🔊 Audio generated: {'Yes' if result.get('audio') else 'No'}")
         
+        # Cache the result if successful
+        if cache_key and result.get('audio'):
+            try:
+                logger = SearchLogger()
+                logger.cache_commentary(
+                    cache_key,
+                    result.get('text', ''),
+                    result.get('audio'),
+                    result.get('mime_type', 'audio/mp3')
+                )
+                print(f"💾 Cached commentary for: {cache_key[:50]}...")
+            except Exception as cache_error:
+                print(f"⚠️ Failed to cache commentary: {cache_error}")
+        
         return jsonify({
             'text': result.get('text', ''),
             'audio': result.get('audio'),
-            'mime_type': result.get('mime_type', 'audio/mp3')
+            'mime_type': result.get('mime_type', 'audio/mp3'),
+            'cached': False
         })
         
     except Exception as e:
