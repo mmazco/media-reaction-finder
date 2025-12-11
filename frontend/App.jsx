@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [news, setNews] = useState([]);
@@ -14,7 +17,6 @@ export default function App() {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
-  const [showCollectionsPage, setShowCollectionsPage] = useState(false); // Collections page view
   
   // Meta Commentary state
   const [metaAudio, setMetaAudio] = useState(null);
@@ -75,9 +77,9 @@ export default function App() {
     fetchCollections();
 
     // Check for URL parameters on initial load
-    const urlParams = new URLSearchParams(window.location.search);
+    const urlParams = new URLSearchParams(location.search);
     const sharedQuery = urlParams.get('q');
-    if (sharedQuery) {
+    if (sharedQuery && location.pathname === '/') {
       const decodedQuery = decodeURIComponent(sharedQuery);
       setQuery(decodedQuery);
       // Automatically perform search for shared URL
@@ -114,7 +116,9 @@ export default function App() {
     setMetaText('');
     setMetaError(null);
     setShowTranscript(false);
-    updateURL(''); // Clear URL parameters
+    setSelectedCollection(null);
+    setCollectionArticles([]);
+    navigate('/'); // Navigate to home
   };
 
   // Generate meta commentary audio
@@ -183,19 +187,17 @@ export default function App() {
 
   // Function to update URL with search query
   const updateURL = (searchQuery) => {
-    const url = new URL(window.location);
     if (searchQuery && searchQuery.trim()) {
-      url.searchParams.set('q', encodeURIComponent(searchQuery));
+      navigate(`/?q=${encodeURIComponent(searchQuery)}`, { replace: true });
     } else {
-      url.searchParams.delete('q');
+      navigate('/', { replace: true });
     }
-    window.history.pushState({}, '', url);
   };
 
   // Function to generate shareable URL
   const generateShareableURL = (searchQuery) => {
-    const baseURL = window.location.origin + window.location.pathname;
-    return `${baseURL}?q=${encodeURIComponent(searchQuery)}`;
+    const baseURL = window.location.origin;
+    return `${baseURL}/?q=${encodeURIComponent(searchQuery)}`;
   };
 
   // Separate function to perform search (used by both handleSearch and URL parameter loading)
@@ -754,7 +756,7 @@ export default function App() {
         </div>
 
       {/* Collections Page Overlay */}
-      {showCollectionsPage && (
+      {location.pathname === '/collections' && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1018,10 +1020,9 @@ export default function App() {
                           <button
                     onClick={() => {
                       setQuery(article.url);
-                              setShowCollectionsPage(false);
-                              setSelectedCollection(null);
-                              setCollectionArticles([]);
-                      updateURL(article.url);
+                      setSelectedCollection(null);
+                      setCollectionArticles([]);
+                      navigate(`/?q=${encodeURIComponent(article.url)}`);
                       performSearch(article.url);
                     }}
                             style={{
@@ -1113,9 +1114,10 @@ export default function App() {
           onClick={() => {
             // Close any open views first
             setSidebarOpen(false);
-            setShowCollectionsPage(false);
             setSelectedCollection(null);
             setCollectionArticles([]);
+            // Navigate to home
+            navigate('/');
             // Scroll to top and focus search input
             window.scrollTo({ top: 0, behavior: 'smooth' });
             setTimeout(() => {
@@ -1145,10 +1147,11 @@ export default function App() {
         {/* History Icon (Clock with counterclockwise arrow) */}
         <div 
           onClick={() => {
-            // Close collections page if open
-            setShowCollectionsPage(false);
-            setSelectedCollection(null);
-            setCollectionArticles([]);
+            // Close collections if on collections page
+            if (location.pathname === '/collections') {
+              setSelectedCollection(null);
+              setCollectionArticles([]);
+            }
             // Toggle history sidebar
             setSidebarOpen(!sidebarOpen);
           }}
@@ -1178,13 +1181,13 @@ export default function App() {
           onClick={() => {
             // Close history sidebar if open
             setSidebarOpen(false);
-            // Toggle collections page
-            if (showCollectionsPage) {
-              setShowCollectionsPage(false);
+            // Toggle collections page via URL
+            if (location.pathname === '/collections') {
               setSelectedCollection(null);
               setCollectionArticles([]);
-                      } else {
-              setShowCollectionsPage(true);
+              navigate('/');
+            } else {
+              navigate('/collections');
             }
           }}
           style={{
@@ -1265,6 +1268,8 @@ export default function App() {
         </div>
       </div>
       
+      {/* Main Content - only show when not on collections page */}
+      {location.pathname !== '/collections' && (
       <div style={styles.content}>
         <h1 
           style={{
@@ -1572,12 +1577,13 @@ export default function App() {
             {/* Disclaimer */}
             <div style={{
               fontSize: '11px',
-              color: darkMode ? '#666' : '#999',
+              color: darkMode ? '#999' : '#666',
               marginBottom: '15px',
               padding: '8px 12px',
               backgroundColor: darkMode ? '#111' : '#f0f0f0',
               borderRadius: '4px',
-              borderLeft: `3px solid ${darkMode ? '#444' : '#ccc'}`
+              borderLeft: `3px solid ${darkMode ? '#444' : '#ccc'}`,
+              fontFamily: 'Arial, sans-serif'
             }}>
               ⚠️ AI-generated analysis may contain inaccuracies. Please verify any specific claims or attributions.
             </div>
@@ -1859,6 +1865,7 @@ export default function App() {
           </div>
         )}
       </div>
+      )}
     </div>
   );
 }
