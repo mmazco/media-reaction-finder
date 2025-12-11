@@ -75,6 +75,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
                                 "score": post.score if hasattr(post, 'score') else 0,
@@ -135,6 +136,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
                                 "score": post.score if hasattr(post, 'score') else 0,
@@ -173,6 +175,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
                                 "score": post.score if hasattr(post, 'score') else 0,
@@ -210,9 +213,11 @@ def search_reddit_posts(query, limit=5, article_title=None):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
+                            "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                             "selftext": post.selftext if hasattr(post, 'selftext') else "",
                             "num_comments": num_comments,
-                            "score": post.score if hasattr(post, 'score') else 0
+                            "score": post.score if hasattr(post, 'score') else 0,
+                            "match_type": "topic"
                         }
 
                         results.append(post_data)

@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from search import search_news
-from reddit import search_reddit_posts, get_title_from_url
+from api.reddit import search_reddit_posts, get_title_from_url
 from summarize import summarize_text
 from api.search_logger import SearchLogger
 from api.meta_commentary import generate_audio_commentary

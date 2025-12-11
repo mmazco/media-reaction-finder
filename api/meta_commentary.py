@@ -24,46 +24,41 @@ def generate_meta_commentary(article, web_results, reddit_results):
     Returns:
         str: ~200 word meta-commentary suitable for 60-90 second audio
     """
-    try:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
-            return "Commentary unavailable - OpenAI API key not configured"
-        
-        # Build context from article
-        article_context = ""
-        if article:
-            article_context = f"""
+    # Build context from article
+    article_context = ""
+    if article:
+        article_context = f"""
 ARTICLE:
 Title: {article.get('title', 'Unknown')}
 Source: {article.get('source', 'Unknown')}
 Summary: {article.get('summary', 'No summary available')}
 """
-        
-        # Build context from web reactions
-        web_context = ""
-        if web_results and len(web_results) > 0:
-            web_snippets = []
-            for r in web_results[:5]:  # Top 5 web results
-                web_snippets.append(f"- {r.get('title', '')}: {r.get('summary', '')[:150]}")
-            web_context = f"""
+    
+    # Build context from web reactions
+    web_context = ""
+    if web_results and len(web_results) > 0:
+        web_snippets = []
+        for r in web_results[:5]:  # Top 5 web results
+            web_snippets.append(f"- {r.get('title', '')}: {r.get('summary', '')[:150]}")
+        web_context = f"""
 WEB REACTIONS:
 {chr(10).join(web_snippets)}
 """
-        
-        # Build context from Reddit discussions
-        reddit_context = ""
-        if reddit_results and len(reddit_results) > 0:
-            reddit_snippets = []
-            for r in reddit_results[:5]:  # Top 5 reddit results
-                match_info = f"[{r.get('match_type', 'topic')}]" if r.get('match_type') else ""
-                reddit_snippets.append(f"- {match_info} r/{r.get('subreddit', 'unknown')}: {r.get('title', '')}")
-            reddit_context = f"""
+    
+    # Build context from Reddit discussions
+    reddit_context = ""
+    if reddit_results and len(reddit_results) > 0:
+        reddit_snippets = []
+        for r in reddit_results[:5]:  # Top 5 reddit results
+            match_info = f"[{r.get('match_type', 'topic')}]" if r.get('match_type') else ""
+            reddit_snippets.append(f"- {match_info} r/{r.get('subreddit', 'unknown')}: {r.get('title', '')}")
+        reddit_context = f"""
 REDDIT DISCUSSIONS:
 {chr(10).join(reddit_snippets)}
 """
-        
-        # Construct the prompt
-        prompt = f"""You are a media analyst providing a concise audio commentary on an article and its online reception.
+    
+    # Construct the prompt
+    prompt = f"""You are a media analyst providing a concise audio commentary on an article and its online reception.
 
 {article_context}
 {web_context}
@@ -87,24 +82,48 @@ IMPORTANT RULES:
 
 The commentary should feel like a brief but insightful audio briefing someone would listen to."""
 
-        client = OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a careful and accurate media analyst who synthesizes article content and online discourse into engaging audio commentaries. You ONLY state facts that are explicitly provided in the context - never invent names, titles, or affiliations. If unsure, use general descriptions instead of guessing."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=400,
-            temperature=0.5  # Lower temperature for more factual output
-        )
-        
-        commentary = response.choices[0].message.content
-        print(f"✅ Meta commentary generated: {len(commentary)} chars")
-        return commentary
-        
-    except Exception as e:
-        print(f"❌ Error generating meta commentary: {e}")
-        return f"Commentary generation failed: {str(e)}"
+    system_prompt = "You are a careful and accurate media analyst who synthesizes article content and online discourse into engaging audio commentaries. You ONLY state facts that are explicitly provided in the context - never invent names, titles, or affiliations. If unsure, use general descriptions instead of guessing."
+
+    # Try OpenAI first
+    openai_key = os.getenv("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            client = OpenAI(api_key=openai_key)
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=400,
+                temperature=0.5
+            )
+            
+            commentary = response.choices[0].message.content
+            print(f"✅ Meta commentary generated with OpenAI: {len(commentary)} chars")
+            return commentary
+        except Exception as e:
+            print(f"⚠️ OpenAI text generation failed: {e}")
+            print("🔄 Falling back to Gemini for text generation...")
+    
+    # Fallback to Gemini for text generation
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if gemini_key:
+        try:
+            genai.configure(api_key=gemini_key)
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            full_prompt = f"{system_prompt}\n\n{prompt}"
+            response = model.generate_content(full_prompt)
+            
+            commentary = response.text
+            print(f"✅ Meta commentary generated with Gemini: {len(commentary)} chars")
+            return commentary
+        except Exception as e:
+            print(f"❌ Gemini text generation failed: {e}")
+            return f"Commentary generation failed: {str(e)}"
+    
+    return "Commentary unavailable - no API keys configured (need OPENAI_API_KEY or GEMINI_API_KEY)"
 
 
 def text_to_speech_openai(text):
