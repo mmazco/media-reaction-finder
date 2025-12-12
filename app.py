@@ -627,6 +627,7 @@ def debug_keys():
     reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
     reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
     openai_key = os.getenv("OPENAI_API_KEY")
+    gemini_key = os.getenv("GEMINI_API_KEY")
     
     return jsonify({
         'SERPAPI_API_KEY': 'configured' if serpapi_key else 'MISSING',
@@ -634,8 +635,34 @@ def debug_keys():
         'REDDIT_CLIENT_SECRET': 'configured' if reddit_client_secret else 'MISSING',
         'REDDIT_USER_AGENT': 'configured' if reddit_user_agent else 'MISSING',
         'OPENAI_API_KEY': 'configured' if openai_key else 'MISSING',
+        'GEMINI_API_KEY': 'configured' if gemini_key else 'MISSING',
         'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
     })
+
+@app.route('/api/debug-tts', methods=['GET'])
+def debug_tts():
+    """
+    Debug endpoint to test TTS functionality with a simple message.
+    This helps diagnose TTS issues in production.
+    """
+    from api.meta_commentary import text_to_speech_openai, text_to_speech_gemini
+    
+    test_text = "This is a test of the text to speech system."
+    
+    result = {
+        'test_text': test_text,
+        'openai_key_configured': bool(os.getenv("OPENAI_API_KEY")),
+        'gemini_key_configured': bool(os.getenv("GEMINI_API_KEY")),
+    }
+    
+    # Test OpenAI TTS directly
+    try:
+        openai_result = text_to_speech_openai(test_text)
+        result['openai_tts'] = 'success' if openai_result and openai_result.get('audio') else 'failed - no audio returned'
+    except Exception as e:
+        result['openai_tts'] = f'error: {str(e)}'
+    
+    return jsonify(result)
 
 @app.route('/api/meta-commentary/check', methods=['POST'])
 def check_cached_commentary():
@@ -689,6 +716,9 @@ def meta_commentary():
         print("🎙️ Starting meta-commentary generation...")
         data = request.get_json()
         
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+        
         article = data.get('article', {})
         web_results = data.get('web', [])
         reddit_results = data.get('reddit', [])
@@ -697,55 +727,77 @@ def meta_commentary():
         cache_key = article.get('url') or article.get('title', '')
         
         if cache_key:
-            logger = SearchLogger()
-            
-            # Check cache first
-            cached = logger.get_cached_commentary(cache_key)
-            if cached and cached.get('audio'):
-                print(f"✅ Returning cached commentary for: {cache_key[:50]}...")
-                return jsonify({
-                    'text': cached['text'],
-                    'audio': cached['audio'],
-                    'mime_type': cached['mime_type'],
-                    'cached': True
-                })
+            try:
+                logger = SearchLogger()
+                
+                # Check cache first
+                cached = logger.get_cached_commentary(cache_key)
+                if cached and cached.get('audio'):
+                    print(f"✅ Returning cached commentary for: {cache_key[:50]}...")
+                    return jsonify({
+                        'text': cached['text'],
+                        'audio': cached['audio'],
+                        'mime_type': cached['mime_type'],
+                        'cached': True
+                    })
+            except Exception as cache_check_error:
+                print(f"⚠️ Cache check failed (continuing without cache): {cache_check_error}")
         
         print(f"📝 Article: {article.get('title', 'No title')[:50]}...")
         print(f"🌐 Web results: {len(web_results)}")
         print(f"👽 Reddit results: {len(reddit_results)}")
         
-        # Generate new audio commentary
-        result = generate_audio_commentary(article, web_results, reddit_results)
+        # Generate new audio commentary with robust error handling
+        try:
+            result = generate_audio_commentary(article, web_results, reddit_results)
+        except Exception as gen_error:
+            print(f"❌ Audio commentary generation failed: {gen_error}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({
+                'error': f'Audio generation failed: {str(gen_error)}',
+                'text': None,
+                'audio': None
+            }), 500
         
-        print(f"✅ Commentary generated: {len(result.get('text', ''))} chars")
-        print(f"🔊 Audio generated: {'Yes' if result.get('audio') else 'No'}")
+        text = result.get('text', '')
+        audio = result.get('audio')
+        
+        print(f"✅ Commentary generated: {len(text)} chars")
+        print(f"🔊 Audio generated: {'Yes' if audio else 'No'}")
         
         # Cache the result if successful
-        if cache_key and result.get('audio'):
+        if cache_key and audio:
             try:
                 logger = SearchLogger()
                 logger.cache_commentary(
                     cache_key,
-                    result.get('text', ''),
-                    result.get('audio'),
+                    text,
+                    audio,
                     result.get('mime_type', 'audio/mp3')
                 )
                 print(f"💾 Cached commentary for: {cache_key[:50]}...")
             except Exception as cache_error:
                 print(f"⚠️ Failed to cache commentary: {cache_error}")
         
-        return jsonify({
-            'text': result.get('text', ''),
-            'audio': result.get('audio'),
+        # Return text even if audio failed
+        response_data = {
+            'text': text,
+            'audio': audio,
             'mime_type': result.get('mime_type', 'audio/mp3'),
             'cached': False
-        })
+        }
+        
+        if result.get('error'):
+            response_data['warning'] = result.get('error_message', 'Audio generation had issues')
+        
+        return jsonify(response_data)
         
     except Exception as e:
         print(f"❌ Error in meta-commentary endpoint: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e), 'text': None, 'audio': None}), 500
 
 # Serve static files and SPA routing
 @app.route('/')

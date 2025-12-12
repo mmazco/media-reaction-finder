@@ -16,4 +16,5 @@ ENV PORT=8080
 EXPOSE 8080
 
 # Start command using shell form to expand $PORT
-CMD gunicorn app:app --bind 0.0.0.0:$PORT
+# Increased timeout (120s) for TTS generation which can take time
+CMD gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120 --workers 2

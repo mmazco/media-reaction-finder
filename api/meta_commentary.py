@@ -99,6 +99,7 @@ The commentary should feel like a brief but insightful audio briefing someone wo
     openai_key = os.getenv("OPENAI_API_KEY")
     if openai_key:
         try:
+            print("📝 Generating commentary with OpenAI GPT-4...")
             client = OpenAI(api_key=openai_key)
             response = client.chat.completions.create(
                 model="gpt-4",
@@ -115,12 +116,17 @@ The commentary should feel like a brief but insightful audio briefing someone wo
             return commentary
         except Exception as e:
             print(f"⚠️ OpenAI text generation failed: {e}")
+            import traceback
+            traceback.print_exc()
             print("🔄 Falling back to Gemini for text generation...")
+    else:
+        print("ℹ️ OPENAI_API_KEY not configured, trying Gemini...")
     
     # Fallback to Gemini for text generation
     gemini_key = os.getenv("GEMINI_API_KEY")
     if gemini_key:
         try:
+            print("📝 Generating commentary with Gemini...")
             genai.configure(api_key=gemini_key)
             model = genai.GenerativeModel('gemini-1.5-flash')
             
@@ -132,6 +138,8 @@ The commentary should feel like a brief but insightful audio briefing someone wo
             return commentary
         except Exception as e:
             print(f"❌ Gemini text generation failed: {e}")
+            import traceback
+            traceback.print_exc()
             return f"Commentary generation failed: {str(e)}"
     
     return "Commentary unavailable - no API keys configured (need OPENAI_API_KEY or GEMINI_API_KEY)"
@@ -195,9 +203,11 @@ def text_to_speech_gemini(text):
     Returns:
         dict with 'audio' (base64 encoded) and 'mime_type', or None on failure
     """
-    # Try Gemini first if API key is available
+    # Check if we should use Gemini TTS (opt-in via env var since it's experimental)
+    use_gemini_tts = os.getenv("USE_GEMINI_TTS", "").lower() == "true"
     gemini_key = os.getenv("GEMINI_API_KEY")
-    if gemini_key:
+    
+    if use_gemini_tts and gemini_key:
         try:
             genai.configure(api_key=gemini_key)
             
@@ -235,8 +245,15 @@ def text_to_speech_gemini(text):
             
         except Exception as e:
             print(f"⚠️ Gemini TTS failed: {e}, falling back to OpenAI TTS")
+            import traceback
+            traceback.print_exc()
+    else:
+        if not use_gemini_tts:
+            print("ℹ️ Using OpenAI TTS (set USE_GEMINI_TTS=true to use Gemini)")
+        elif not gemini_key:
+            print("ℹ️ GEMINI_API_KEY not configured, using OpenAI TTS")
     
-    # Fall back to OpenAI TTS
+    # Use OpenAI TTS (more reliable)
     return text_to_speech_openai(text)
 
 
