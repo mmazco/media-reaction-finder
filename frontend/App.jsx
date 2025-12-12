@@ -886,7 +886,7 @@ export default function App() {
                   position: 'relative',
                   zIndex: 1
                 }}>
-                  {['palestine', 'culture', 'ai', 'internet', 'politics']
+                  {['palestine', 'culture', 'ai', 'politics']
                     .map(tag => collections.find(c => c.tag.toLowerCase() === tag))
                     .filter(Boolean)
                     .map((collection) => (
