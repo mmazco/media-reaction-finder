@@ -18,6 +18,20 @@ export default function App() {
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  
+  // Handle window resize for mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+      if (window.innerWidth > 768) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // Meta Commentary state
   const [metaAudio, setMetaAudio] = useState(null);
@@ -479,7 +493,7 @@ export default function App() {
       alignItems: 'center',
       justifyContent: (news.length > 0 || reddit.length > 0 || article) ? 'flex-start' : 'center',
       padding: '20px',
-      paddingLeft: '76px', // Account for left sidebar (56px + 20px)
+      paddingLeft: window.innerWidth <= 768 ? '20px' : '76px', // Account for left sidebar on desktop
       paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
         (window.innerWidth <= 768 ? '100px' : '80px') : '20px',
       position: 'relative',
@@ -598,11 +612,11 @@ export default function App() {
       sidebar: {
       position: 'fixed',
       top: 0,
-      left: '56px',
+      left: window.innerWidth <= 768 ? 0 : '56px',
       height: '100vh',
-      width: '320px',
+      width: window.innerWidth <= 768 ? '100%' : '320px',
       backgroundColor: baseColors.bg,
-      borderRight: `1px solid ${baseColors.border}`,
+      borderRight: window.innerWidth <= 768 ? 'none' : `1px solid ${baseColors.border}`,
       transform: 'translateX(-100%)',
       transition: 'transform 0.3s ease',
       zIndex: 1000,
@@ -1171,7 +1185,251 @@ export default function App() {
         </div>
       )}
       
-      {/* Left Icon Sidebar */}
+      {/* Mobile Burger Menu */}
+      {isMobile && (
+        <>
+          {/* Burger Icon */}
+          <div
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            style={{
+              position: 'fixed',
+              top: '16px',
+              left: '16px',
+              zIndex: 1002,
+              width: '40px',
+              height: '40px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+              backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+              borderRadius: '8px',
+              gap: '5px'
+            }}
+          >
+            <div style={{
+              width: '20px',
+              height: '2px',
+              backgroundColor: darkMode ? '#fff' : '#333',
+              transition: 'all 0.3s ease',
+              transform: mobileMenuOpen ? 'rotate(45deg) translateY(7px)' : 'none'
+            }} />
+            <div style={{
+              width: '20px',
+              height: '2px',
+              backgroundColor: darkMode ? '#fff' : '#333',
+              transition: 'all 0.3s ease',
+              opacity: mobileMenuOpen ? 0 : 1
+            }} />
+            <div style={{
+              width: '20px',
+              height: '2px',
+              backgroundColor: darkMode ? '#fff' : '#333',
+              transition: 'all 0.3s ease',
+              transform: mobileMenuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none'
+            }} />
+          </div>
+
+          {/* Mobile Menu Overlay */}
+          {mobileMenuOpen && (
+            <div
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                zIndex: 1000
+              }}
+            />
+          )}
+
+          {/* Mobile Slide-out Menu */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            height: '100vh',
+            width: '280px',
+            backgroundColor: darkMode ? '#0a0a0a' : '#f5f5f5',
+            borderRight: `1px solid ${darkMode ? '#222' : '#ddd'}`,
+            zIndex: 1001,
+            transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transition: 'transform 0.3s ease',
+            padding: '80px 20px 20px 20px',
+            overflowY: 'auto'
+          }}>
+            {/* Menu Items */}
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setSidebarOpen(false);
+                setSelectedCollection(null);
+                setCollectionArticles([]);
+                navigate('/');
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                marginBottom: '8px',
+                backgroundColor: location.pathname === '/' && !sidebarOpen ? (darkMode ? '#222' : '#e5e5e5') : 'transparent'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#fff' : '#333'} strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>Search</span>
+            </div>
+
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                if (location.pathname !== '/') {
+                  navigate('/');
+                  setSelectedCollection(null);
+                  setCollectionArticles([]);
+                }
+                setSidebarOpen(!sidebarOpen);
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                marginBottom: '8px',
+                backgroundColor: sidebarOpen ? (darkMode ? '#222' : '#e5e5e5') : 'transparent'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#fff' : '#333'} strokeWidth="2">
+                <path d="M3 3v5h5"></path>
+                <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
+              </svg>
+              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>Search History</span>
+            </div>
+
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setSidebarOpen(false);
+                if (location.pathname === '/collections') {
+                  setSelectedCollection(null);
+                  setCollectionArticles([]);
+                  navigate('/');
+                } else {
+                  navigate('/collections');
+                }
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                marginBottom: '8px',
+                backgroundColor: location.pathname === '/collections' ? (darkMode ? '#222' : '#e5e5e5') : 'transparent'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#fff' : '#333'} strokeWidth="2">
+                <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"></path>
+              </svg>
+              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>Collections</span>
+            </div>
+
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                toggleDarkMode();
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                marginBottom: '8px'
+              }}
+            >
+              {darkMode ? (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <circle cx="12" cy="12" r="5"></circle>
+                  <line x1="12" y1="1" x2="12" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="23"></line>
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                  <line x1="1" y1="12" x2="3" y2="12"></line>
+                  <line x1="21" y1="12" x2="23" y2="12"></line>
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+              ) : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" strokeWidth="2">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+              )}
+              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </span>
+            </div>
+
+            <div style={{ borderTop: `1px solid ${darkMode ? '#333' : '#ddd'}`, margin: '16px 0' }} />
+
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                window.open('https://github.com/mmazco/media-reaction-finder', '_blank');
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px',
+                marginBottom: '8px'
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={darkMode ? '#888' : '#666'}>
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+              </svg>
+              <span style={{ color: darkMode ? '#888' : '#666', fontWeight: '500' }}>GitHub</span>
+            </div>
+
+            <div
+              onClick={() => {
+                setMobileMenuOpen(false);
+                window.open('https://x.com/mmazco', '_blank');
+              }}
+              style={{
+                padding: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                cursor: 'pointer',
+                borderRadius: '8px'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={darkMode ? '#888' : '#666'}>
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+              </svg>
+              <span style={{ color: darkMode ? '#888' : '#666', fontWeight: '500' }}>X (Twitter)</span>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Left Icon Sidebar - Desktop Only */}
       <div style={{
         position: 'fixed',
         left: 0,
@@ -1180,7 +1438,7 @@ export default function App() {
         width: '56px',
         backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
         borderRight: `1px solid ${darkMode ? '#222' : '#333'}`,
-        display: 'flex',
+        display: isMobile ? 'none' : 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: '16px',
