@@ -1457,7 +1457,7 @@ export default function App() {
               {/* Example 2: Blog */}
               <div
                 onClick={() => {
-                  const exampleUrl = 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth';
+                  const exampleUrl = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale';
                   setQuery(exampleUrl);
                   updateURL(exampleUrl);
                   performSearch(exampleUrl);
@@ -1495,7 +1495,7 @@ export default function App() {
                   color: darkMode ? '#fff' : '#000',
                   fontFamily: 'Georgia, serif'
                 }}>
-                  Blind Model & Earth
+                  AI & Decentralized Governance
                 </div>
               </div>
 
