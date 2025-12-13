@@ -519,7 +519,6 @@ export default function App() {
       fontSize: window.innerWidth <= 768 ? '14px' : '16px',
       color: baseColors.textSecondary,
       marginBottom: window.innerWidth <= 768 ? '30px' : '50px',
-      fontStyle: 'italic',
       fontFamily: 'Georgia, serif'
     },
       form: {
