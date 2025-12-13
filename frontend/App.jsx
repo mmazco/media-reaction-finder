@@ -506,18 +506,19 @@ export default function App() {
       textAlign: 'center'
     },
       title: {
-      fontSize: '48px',
+      fontSize: window.innerWidth <= 768 ? '32px' : '48px',
       fontWeight: 'normal',
-      marginBottom: '20px',
+      marginBottom: window.innerWidth <= 768 ? '12px' : '20px',
+      marginTop: window.innerWidth <= 768 ? '60px' : '0',
       color: baseColors.text,
       fontFamily: 'Georgia, serif',
       cursor: 'pointer',
       transition: 'opacity 0.2s ease'
     },
       subtitle: {
-      fontSize: '16px',
+      fontSize: window.innerWidth <= 768 ? '14px' : '16px',
       color: baseColors.textSecondary,
-      marginBottom: '50px',
+      marginBottom: window.innerWidth <= 768 ? '30px' : '50px',
       fontStyle: 'italic',
       fontFamily: 'Georgia, serif'
     },
@@ -1642,8 +1643,8 @@ export default function App() {
         </h1>
         <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
         
-        {/* Search Examples Section */}
-        {!loading && !article && news.length === 0 && reddit.length === 0 && (
+        {/* Desktop: Search Examples Section (before search bar) */}
+        {!isMobile && !loading && !article && news.length === 0 && reddit.length === 0 && (
           <div style={{
             marginBottom: '40px',
             marginTop: '40px',
@@ -1842,6 +1843,120 @@ export default function App() {
             </div>
           )}
         </div>
+
+        {/* Mobile: Search Examples Section (after search bar, as simple list) */}
+        {isMobile && !loading && !article && news.length === 0 && reddit.length === 0 && (
+          <div style={{
+            width: '100%',
+            maxWidth: '700px',
+            marginTop: '20px'
+          }}>
+            {/* Example 1 */}
+            <div
+              onClick={() => {
+                const exampleUrl = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion';
+                setQuery(exampleUrl);
+                updateURL(exampleUrl);
+                performSearch(exampleUrl);
+              }}
+              style={{
+                padding: '16px 0',
+                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span style={{
+                  fontSize: '15px',
+                  color: darkMode ? '#ccc' : '#333',
+                  fontWeight: '500'
+                }}>
+                  Faith in Silicon Valley
+                </span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+
+            {/* Example 2 */}
+            <div
+              onClick={() => {
+                const exampleUrl = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale';
+                setQuery(exampleUrl);
+                updateURL(exampleUrl);
+                performSearch(exampleUrl);
+              }}
+              style={{
+                padding: '16px 0',
+                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span style={{
+                  fontSize: '15px',
+                  color: darkMode ? '#ccc' : '#333',
+                  fontWeight: '500'
+                }}>
+                  AI & Decentralized Governance
+                </span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+
+            {/* Example 3 */}
+            <div
+              onClick={() => {
+                const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
+                setQuery(exampleUrl);
+                updateURL(exampleUrl);
+                performSearch(exampleUrl);
+              }}
+              style={{
+                padding: '16px 0',
+                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span style={{
+                  fontSize: '15px',
+                  color: darkMode ? '#ccc' : '#333',
+                  fontWeight: '500'
+                }}>
+                  Machines of Loving Grace
+                </span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+          </div>
+        )}
 
         {/* Article Summary - Also show for any URL that was searched */}
         {(article || (query.startsWith('http') && (news.length > 0 || reddit.length > 0))) && (
