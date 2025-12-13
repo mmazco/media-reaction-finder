@@ -1406,7 +1406,7 @@ export default function App() {
             <div style={{
               display: 'flex',
               gap: '12px',
-              flexWrap: 'wrap',
+              flexWrap: 'nowrap',
               justifyContent: 'center'
             }}>
               {/* Example 1: News */}
