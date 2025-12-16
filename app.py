@@ -800,19 +800,26 @@ def meta_commentary():
         return jsonify({'error': str(e), 'text': None, 'audio': None}), 500
 
 # Serve static files and SPA routing
+# Get the directory where this file (app.py) lives - this is our static root
+STATIC_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 @app.route('/')
 def serve_index():
     """Serve the main index.html"""
-    return send_from_directory('.', 'index.html')
+    return send_from_directory(STATIC_ROOT, 'index.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files or fallback to index.html for SPA routing"""
-    # Check if it's a static asset
-    if os.path.exists(path):
-        return send_from_directory('.', path)
-    # Fallback to index.html for SPA routing
-    return send_from_directory('.', 'index.html')
+    # Build absolute path to check if file exists
+    full_path = os.path.join(STATIC_ROOT, path)
+    
+    # Check if it's a static asset (file exists and is a file, not directory)
+    if os.path.isfile(full_path):
+        return send_from_directory(STATIC_ROOT, path)
+    
+    # Fallback to index.html for SPA routing (React Router handles client-side routes)
+    return send_from_directory(STATIC_ROOT, 'index.html')
 
 if __name__ == '__main__':
     # Use PORT environment variable for Railway, fallback to 5002 for local dev
