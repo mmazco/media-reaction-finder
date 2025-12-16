@@ -16,8 +16,8 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Set up Flask with static file serving for production
-app = Flask(__name__, static_folder='.', static_url_path='')
+# Set up Flask - disable built-in static handling, we handle it ourselves for SPA support
+app = Flask(__name__, static_folder=None)
 
 def update_recommended_articles():
     """Update recommended flags on existing articles (runs every startup)"""
