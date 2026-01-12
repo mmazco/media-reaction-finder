@@ -120,8 +120,50 @@ def seed_collections_on_startup():
     except Exception as e:
         print(f"⚠️ Error seeding collections: {e}")
 
+def seed_iran_collection():
+    """Seed Iran collection if it doesn't exist"""
+    try:
+        logger = SearchLogger()
+        if not logger.get_collection_by_tag('iran'):
+            logger.create_collection(
+                'iran', 
+                'Iran', 
+                '', 
+                'Articles on Iran, Iranian politics, opposition movements, and regional dynamics'
+            )
+            print("✅ Created 'Iran' collection")
+            
+            iran_articles = [
+                ("Tehran's Method of Governance Has Reached a Dead End - Former Top Adviser Tells Euronews", 
+                 'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews', 
+                 'Euronews', None, 'January 5, 2026', 
+                 'A former top adviser discusses the challenges facing the Iranian government and its governance model.', False),
+                ("In Pursuit of Whiteness: Why Iranian Monarchists Cheer Israel's Genocide", 
+                 'https://www.jadaliyya.com/Details/46906', 
+                 'Jadaliyya', 'Reza Zia-Ebrahimi', 'September 22, 2025', 
+                 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.', False),
+                ("Iran's Political Opposition Jailed", 
+                 'https://www.theatlantic.com/international/archive/2025/08/iran-political-opposition-jailed/683785/', 
+                 'The Atlantic', None, 'August 2025', 
+                 'Examination of the imprisonment of political opposition figures in Iran.', False),
+                ('The Israeli Influence Operation in Iran Pushing to Reinstate the Shah Monarchy', 
+                 'https://www.haaretz.com/israel-news/security-aviation/2025-10-03/ty-article-magazine/.premium/the-israeli-influence-operation-in-iran-pushing-to-reinstate-the-shah-monarchy/00000199-9f12-df33-a5dd-9f770d7a0000', 
+                 'Haaretz', None, 'October 3, 2025', 
+                 'Investigation into Israeli operations aimed at promoting monarchist restoration in Iran.', False),
+            ]
+            
+            for title, url, source, authors, date, summary, recommended in iran_articles:
+                logger.add_article_to_collection('iran', title, url, source, authors, date, summary)
+            
+            print(f"  📄 Added {len(iran_articles)} articles to Iran collection")
+        else:
+            print("📁 Iran collection already exists")
+    except Exception as e:
+        print(f"⚠️ Error seeding Iran collection: {e}")
+
 # Seed collections on startup
 seed_collections_on_startup()
+seed_iran_collection()
 update_recommended_articles()
 
 # Enable CORS - more permissive in production
@@ -143,16 +185,12 @@ def extract_article_metadata(url):
         # More comprehensive headers to avoid bot detection
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Encoding': 'gzip, deflate',  # Removed 'br' (brotli) to avoid decoding issues
             'DNT': '1',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
             'Cache-Control': 'max-age=0'
         }
         
@@ -172,12 +210,23 @@ def extract_article_metadata(url):
         
         response.raise_for_status()
         
+        print(f"📄 Response status: {response.status_code}, content length: {len(response.content)}", flush=True)
+        
         soup = BeautifulSoup(response.content, 'html.parser')
         
         # Extract title
         title = None
         if soup.title:
-            title = soup.title.string.strip()
+            # Handle both simple titles and nested elements
+            title_string = soup.title.string
+            if title_string:
+                title = title_string.strip()
+            else:
+                # Fallback to get_text() if string is None (nested elements)
+                title = soup.title.get_text().strip()
+            print(f"📰 Extracted title: {title[:50] if title else 'None'}...", flush=True)
+        else:
+            print("⚠️ No title tag found in HTML", flush=True)
             # Clean title by removing site name after | or -
             if "|" in title:
                 title = title.split("|")[0].strip()
@@ -455,12 +504,30 @@ Highlight the main points and key information. Use the author's name from the ti
                 
             print(f"🧠 Extracted article: {article_title}")
         
-        # Search news
+        # Search news - use smarter query for URLs
         print("📰 Searching news...")
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
-        news_results = search_news(query, user_ip=user_ip)
         
-        # Filter out results from the same domain if query is a URL
+        # If URL was provided and we have article metadata, search with title + domain exclusion
+        # This finds external reactions rather than pages from the same site
+        search_query = query
+        if query.startswith('http') and article_metadata:
+            try:
+                query_domain = urlparse(query).netloc.replace('www.', '').lower()
+                source = article_metadata.get('source', '')
+                title = article_metadata.get('title', '')
+                
+                # Build a smarter search query that finds reactions
+                if title and title != 'Article':
+                    # Use title in quotes for exact match, add source, exclude original domain
+                    search_query = f'"{title}" {source} -site:{query_domain}'
+                    print(f"🔍 Using smart search query: {search_query[:80]}...")
+            except Exception as e:
+                print(f"Warning: Could not build smart query, using URL: {e}")
+        
+        news_results = search_news(search_query, user_ip=user_ip)
+        
+        # Filter out results from the same domain if query is a URL (backup filter)
         if query.startswith('http'):
             try:
                 query_domain = urlparse(query).netloc.replace('www.', '').lower()
