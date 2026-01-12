@@ -54,7 +54,7 @@ def seed_iran_collection():
         },
         {
             'title': 'The Israeli Influence Operation in Iran Pushing to Reinstate the Shah Monarchy',
-            'url': 'https://www.haaretz.com/israel-news/security-aviation/2025-10-03/ty-article-magazine/.premium/the-israeli-influence-operation-in-iran-pushing-to-reinstate-the-shah-monarchy/00000199-9f12-df33-a5dd-9f770d7a0000',
+            'url': 'https://archive.ph/QvqFh',
             'source': 'Haaretz',
             'authors': None,
             'date': 'October 3, 2025',
