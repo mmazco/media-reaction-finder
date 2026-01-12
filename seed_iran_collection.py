@@ -23,7 +23,7 @@ def seed_iran_collection():
     else:
         print("📁 'Iran' collection already exists")
     
-    # Iran articles
+    # Iran articles - (title, url, source, authors, date, summary, recommended)
     iran_articles = [
         {
             'title': "Tehran's Method of Governance Has Reached a Dead End - Former Top Adviser Tells Euronews",
@@ -31,7 +31,8 @@ def seed_iran_collection():
             'source': 'Euronews',
             'authors': None,
             'date': 'January 5, 2026',
-            'summary': 'A former top adviser discusses the challenges facing the Iranian government and its governance model.'
+            'summary': 'A former top adviser discusses the challenges facing the Iranian government and its governance model.',
+            'recommended': True
         },
         {
             'title': "In Pursuit of Whiteness: Why Iranian Monarchists Cheer Israel's Genocide",
@@ -39,7 +40,8 @@ def seed_iran_collection():
             'source': 'Jadaliyya',
             'authors': 'Reza Zia-Ebrahimi',
             'date': 'September 22, 2025',
-            'summary': 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.'
+            'summary': 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.',
+            'recommended': True
         },
         {
             'title': "Iran's Political Opposition Jailed",
@@ -47,7 +49,8 @@ def seed_iran_collection():
             'source': 'The Atlantic',
             'authors': None,
             'date': 'August 2025',
-            'summary': 'Examination of the imprisonment of political opposition figures in Iran.'
+            'summary': 'Examination of the imprisonment of political opposition figures in Iran.',
+            'recommended': False
         },
         {
             'title': 'The Israeli Influence Operation in Iran Pushing to Reinstate the Shah Monarchy',
@@ -55,7 +58,8 @@ def seed_iran_collection():
             'source': 'Haaretz',
             'authors': None,
             'date': 'October 3, 2025',
-            'summary': "Investigation into Israeli operations aimed at promoting monarchist restoration in Iran."
+            'summary': "Investigation into Israeli operations aimed at promoting monarchist restoration in Iran.",
+            'recommended': False
         },
     ]
     

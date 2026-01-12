@@ -34,6 +34,9 @@ def update_recommended_articles():
             'https://models.com/oftheminute/?p=168720',
             'https://substack.com/@trishestalks/p-176272631',
             'https://www.noemamag.com/building-a-prosocial-media-ecosystem/',
+            # Iran collection
+            'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews',
+            'https://www.jadaliyya.com/Details/46906',
         ]
         conn = sqlite3.connect(logger.db_path)
         cursor = conn.cursor()
@@ -137,11 +140,11 @@ def seed_iran_collection():
                 ("Tehran's Method of Governance Has Reached a Dead End - Former Top Adviser Tells Euronews", 
                  'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews', 
                  'Euronews', None, 'January 5, 2026', 
-                 'A former top adviser discusses the challenges facing the Iranian government and its governance model.', False),
+                 'A former top adviser discusses the challenges facing the Iranian government and its governance model.', True),
                 ("In Pursuit of Whiteness: Why Iranian Monarchists Cheer Israel's Genocide", 
                  'https://www.jadaliyya.com/Details/46906', 
                  'Jadaliyya', 'Reza Zia-Ebrahimi', 'September 22, 2025', 
-                 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.', False),
+                 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.', True),
                 ("Iran's Political Opposition Jailed", 
                  'https://www.theatlantic.com/international/archive/2025/08/iran-political-opposition-jailed/683785/', 
                  'The Atlantic', None, 'August 2025', 
