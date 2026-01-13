@@ -4,6 +4,17 @@ import { useNavigate } from 'react-router-dom';
 // Prediction market data - linked to entities
 const predictionMarkets = [
   {
+    id: 'khamenei-out-jan31',
+    title: 'Khamenei out as Supreme Leader by January 31?',
+    probability: 21,
+    previousProb: 18,
+    volume: '$20.5M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-january-31',
+    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
+    trend: 'up',
+  },
+  {
     id: 'khamenei-out-2026',
     title: 'Khamenei out as Supreme Leader by Dec 31, 2026?',
     probability: 61,
@@ -13,31 +24,37 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxkhameneiout/ali-khamenei-out/kxkhameneiout-akha',
     linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
     trend: 'up',
-    timeframes: [
-      { label: 'Before Apr 1, 2026', prob: 41 },
-      { label: 'Before Jul 1, 2026', prob: 58 },
-      { label: 'Before Sep 1, 2026', prob: 61 },
-    ]
   },
   {
-    id: 'khamenei-out-poly',
-    title: 'Khamenei out as Supreme Leader by December 31, 2026?',
-    probability: 52,
+    id: 'regime-fall-2026',
+    title: 'Will the Iranian regime fall before 2027?',
+    probability: 54,
     previousProb: 48,
-    volume: '$221K',
+    volume: '$1.74M',
     platform: 'polymarket',
-    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-december-31-2026',
-    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k'],
+    url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-the-end-of-2026',
+    linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
+    trend: 'up',
+  },
+  {
+    id: 'us-strikes-iran',
+    title: 'US strikes Iran by January 31, 2026?',
+    probability: 66,
+    previousProb: 55,
+    volume: '$18.7M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/us-strikes-iran-by',
+    linkedEntities: ['trump', 'israel', 'irgc', 'khamenei'],
     trend: 'up',
   },
   {
     id: 'pahlavi-visit',
-    title: 'Will Reza Pahlavi visit Iran this year?',
+    title: 'Will Reza Pahlavi enter Iran before September?',
     probability: 57,
     previousProb: 34,
-    volume: '$246',
+    volume: '$1.8K',
     platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxpahlavi',
+    url: 'https://kalshi.com/markets/kxpahlavivisita/will-reza-pahlavi-enter-iran-before-september/kxpahlavivisita',
     linkedEntities: ['pahlavi'],
     trend: 'up',
   },
@@ -48,17 +65,17 @@ const predictionMarkets = [
     previousProb: 28,
     volume: '$1.2K',
     platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxpahlavi-recognize',
+    url: 'https://kalshi.com/markets/kxrecogpersoniran/recognize-reza-pahlavi/kxrecogpersoniran-26',
     linkedEntities: ['pahlavi', 'trump'],
     trend: 'up',
   },
   {
     id: 'next-supreme-leader',
-    title: 'Who will be the next Supreme Leader of Iran?',
+    title: "Who will be Khamenei's successor?",
     probability: null,
     volume: '$2.3K',
     platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxnextiranleader',
+    url: 'https://kalshi.com/markets/kxnextiranleader/who-will-be-khameneis-successor/kxnextiranleader-45jan01',
     linkedEntities: ['mojtaba', 'hassan_k', 'arafi', 'khamenei'],
     candidates: [
       { name: 'Mojtaba Khamenei', prob: 25 },
@@ -67,35 +84,24 @@ const predictionMarkets = [
     trend: 'stable',
   },
   {
-    id: 'israel-strikes-iran',
-    title: 'Israel strikes Iran by January 31, 2026?',
-    probability: 31,
-    previousProb: 45,
-    volume: '$5M',
-    platform: 'polymarket',
-    url: 'https://polymarket.com/event/israel-strikes-iran',
-    linkedEntities: ['israel', 'irgc', 'khamenei'],
-    trend: 'down',
-  },
-  {
     id: 'iran-nuclear-deal',
-    title: 'New US-Iran nuclear deal this year?',
+    title: 'US-Iran nuclear deal this year?',
     probability: 49,
     previousProb: 35,
     volume: '$1.5K',
     platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxirannuke',
+    url: 'https://kalshi.com/markets/kxusairanagreement/us-iran-nuclear-deal/kxusairanagreement-27',
     linkedEntities: ['trump', 'khamenei', 'pezeshkian'],
     trend: 'up',
   },
   {
     id: 'strait-hormuz',
-    title: 'Will Iran close the Strait of Hormuz this year?',
+    title: 'Will Iran close the Strait of Hormuz?',
     probability: 31,
     previousProb: 22,
     volume: '$4.1K',
     platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxhormuz',
+    url: 'https://kalshi.com/markets/kxclosehormuz/strait-of-hormuz/kxclosehormuz-27jan',
     linkedEntities: ['irgc', 'khamenei'],
     trend: 'up',
   },
@@ -632,17 +638,20 @@ export default function IranPoliticalGraph({ darkMode = true }) {
             </button>
           </div>
           
-          {/* Pan/Zoom hint */}
+          {/* Pan/Zoom hint - positioned over the SVG */}
           <div style={{
             position: 'absolute',
-            bottom: '50px',
+            bottom: '70px',
             left: '10px',
             zIndex: 10,
             fontSize: '10px',
             color: theme.textFaint,
             fontFamily: "Arial, sans-serif",
             background: theme.svgBg,
-            padding: '4px 8px',
+            padding: '6px 10px',
+            borderRadius: '4px',
+            border: `1px solid ${theme.cardBorder}`,
+            pointerEvents: 'none',
           }}>
             Scroll to zoom • Drag background to pan • Drag nodes to move
           </div>
@@ -952,35 +961,36 @@ export default function IranPoliticalGraph({ darkMode = true }) {
             )}
           </div>
 
-          {/* Key Insight */}
+          {/* Note */}
           <div style={{
             marginTop: '16px',
             padding: '14px',
-            background: darkMode ? 'rgba(74, 26, 26, 0.3)' : 'rgba(255, 235, 238, 0.8)',
-            border: `1px solid ${darkMode ? '#6a2a2a' : '#e57373'}`,
+            background: theme.cardBg,
+            border: `1px solid ${theme.cardBorder}`,
           }}>
-            <div style={{ fontSize: '9px', color: '#e57373', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px', fontFamily: 'Arial, sans-serif' }}>
-              Key Insight
+            <div style={{ fontSize: '9px', color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
+              Note
             </div>
-            <p style={{ fontSize: '11px', lineHeight: 1.5, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
-              Markets price Khamenei leaving power at <strong style={{ color: theme.accent }}>58-61%</strong> by mid-2026. 
-              The opposition lacks unified leadership — a "Bonaparte" may emerge from within.
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 10px 0', fontFamily: 'Arial, sans-serif' }}>
+              Prediction markets currently price Khamenei leaving power at <strong style={{ color: theme.accent }}>58-61%</strong> by mid-2026. The succession process and potential political transitions remain uncertain.
+            </p>
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
+              For further reading and analysis, head over to the{' '}
+              <span 
+                onClick={() => navigate('/collections')}
+                style={{ 
+                  color: theme.accent, 
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Collections page
+              </span>
+              {' '}to view various sources covering Iran.
             </p>
           </div>
 
           {/* Sources */}
-          <div style={{
-            marginTop: '12px',
-            padding: '10px 12px',
-            background: theme.cardBg,
-            border: `1px solid ${theme.cardBorder}`,
-            fontSize: '9px',
-            color: theme.textFaint,
-            fontFamily: 'Arial, sans-serif',
-          }}>
-            <span style={{ textTransform: 'uppercase', letterSpacing: '1px' }}>Sources: </span>
-            <span style={{ color: theme.textMuted }}>Euronews, Atlantic Council, Iran International, CNN, Polymarket, Kalshi</span>
-          </div>
         </div>
       </div>
     </div>
