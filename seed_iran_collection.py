@@ -79,6 +79,15 @@ def seed_iran_collection():
             'summary': "Discussion on what's driving Iran's protests, what we know under conditions of severe information blackout, and why Washington's talk of intervention carries enormous risks for Iranians and the broader region.",
             'recommended': True
         },
+        {
+            'title': "Military Intervention Will Not Liberate the Iranian People",
+            'url': 'https://newrepublic.com/article/205176/iran-crackdown-force-us-military',
+            'source': 'The New Republic',
+            'authors': 'Nancy Okail, Sina Toossi',
+            'date': 'January 13, 2026',
+            'summary': "Argues that Iranians are caught between their brutal regime and the U.S. war machine, rejecting military intervention as a solution. Discusses how repression cannot restore political order and why external intervention distorts democratic transitions.",
+            'recommended': True
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")
