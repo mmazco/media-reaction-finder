@@ -70,6 +70,15 @@ def seed_iran_collection():
             'summary': "Analysis comparing current Iran protests to 1979 revolution, examining why structural conditions differ - the bazaar has lost autonomy to IRGC-connected elites, clergy is fragmented, military hasn't defected, and external disinformation complicates genuine opposition.",
             'recommended': True
         },
+        {
+            'title': "How the U.S. and Israel Are Trying to Co-opt Iran's Protests",
+            'url': 'https://www.dropsitenews.com/p/iran-protests-us-israel-islamic-republic',
+            'source': 'Drop Site News',
+            'authors': 'Samira Mohyeddin, Narges Bajoghli, Jeremy Scahill, Murtaza Hussain',
+            'date': 'January 13, 2026',
+            'summary': "Discussion on what's driving Iran's protests, what we know under conditions of severe information blackout, and why Washington's talk of intervention carries enormous risks for Iranians and the broader region.",
+            'recommended': True
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")
