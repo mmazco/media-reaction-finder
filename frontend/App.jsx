@@ -7,10 +7,12 @@ import IranPoliticalGraph from './IranPoliticalGraph';
 function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery }) {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [reddit, setReddit] = useState([]);
   const [web, setWeb] = useState([]);
   const [twitter, setTwitter] = useState([]);
   const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
   
   // Extract topic from URL
   const topic = location.pathname.split('/trending/')[1]?.split('/')[0] || 'iran';
@@ -18,7 +20,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
   const topicInfo = {
     'iran': {
       title: "What's Happening in Iran?",
-      description: 'Political landscape, opposition movements, and regime dynamics',
+      description: 'Political landscape and updates on events',
       category: 'Geopolitics'
     },
     'ai-governance': {
@@ -35,27 +37,34 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
   
   const info = topicInfo[topic] || { title: topic, description: '', category: 'Topic' };
   
-  useEffect(() => {
-    const fetchReactions = async () => {
+  const fetchReactions = async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+    } else {
       setLoading(true);
-      try {
-        const response = await fetch(`/api/trending/${topic}`);
-        if (response.ok) {
-          const data = await response.json();
-          setReddit(data.reddit || []);
-          setWeb(data.web || []);
-          setTwitter(data.twitter || []);
-        } else {
-          setError('Failed to fetch reactions');
-        }
-      } catch (err) {
-        console.error('Error fetching trending reactions:', err);
+    }
+    try {
+      const response = await fetch(`/api/trending/${topic}`);
+      if (response.ok) {
+        const data = await response.json();
+        setReddit(data.reddit || []);
+        setWeb(data.web || []);
+        setTwitter(data.twitter || []);
+        setLastUpdated(new Date());
+        setError(null);
+      } else {
         setError('Failed to fetch reactions');
-      } finally {
-        setLoading(false);
       }
-    };
-    
+    } catch (err) {
+      console.error('Error fetching trending reactions:', err);
+      setError('Failed to fetch reactions');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchReactions();
   }, [topic]);
   
@@ -71,6 +80,14 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
       overflowY: 'auto',
       padding: '0'
     }}>
+      {/* CSS Animation for refresh spinner */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+      
       {/* Header */}
       <div style={{
         position: 'sticky',
@@ -80,23 +97,6 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
         borderBottom: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
         zIndex: 10
       }}>
-        <button
-          onClick={() => navigate('/')}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: darkMode ? '#888' : '#666',
-            fontSize: '13px',
-            cursor: 'pointer',
-            padding: 0,
-            marginBottom: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}
-        >
-          ← Back to Home
-        </button>
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -111,9 +111,10 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
               textTransform: 'uppercase',
               letterSpacing: '1px',
               marginBottom: '4px',
-              fontWeight: '600'
+              fontWeight: '600',
+              fontFamily: 'Arial, sans-serif'
             }}>
-              📈 Trending: {info.category}
+              Trending: {info.category}
             </div>
             <h1 style={{
               fontSize: '24px',
@@ -129,32 +130,93 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 fontSize: '14px',
                 color: darkMode ? '#888' : '#666',
                 margin: '6px 0 0',
-                fontStyle: 'italic'
+                fontFamily: 'Arial, sans-serif'
               }}>
                 {info.description}
               </p>
             )}
           </div>
           
-          {topic === 'iran' && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Refresh Button */}
             <button
-              onClick={() => navigate('/trending/iran/graph')}
+              onClick={() => fetchReactions(true)}
+              disabled={refreshing || loading}
+              title="Refresh feed"
               style={{
-                padding: '10px 20px',
+                padding: '10px',
                 fontSize: '12px',
-                fontWeight: '600',
-                backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
-                color: darkMode ? '#000' : '#fff',
-                border: 'none',
+                backgroundColor: 'transparent',
+                color: darkMode ? '#888' : '#666',
+                border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
                 borderRadius: '6px',
-                cursor: 'pointer',
-                fontFamily: 'Arial, sans-serif'
+                cursor: refreshing || loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s ease',
+                opacity: refreshing || loading ? 0.5 : 1
+              }}
+              onMouseEnter={(e) => {
+                if (!refreshing && !loading) {
+                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
+                  e.currentTarget.style.color = darkMode ? '#fff' : '#333';
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
+                e.currentTarget.style.color = darkMode ? '#888' : '#666';
               }}
             >
-              VIEW POLITICAL MAP (BETA)
+              <svg 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2"
+                style={{
+                  animation: refreshing ? 'spin 1s linear infinite' : 'none'
+                }}
+              >
+                <path d="M23 4v6h-6"></path>
+                <path d="M1 20v-6h6"></path>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
             </button>
-          )}
+            
+            {topic === 'iran' && (
+              <button
+                onClick={() => navigate('/trending/iran/graph')}
+                style={{
+                  padding: '10px 20px',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                  color: darkMode ? '#000' : '#fff',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'Arial, sans-serif'
+                }}
+              >
+                VIEW POLITICAL MAP (BETA)
+              </button>
+            )}
+          </div>
         </div>
+        
+        {/* Last updated indicator */}
+        {lastUpdated && !loading && (
+          <div style={{
+            fontSize: '11px',
+            color: darkMode ? '#555' : '#999',
+            marginTop: '8px',
+            fontFamily: 'Arial, sans-serif'
+          }}>
+            Last updated: {lastUpdated.toLocaleTimeString()}
+          </div>
+        )}
       </div>
       
       {/* Content */}
@@ -194,16 +256,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                fontFamily: 'Georgia, serif'
               }}>
-                <span style={{
-                  padding: '4px 10px',
-                  backgroundColor: '#1DA1F2',
-                  color: '#fff',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  borderRadius: '4px'
-                }}>X</span>
                 Posts on X
                 <span style={{
                   padding: '2px 6px',
@@ -213,70 +268,74 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                   fontWeight: '700',
                   letterSpacing: '0.5px',
                   borderRadius: '3px',
-                  fontFamily: 'Arial, sans-serif',
-                  marginLeft: '8px'
+                  fontFamily: 'Arial, sans-serif'
                 }}>
                   BETA
                 </span>
-                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400', fontFamily: 'Arial, sans-serif' }}>
                   ({twitter.length})
                 </span>
               </h2>
               {twitter.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
                   {twitter.map((tweet, i) => (
-                    <a
+                    <div
                       key={i}
-                      href={tweet.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       style={{
-                        padding: '16px',
-                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        transition: 'all 0.2s ease'
+                        marginBottom: '20px',
+                        padding: '15px',
+                        backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                        borderRadius: '5px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
-                        <div style={{ flex: 1 }}>
-                          <div style={{
-                            fontSize: '13px',
-                            fontWeight: '600',
-                            color: darkMode ? '#fff' : '#000',
-                            marginBottom: '4px'
-                          }}>
-                            {tweet.author_name}
-                            <span style={{ fontWeight: '400', color: darkMode ? '#666' : '#888', marginLeft: '6px' }}>
-                              @{tweet.author_username}
-                            </span>
-                          </div>
-                          <p style={{
-                            fontSize: '14px',
-                            color: darkMode ? '#ccc' : '#333',
-                            lineHeight: '1.5',
-                            margin: '8px 0'
-                          }}>
-                            {tweet.text}
-                          </p>
-                          <div style={{
-                            fontSize: '12px',
-                            color: darkMode ? '#666' : '#888',
-                            display: 'flex',
-                            gap: '16px'
-                          }}>
-                            <span>❤️ {tweet.likes}</span>
-                            <span>🔄 {tweet.retweets}</span>
-                            <span>💬 {tweet.replies}</span>
-                          </div>
-                        </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                        <span style={{
+                          fontSize: '12px',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: '#1DA1F2',
+                          color: '#fff',
+                          fontWeight: '500'
+                        }}>
+                          X
+                        </span>
+                        <a 
+                          href={tweet.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{
+                            color: darkMode ? '#ffffff' : '#000000',
+                            textDecoration: 'none',
+                            fontSize: '16px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {tweet.author_name}
+                          <span style={{ fontWeight: '400', color: darkMode ? '#888' : '#666', marginLeft: '6px' }}>
+                            @{tweet.author_username}
+                          </span>
+                        </a>
+                        <span style={{
+                          fontSize: '11px',
+                          color: darkMode ? '#999' : '#666',
+                          marginLeft: 'auto'
+                        }}>
+                          ❤️ {tweet.likes} · 🔄 {tweet.retweets} · 💬 {tweet.replies}
+                        </span>
                       </div>
-                    </a>
+                      <p style={{
+                        marginTop: '8px',
+                        color: darkMode ? '#b3b3b3' : '#666',
+                        fontSize: '14px',
+                        lineHeight: '1.5'
+                      }}>
+                        {tweet.text}
+                      </p>
+                    </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                <p style={{ color: darkMode ? '#666' : '#888' }}>
                   No tweets found. Twitter API may not be configured.
                 </p>
               )}
@@ -291,68 +350,75 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                fontFamily: 'Georgia, serif'
               }}>
-                <span style={{
-                  padding: '4px 10px',
-                  backgroundColor: '#FF4500',
-                  color: '#fff',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  borderRadius: '4px'
-                }}>Reddit</span>
                 Reddit Discussions
-                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400', fontFamily: 'Arial, sans-serif' }}>
                   ({reddit.length})
                 </span>
               </h2>
               {reddit.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
                   {reddit.map((post, i) => (
-                    <a
+                    <div
                       key={i}
-                      href={post.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       style={{
-                        padding: '16px',
-                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        transition: 'all 0.2s ease'
+                        marginBottom: '20px',
+                        padding: '15px',
+                        backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                        borderRadius: '5px'
                       }}
                     >
-                      <div style={{
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        color: darkMode ? '#fff' : '#000',
-                        marginBottom: '8px',
-                        lineHeight: '1.4'
-                      }}>
-                        {post.title}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                        <span style={{
+                          fontSize: '12px',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: '#FF6B6B',
+                          color: '#fff',
+                          fontWeight: '500'
+                        }}>
+                          Reddit
+                        </span>
+                        <a 
+                          href={post.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{
+                            color: darkMode ? '#ffffff' : '#000000',
+                            textDecoration: 'none',
+                            fontSize: '16px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {post.title}
+                        </a>
+                        {post.num_comments > 0 && (
+                          <span style={{
+                            fontSize: '11px',
+                            color: darkMode ? '#999' : '#666',
+                            marginLeft: 'auto'
+                          }}>
+                            💬 {post.num_comments} comments
+                          </span>
+                        )}
                       </div>
                       {post.summary && (
                         <p style={{
-                          fontSize: '13px',
-                          color: darkMode ? '#aaa' : '#555',
-                          lineHeight: '1.5',
-                          margin: '0 0 8px'
+                          marginTop: '8px',
+                          color: darkMode ? '#b3b3b3' : '#666',
+                          fontSize: '14px',
+                          lineHeight: '1.5'
                         }}>
                           {post.summary}
                         </p>
                       )}
-                      <div style={{
-                        fontSize: '12px',
-                        color: darkMode ? '#666' : '#888'
-                      }}>
-                        r/{post.subreddit} • {post.num_comments} comments
-                      </div>
-                    </a>
+                    </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                <p style={{ color: darkMode ? '#666' : '#888' }}>
                   No Reddit discussions found.
                 </p>
               )}
@@ -367,68 +433,66 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                fontFamily: 'Georgia, serif'
               }}>
-                <span style={{
-                  padding: '4px 10px',
-                  backgroundColor: '#4ECDC4',
-                  color: '#fff',
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  borderRadius: '4px'
-                }}>Web</span>
                 Web Articles
-                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400', fontFamily: 'Arial, sans-serif' }}>
                   ({web.length})
                 </span>
               </h2>
               {web.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
                   {web.map((article, i) => (
-                    <a
+                    <div
                       key={i}
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       style={{
-                        padding: '16px',
-                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                        borderRadius: '8px',
-                        textDecoration: 'none',
-                        transition: 'all 0.2s ease'
+                        marginBottom: '20px',
+                        padding: '15px',
+                        backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                        borderRadius: '5px'
                       }}
                     >
-                      <div style={{
-                        fontSize: '15px',
-                        fontWeight: '600',
-                        color: darkMode ? '#fff' : '#000',
-                        marginBottom: '8px',
-                        lineHeight: '1.4'
-                      }}>
-                        {article.title}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                        <span style={{
+                          fontSize: '12px',
+                          padding: '2px 8px',
+                          borderRadius: '4px',
+                          backgroundColor: '#4ECDC4',
+                          color: '#fff',
+                          fontWeight: '500'
+                        }}>
+                          Web
+                        </span>
+                        <a 
+                          href={article.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          style={{
+                            color: darkMode ? '#ffffff' : '#000000',
+                            textDecoration: 'none',
+                            fontSize: '16px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {article.title}
+                        </a>
                       </div>
                       {article.summary && (
                         <p style={{
-                          fontSize: '13px',
-                          color: darkMode ? '#aaa' : '#555',
-                          lineHeight: '1.5',
-                          margin: '0 0 8px'
+                          marginTop: '8px',
+                          color: darkMode ? '#b3b3b3' : '#666',
+                          fontSize: '14px',
+                          lineHeight: '1.5'
                         }}>
                           {article.summary}
                         </p>
                       )}
-                      <div style={{
-                        fontSize: '12px',
-                        color: darkMode ? '#4da6ff' : '#0066cc'
-                      }}>
-                        {article.source}
-                      </div>
-                    </a>
+                    </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                <p style={{ color: darkMode ? '#666' : '#888' }}>
                   No web articles found.
                 </p>
               )}
@@ -1631,11 +1695,11 @@ export default function App() {
           left: isMobile ? 0 : '56px',
           width: isMobile ? '100vw' : 'calc(100vw - 56px)',
           height: '100vh',
-          backgroundColor: '#0d0d0d',
+          backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
           zIndex: 1000,
           overflowY: 'auto'
         }}>
-          <IranPoliticalGraph />
+          <IranPoliticalGraph darkMode={darkMode} />
         </div>
       )}
 
@@ -1910,7 +1974,7 @@ export default function App() {
         zIndex: 1001,
         gap: '4px'
       }}>
-        {/* Search Icon */}
+        {/* Search Icon (also serves as Home) */}
         <div 
           onClick={() => {
             // Close any open views first
