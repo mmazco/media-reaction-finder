@@ -1,6 +1,444 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import IranPoliticalGraph from './IranPoliticalGraph';
 // v2.1.0 - Simplified error message styling
+
+// Trending Topic Reactions Page Component
+function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery }) {
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [reddit, setReddit] = useState([]);
+  const [web, setWeb] = useState([]);
+  const [twitter, setTwitter] = useState([]);
+  const [error, setError] = useState(null);
+  
+  // Extract topic from URL
+  const topic = location.pathname.split('/trending/')[1]?.split('/')[0] || 'iran';
+  
+  const topicInfo = {
+    'iran': {
+      title: "What's Happening in Iran?",
+      description: 'Political landscape, opposition movements, and regime dynamics',
+      category: 'Geopolitics'
+    },
+    'ai-governance': {
+      title: 'AI Governance & Regulation',
+      description: 'Policy discussions around artificial intelligence',
+      category: 'Technology'
+    },
+    'climate-tech': {
+      title: 'Climate Technology',
+      description: 'Innovation in renewable energy and sustainability',
+      category: 'Climate'
+    }
+  };
+  
+  const info = topicInfo[topic] || { title: topic, description: '', category: 'Topic' };
+  
+  useEffect(() => {
+    const fetchReactions = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/trending/${topic}`);
+        if (response.ok) {
+          const data = await response.json();
+          setReddit(data.reddit || []);
+          setWeb(data.web || []);
+          setTwitter(data.twitter || []);
+        } else {
+          setError('Failed to fetch reactions');
+        }
+      } catch (err) {
+        console.error('Error fetching trending reactions:', err);
+        setError('Failed to fetch reactions');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchReactions();
+  }, [topic]);
+  
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: isMobile ? 0 : '56px',
+      width: isMobile ? '100vw' : 'calc(100vw - 56px)',
+      height: '100vh',
+      backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+      zIndex: 1000,
+      overflowY: 'auto',
+      padding: '0'
+    }}>
+      {/* Header */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+        padding: '20px 30px',
+        borderBottom: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+        zIndex: 10
+      }}>
+        <button
+          onClick={() => navigate('/')}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: darkMode ? '#888' : '#666',
+            fontSize: '13px',
+            cursor: 'pointer',
+            padding: 0,
+            marginBottom: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px'
+          }}
+        >
+          ← Back to Home
+        </button>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div>
+            <div style={{
+              fontSize: '11px',
+              color: darkMode ? '#ffd54f' : '#b8860b',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              marginBottom: '4px',
+              fontWeight: '600'
+            }}>
+              📈 Trending: {info.category}
+            </div>
+            <h1 style={{
+              fontSize: '24px',
+              fontWeight: '600',
+              color: darkMode ? '#fff' : '#000',
+              margin: 0,
+              fontFamily: 'Georgia, serif'
+            }}>
+              {info.title}
+            </h1>
+            {info.description && (
+              <p style={{
+                fontSize: '14px',
+                color: darkMode ? '#888' : '#666',
+                margin: '6px 0 0',
+                fontStyle: 'italic'
+              }}>
+                {info.description}
+              </p>
+            )}
+          </div>
+          
+          {topic === 'iran' && (
+            <button
+              onClick={() => navigate('/trending/iran/graph')}
+              style={{
+                padding: '10px 20px',
+                fontSize: '12px',
+                fontWeight: '600',
+                backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                color: darkMode ? '#000' : '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontFamily: 'Arial, sans-serif'
+              }}
+            >
+              VIEW POLITICAL MAP (BETA)
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {/* Content */}
+      <div style={{
+        maxWidth: '900px',
+        margin: '0 auto',
+        padding: '30px 20px'
+      }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{
+              width: '24px',
+              height: '24px',
+              border: `2px solid ${darkMode ? '#333' : '#ddd'}`,
+              borderTopColor: darkMode ? '#fff' : '#000',
+              borderRadius: '50%',
+              animation: 'spin 1s linear infinite',
+              margin: '0 auto 16px'
+            }} />
+            <p style={{ color: darkMode ? '#888' : '#666', fontStyle: 'italic' }}>
+              Fetching reactions from Reddit, X, and the web...
+            </p>
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: darkMode ? '#e57373' : '#c62828' }}>
+            {error}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            
+            {/* Twitter/X Section */}
+            <div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: darkMode ? '#fff' : '#000',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{
+                  padding: '4px 10px',
+                  backgroundColor: '#1DA1F2',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '4px'
+                }}>X</span>
+                Posts on X
+                <span style={{
+                  padding: '2px 6px',
+                  backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                  color: darkMode ? '#000' : '#fff',
+                  fontSize: '9px',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  borderRadius: '3px',
+                  fontFamily: 'Arial, sans-serif',
+                  marginLeft: '8px'
+                }}>
+                  BETA
+                </span>
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                  ({twitter.length})
+                </span>
+              </h2>
+              {twitter.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {twitter.map((tweet, i) => (
+                    <a
+                      key={i}
+                      href={tweet.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '16px',
+                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+                        <div style={{ flex: 1 }}>
+                          <div style={{
+                            fontSize: '13px',
+                            fontWeight: '600',
+                            color: darkMode ? '#fff' : '#000',
+                            marginBottom: '4px'
+                          }}>
+                            {tweet.author_name}
+                            <span style={{ fontWeight: '400', color: darkMode ? '#666' : '#888', marginLeft: '6px' }}>
+                              @{tweet.author_username}
+                            </span>
+                          </div>
+                          <p style={{
+                            fontSize: '14px',
+                            color: darkMode ? '#ccc' : '#333',
+                            lineHeight: '1.5',
+                            margin: '8px 0'
+                          }}>
+                            {tweet.text}
+                          </p>
+                          <div style={{
+                            fontSize: '12px',
+                            color: darkMode ? '#666' : '#888',
+                            display: 'flex',
+                            gap: '16px'
+                          }}>
+                            <span>❤️ {tweet.likes}</span>
+                            <span>🔄 {tweet.retweets}</span>
+                            <span>💬 {tweet.replies}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                  No tweets found. Twitter API may not be configured.
+                </p>
+              )}
+            </div>
+            
+            {/* Reddit Section */}
+            <div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: darkMode ? '#fff' : '#000',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{
+                  padding: '4px 10px',
+                  backgroundColor: '#FF4500',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '4px'
+                }}>Reddit</span>
+                Reddit Discussions
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                  ({reddit.length})
+                </span>
+              </h2>
+              {reddit.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {reddit.map((post, i) => (
+                    <a
+                      key={i}
+                      href={post.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '16px',
+                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        color: darkMode ? '#fff' : '#000',
+                        marginBottom: '8px',
+                        lineHeight: '1.4'
+                      }}>
+                        {post.title}
+                      </div>
+                      {post.summary && (
+                        <p style={{
+                          fontSize: '13px',
+                          color: darkMode ? '#aaa' : '#555',
+                          lineHeight: '1.5',
+                          margin: '0 0 8px'
+                        }}>
+                          {post.summary}
+                        </p>
+                      )}
+                      <div style={{
+                        fontSize: '12px',
+                        color: darkMode ? '#666' : '#888'
+                      }}>
+                        r/{post.subreddit} • {post.num_comments} comments
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                  No Reddit discussions found.
+                </p>
+              )}
+            </div>
+            
+            {/* Web Section */}
+            <div>
+              <h2 style={{
+                fontSize: '18px',
+                fontWeight: '600',
+                color: darkMode ? '#fff' : '#000',
+                marginBottom: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px'
+              }}>
+                <span style={{
+                  padding: '4px 10px',
+                  backgroundColor: '#4ECDC4',
+                  color: '#fff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '4px'
+                }}>Web</span>
+                Web Articles
+                <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400' }}>
+                  ({web.length})
+                </span>
+              </h2>
+              {web.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {web.map((article, i) => (
+                    <a
+                      key={i}
+                      href={article.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        padding: '16px',
+                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                        borderRadius: '8px',
+                        textDecoration: 'none',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      <div style={{
+                        fontSize: '15px',
+                        fontWeight: '600',
+                        color: darkMode ? '#fff' : '#000',
+                        marginBottom: '8px',
+                        lineHeight: '1.4'
+                      }}>
+                        {article.title}
+                      </div>
+                      {article.summary && (
+                        <p style={{
+                          fontSize: '13px',
+                          color: darkMode ? '#aaa' : '#555',
+                          lineHeight: '1.5',
+                          margin: '0 0 8px'
+                        }}>
+                          {article.summary}
+                        </p>
+                      )}
+                      <div style={{
+                        fontSize: '12px',
+                        color: darkMode ? '#4da6ff' : '#0066cc'
+                      }}>
+                        {article.source}
+                      </div>
+                    </a>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ color: darkMode ? '#666' : '#888', fontStyle: 'italic' }}>
+                  No web articles found.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   const navigate = useNavigate();
@@ -1184,6 +1622,33 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Iran Political Graph Page */}
+      {location.pathname === '/trending/iran/graph' && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: isMobile ? 0 : '56px',
+          width: isMobile ? '100vw' : 'calc(100vw - 56px)',
+          height: '100vh',
+          backgroundColor: '#0d0d0d',
+          zIndex: 1000,
+          overflowY: 'auto'
+        }}>
+          <IranPoliticalGraph />
+        </div>
+      )}
+
+      {/* Trending Topic Reactions Page */}
+      {location.pathname.startsWith('/trending/') && !location.pathname.includes('/graph') && (
+        <TrendingTopicPage 
+          darkMode={darkMode} 
+          isMobile={isMobile} 
+          navigate={navigate}
+          performSearch={performSearch}
+          setQuery={setQuery}
+        />
+      )}
       
       {/* Mobile Burger Menu */}
       {isMobile && (
@@ -1642,169 +2107,6 @@ export default function App() {
         </h1>
         <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
         
-        {/* Desktop: Search Examples Section (before search bar) */}
-        {!isMobile && !loading && !article && news.length === 0 && reddit.length === 0 && (
-          <div style={{
-            marginBottom: '40px',
-            marginTop: '40px',
-            width: '100%',
-            maxWidth: '700px'
-          }}>
-            <div style={{
-              fontSize: '11px',
-              color: darkMode ? '#666' : '#999',
-              marginBottom: '16px',
-              fontWeight: '600',
-              letterSpacing: '1px',
-              textAlign: 'center',
-              textTransform: 'uppercase'
-            }}>
-              Search Examples
-            </div>
-            <div style={{
-              display: 'flex',
-              gap: '12px',
-              flexWrap: 'nowrap',
-              justifyContent: 'center'
-            }}>
-              {/* Example 1: News */}
-              <div
-                onClick={() => {
-                  const exampleUrl = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion';
-                  setQuery(exampleUrl);
-                  updateURL(exampleUrl);
-                  performSearch(exampleUrl);
-                }}
-                style={{
-                  padding: '14px 20px',
-                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
-                }}
-              >
-                <div style={{
-                  fontSize: '13px',
-                  fontWeight: '400',
-                  color: darkMode ? '#888' : '#666',
-                  marginBottom: '4px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  News
-                </div>
-                <div style={{
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  color: darkMode ? '#fff' : '#000',
-                  fontFamily: 'Georgia, serif'
-                }}>
-                  Faith in Silicon Valley
-                </div>
-              </div>
-
-              {/* Example 2: Blog */}
-              <div
-                onClick={() => {
-                  const exampleUrl = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale';
-                  setQuery(exampleUrl);
-                  updateURL(exampleUrl);
-                  performSearch(exampleUrl);
-                }}
-                style={{
-                  padding: '14px 20px',
-                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
-                }}
-              >
-                <div style={{
-                  fontSize: '13px',
-                  fontWeight: '400',
-                  color: darkMode ? '#888' : '#666',
-                  marginBottom: '4px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  Blog
-                </div>
-                <div style={{
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  color: darkMode ? '#fff' : '#000',
-                  fontFamily: 'Georgia, serif'
-                }}>
-                  AI & Decentralized Governance
-                </div>
-              </div>
-
-              {/* Example 3: Essay */}
-              <div
-                onClick={() => {
-                  const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
-                  setQuery(exampleUrl);
-                  updateURL(exampleUrl);
-                  performSearch(exampleUrl);
-                }}
-                style={{
-                  padding: '14px 20px',
-                  backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
-                  border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'left'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#555' : '#999';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#eee';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
-                  e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5';
-                }}
-              >
-                <div style={{
-                  fontSize: '13px',
-                  fontWeight: '400',
-                  color: darkMode ? '#888' : '#666',
-                  marginBottom: '4px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  Essay
-                </div>
-                <div style={{
-                  fontSize: '15px',
-                  fontWeight: '700',
-                  color: darkMode ? '#fff' : '#000',
-                  fontFamily: 'Georgia, serif'
-                }}>
-                  Machines of Loving Grace
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-        
         <div style={styles.form}>
           <label style={styles.label}>Insert URL or Topic</label>
           <input
@@ -1843,14 +2145,56 @@ export default function App() {
           )}
         </div>
 
-        {/* Mobile: Search Examples Section (after search bar, as simple list) */}
-        {isMobile && !loading && !article && news.length === 0 && reddit.length === 0 && (
+        {/* Unified Examples Section (after search bar) */}
+        {!loading && !article && news.length === 0 && reddit.length === 0 && (
           <div style={{
             width: '100%',
             maxWidth: '700px',
-            marginTop: '20px'
+            marginTop: '24px'
           }}>
-            {/* Example 1 */}
+            {/* Iran Trending Topic - with BETA badge */}
+            <div
+              onClick={() => navigate('/trending/iran')}
+              style={{
+                padding: '16px 0',
+                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
+                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                  <polyline points="17 6 23 6 23 12"></polyline>
+                </svg>
+                <span style={{
+                  fontSize: '15px',
+                  color: darkMode ? '#ccc' : '#333',
+                  fontWeight: '500'
+                }}>
+                  What's Happening in Iran?
+                </span>
+                <span style={{
+                  padding: '2px 6px',
+                  backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                  color: darkMode ? '#000' : '#fff',
+                  fontSize: '9px',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  borderRadius: '3px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  BETA
+                </span>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+              </svg>
+            </div>
+
+            {/* Example 1: Faith in Silicon Valley */}
             <div
               onClick={() => {
                 const exampleUrl = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion';
@@ -1885,7 +2229,7 @@ export default function App() {
               </svg>
             </div>
 
-            {/* Example 2 */}
+            {/* Example 2: AI & Decentralized Governance */}
             <div
               onClick={() => {
                 const exampleUrl = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale';
@@ -1920,7 +2264,7 @@ export default function App() {
               </svg>
             </div>
 
-            {/* Example 3 */}
+            {/* Example 3: Machines of Loving Grace */}
             <div
               onClick={() => {
                 const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';

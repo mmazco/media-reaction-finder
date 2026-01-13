@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from search import search_news
 from api.reddit import search_reddit_posts, get_title_from_url
+from api.twitter import search_twitter_posts, get_trending_tweets
 from summarize import summarize_text
 from api.search_logger import SearchLogger
 from api.meta_commentary import generate_audio_commentary
@@ -13,8 +14,9 @@ import re
 from datetime import datetime
 from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables (check both .env and .env.local)
 load_dotenv()
+load_dotenv('.env.local', override=True)
 
 # Set up Flask - disable built-in static handling, we handle it ourselves for SPA support
 app = Flask(__name__, static_folder=None)
@@ -687,6 +689,82 @@ def health():
         'message': 'Media Reaction Finder API is running'
     })
 
+@app.route('/api/twitter', methods=['POST'])
+def get_twitter_reactions():
+    """
+    Search for tweets related to a topic or query.
+    
+    Expects JSON body with:
+    - query: Search query string
+    - limit: Optional number of tweets (default 10)
+    
+    Returns:
+    - tweets: Array of tweet objects with text, author, engagement, url
+    """
+    try:
+        data = request.get_json()
+        query = data.get('query', '')
+        limit = data.get('limit', 10)
+        
+        if not query:
+            return jsonify({'error': 'Query is required'}), 400
+        
+        print(f"🐦 Twitter search request for: {query[:50]}...")
+        tweets = search_twitter_posts(query, limit=limit)
+        
+        return jsonify({
+            'tweets': tweets,
+            'count': len(tweets),
+            'query': query
+        })
+        
+    except Exception as e:
+        print(f"Error in Twitter endpoint: {e}")
+        return jsonify({'error': str(e), 'tweets': []}), 500
+
+@app.route('/api/trending/<topic>', methods=['GET'])
+def get_trending_reactions(topic):
+    """
+    Get combined reactions (Reddit, Web, Twitter) for a trending topic.
+    
+    Args:
+        topic: Topic name (e.g., 'iran', 'ai-governance')
+    
+    Returns:
+    - reddit: Reddit posts
+    - web: Web search results
+    - twitter: Twitter posts
+    """
+    try:
+        print(f"📈 Fetching trending reactions for: {topic}")
+        
+        # Topic-specific search queries
+        topic_queries = {
+            'iran': 'Iran protests politics opposition Tehran',
+            'ai-governance': 'AI governance regulation policy',
+            'climate-tech': 'climate technology renewable energy innovation',
+        }
+        
+        query = topic_queries.get(topic.lower(), topic.replace('-', ' '))
+        user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        
+        # Fetch from all sources in parallel would be ideal, but for now sequential
+        reddit_results = search_reddit_posts(query, limit=5)
+        web_results = search_news(query, user_ip=user_ip)[:5]
+        twitter_results = get_trending_tweets(topic, limit=5)
+        
+        return jsonify({
+            'topic': topic,
+            'query': query,
+            'reddit': reddit_results,
+            'web': web_results,
+            'twitter': twitter_results
+        })
+        
+    except Exception as e:
+        print(f"Error fetching trending reactions: {e}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/debug-keys', methods=['GET'])
 def debug_keys():
     """
@@ -698,6 +776,7 @@ def debug_keys():
     reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
     openai_key = os.getenv("OPENAI_API_KEY")
     gemini_key = os.getenv("GEMINI_API_KEY")
+    twitter_key = os.getenv("TWITTER_BEARER_TOKEN")
     
     return jsonify({
         'SERPAPI_API_KEY': 'configured' if serpapi_key else 'MISSING',
@@ -706,6 +785,7 @@ def debug_keys():
         'REDDIT_USER_AGENT': 'configured' if reddit_user_agent else 'MISSING',
         'OPENAI_API_KEY': 'configured' if openai_key else 'MISSING',
         'GEMINI_API_KEY': 'configured' if gemini_key else 'MISSING',
+        'TWITTER_BEARER_TOKEN': 'configured' if twitter_key else 'MISSING',
         'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
     })
 
