@@ -295,7 +295,7 @@ const MarketCard = ({ market, isHighlighted, compact = false, darkMode = true })
   );
 };
 
-export default function IranPoliticalGraph({ darkMode = true }) {
+export default function IranPoliticalGraph({ darkMode = true, isMobile = false }) {
   const navigate = useNavigate();
   const [selectedNode, setSelectedNode] = useState(null);
   const [hoveredNode, setHoveredNode] = useState(null);
@@ -434,7 +434,7 @@ export default function IranPoliticalGraph({ darkMode = true }) {
       background: theme.bg,
       fontFamily: "'Georgia', serif",
       color: theme.text,
-      padding: '20px',
+      padding: isMobile ? '60px 16px 20px 16px' : '20px',
     }}>
       <style>{`
         .filter-btn-${darkMode ? 'dark' : 'light'} {

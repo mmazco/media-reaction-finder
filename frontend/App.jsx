@@ -93,7 +93,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
         position: 'sticky',
         top: 0,
         backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
-        padding: '20px 30px',
+        padding: isMobile ? '60px 20px 20px 20px' : '20px 30px',
         borderBottom: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
         zIndex: 10
       }}>
@@ -1699,7 +1699,7 @@ export default function App() {
           zIndex: 1000,
           overflowY: 'auto'
         }}>
-          <IranPoliticalGraph darkMode={darkMode} />
+          <IranPoliticalGraph darkMode={darkMode} isMobile={isMobile} />
         </div>
       )}
 
@@ -1723,7 +1723,7 @@ export default function App() {
             style={{
               position: 'fixed',
               top: '16px',
-              left: '16px',
+              right: '16px',
               zIndex: 1002,
               width: '40px',
               height: '40px',
