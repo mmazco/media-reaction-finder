@@ -88,6 +88,15 @@ def seed_iran_collection():
             'summary': "Argues that Iranians are caught between their brutal regime and the U.S. war machine, rejecting military intervention as a solution. Discusses how repression cannot restore political order and why external intervention distorts democratic transitions.",
             'recommended': True
         },
+        {
+            'title': "A Fractured Iran Might Not Be So Bad",
+            'url': 'https://www.wsj.com/opinion/a-fractured-iran-might-not-be-so-bad-5ec2d702',
+            'source': 'Wall Street Journal',
+            'authors': None,
+            'date': 'January 2026',
+            'summary': "Opinion piece discussing potential outcomes of political fragmentation in Iran.",
+            'recommended': False
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")
