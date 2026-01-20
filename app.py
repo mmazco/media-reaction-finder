@@ -546,9 +546,9 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
-        # Search Reddit - for URLs, pass the URL directly
+        # Search Reddit - for URLs, pass the URL and article title for better topic matching
         print("📣 Searching Reddit...")
-        reddit_results = search_reddit_posts(query)
+        reddit_results = search_reddit_posts(query, article_title=article_title)
         
         # Add summaries to Reddit posts
         for post in reddit_results:

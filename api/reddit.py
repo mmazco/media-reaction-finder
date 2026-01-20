@@ -56,13 +56,35 @@ def search_reddit_posts(query, limit=5, article_title=None):
             # Clean the URL (remove query params and trailing slashes)
             stripped_url = query.split("?")[0].rstrip("/")
             
+            # Extract key topic words early for relevance filtering
+            key_topic_words = []
+            if article_title:
+                # Clean and extract key words from article title
+                clean_title = article_title
+                for suffix in [' | NOEMA', ' - The New York Times', ' | CNN', ' - BBC', ' - The Guardian', '| NYT', '| WSJ', ' | TIME', '| TIME']:
+                    if suffix in clean_title:
+                        clean_title = clean_title.split(suffix)[0].strip()
+                
+                for word in clean_title.split():
+                    clean_word = word.strip('.,!?()[]"\'').lower()
+                    if len(clean_word) >= 4:
+                        # Prioritize proper nouns (names, places) and specific terms
+                        if word[0].isupper() or clean_word.isdigit():
+                            key_topic_words.append(clean_word)
+                        elif len(clean_word) >= 5:
+                            key_topic_words.append(clean_word)
+                
+                print(f"🔑 Key topic words for filtering: {key_topic_words[:10]}")
+            
             # PHASE 1: Search for exact URL matches (specific article discussions)
             print(f"📍 Phase 1: Searching for exact URL matches...")
             try:
+                # Try exact URL search first
                 url_search = reddit.subreddit("all").search(
                     f'url:"{stripped_url}"', 
                     limit=limit * 2,
-                    sort="relevance"
+                    sort="relevance",
+                    time_filter="year"
                 )
                 
                 for post in url_search:
@@ -83,14 +105,14 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             }
                             results.append(post_data)
                             seen_permalinks.add(post.permalink)
-                            print(f"  ✓ Found URL match: {post.title[:50]}... ({num_comments} comments)")
+                            print(f"  ✓ Found exact URL match: {post.title[:50]}... ({num_comments} comments)")
 
                     except Exception as e:
                         print(f"Error processing post: {e}")
                         continue
                         
             except Exception as e:
-                print(f"URL search failed: {e}")
+                print(f"Exact URL search failed: {e}")
             
             # PHASE 2: Search by article title/topic (broader discussions)
             if article_title and len(results) < limit * 2:
@@ -98,15 +120,18 @@ def search_reddit_posts(query, limit=5, article_title=None):
                 topic_query = article_title
                 
                 # Remove site name suffixes
-                for suffix in [' | NOEMA', ' - The New York Times', ' | CNN', ' - BBC', ' - The Guardian', '| NYT', '| WSJ']:
+                for suffix in [' | NOEMA', ' - The New York Times', ' | CNN', ' - BBC', ' - The Guardian', '| NYT', '| WSJ', ' | TIME', '| TIME']:
                     if suffix in topic_query:
                         topic_query = topic_query.split(suffix)[0].strip()
                 
                 # Remove very common/generic words that cause noise
-                common_words = ['building', 'creating', 'making', 'new', 'how', 'why', 'what', 'the', 'a', 'an']
+                common_words = ['building', 'creating', 'making', 'new', 'how', 'why', 'what', 'the', 'a', 'an', 
+                               'this', 'that', 'time', 'isn', 'like', 'quite', 'just', 'about', 'from', 'with', 'have']
                 words = topic_query.split()
                 # Keep only meaningful words (longer than 3 chars, not common)
                 filtered_words = [w for w in words if len(w) > 3 and w.lower() not in common_words]
+                
+                print(f"🔑 Using key topic words for relevance: {key_topic_words[:8]}")
                 
                 # If we filtered everything, use original; otherwise use filtered
                 if len(filtered_words) >= 2:
@@ -118,7 +143,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                     
                     topic_search = reddit.subreddit("all").search(
                         topic_query, 
-                        limit=limit * 3,
+                        limit=limit * 5,  # Fetch more to filter
                         sort="relevance",
                         time_filter="month"
                     )
@@ -133,6 +158,25 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             if post.permalink in seen_permalinks:
                                 continue
                             
+                            # RELEVANCE CHECK: Post title/content must contain at least one key topic word
+                            post_title_lower = post.title.lower()
+                            post_selftext_lower = (post.selftext if hasattr(post, 'selftext') else "").lower()
+                            subreddit_name = str(post.subreddit).lower() if hasattr(post, 'subreddit') else ""
+                            
+                            # Check if any key topic word appears in the post
+                            relevance_score = 0
+                            matched_words = []
+                            for key_word in key_topic_words:
+                                if key_word in post_title_lower or key_word in post_selftext_lower or key_word in subreddit_name:
+                                    relevance_score += 1
+                                    matched_words.append(key_word)
+                            
+                            # Require at least 1 key word match (or 2 if we have many key words)
+                            min_matches = 2 if len(key_topic_words) > 4 else 1
+                            if relevance_score < min_matches:
+                                print(f"  ⏭️  Skipping irrelevant: {post.title[:40]}... (no key words matched)")
+                                continue
+                            
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
@@ -140,11 +184,13 @@ def search_reddit_posts(query, limit=5, article_title=None):
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
                                 "score": post.score if hasattr(post, 'score') else 0,
-                                "match_type": "topic"  # Tag for debugging
+                                "match_type": "topic",
+                                "relevance_score": relevance_score,
+                                "matched_words": matched_words
                             }
                             results.append(post_data)
                             seen_permalinks.add(post.permalink)
-                            print(f"  ✓ Found topic match: {post.title[:50]}... ({num_comments} comments)")
+                            print(f"  ✓ Found topic match: {post.title[:50]}... ({num_comments} comments, matched: {matched_words})")
                             
                         except Exception as e:
                             print(f"Error processing topic post: {e}")
