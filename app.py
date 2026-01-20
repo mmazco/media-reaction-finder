@@ -39,6 +39,7 @@ def update_recommended_articles():
             # Iran collection
             'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews',
             'https://www.jadaliyya.com/Details/46906',
+            'https://time.com/7345623/iran-protests-reza-shah-pahlavi-ayatollah-1979/',
         ]
         conn = sqlite3.connect(logger.db_path)
         cursor = conn.cursor()
