@@ -97,6 +97,15 @@ def seed_iran_collection():
             'summary': "Opinion piece discussing potential outcomes of political fragmentation in Iran.",
             'recommended': False
         },
+        {
+            'title': "Beyond Black and White: Notes from Tehran",
+            'url': 'https://themarkaz.org/beyond-black-and-white-notes-from-tehran/',
+            'source': 'The Markaz Review',
+            'authors': 'M. Nateqnuri',
+            'date': 'January 23, 2026',
+            'summary': "First-hand account from Tehran noting layers of complexity: genuine economic grievances mixed with trained foreign agents (Israeli, US-backed MEK, separatists) attempting to manipulate protests. Describes unprecedented violence, magical thinking about US/Israeli intervention, and fear of civil war without viable opposition.",
+            'recommended': True
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")
