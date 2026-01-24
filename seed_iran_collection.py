@@ -68,7 +68,7 @@ def seed_iran_collection():
             'authors': 'Narges Bajoghli',
             'date': 'January 2026',
             'summary': "Analysis comparing current Iran protests to 1979 revolution, examining why structural conditions differ - the bazaar has lost autonomy to IRGC-connected elites, clergy is fragmented, military hasn't defected, and external disinformation complicates genuine opposition.",
-            'recommended': True
+            'recommended': False
         },
         {
             'title': "How the U.S. and Israel Are Trying to Co-opt Iran's Protests",
