@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
 Update the frontend analytics to show detailed source information
+Run from project root: python scripts/update_frontend_analytics.py
 """
 
+import os
+
+# Get project root directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def update_frontend_analytics():
-    with open('frontend/App.jsx', 'r') as f:
+    with open(os.path.join(PROJECT_ROOT, 'frontend', 'App.jsx'), 'r') as f:
         content = f.read()
     
     # Add a helper function to extract source from URL at the top of the component

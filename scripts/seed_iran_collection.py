@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
 Seed the Iran collection with articles
+Run from project root: python scripts/seed_iran_collection.py
 """
 
 import sys
-sys.path.insert(0, 'api')
+import os
 
-from search_logger import SearchLogger
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from api.search_logger import SearchLogger
 
 def seed_iran_collection():
     logger = SearchLogger(db_path="search_history.db")

@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 """
 Seed the curated collections with initial articles
+Run from project root: python scripts/seed_collections.py
 """
 
 import sys
-sys.path.insert(0, 'api')
+import os
 
-from search_logger import SearchLogger
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from api.search_logger import SearchLogger
 
 def seed_collections():
     logger = SearchLogger(db_path="search_history.db")

@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
 Update search logger to include domain and source fields
+Run from project root: python scripts/update_search_logger.py
 """
 
+import os
+
+# Get project root directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def update_search_logger():
-    with open('api/search_logger.py', 'r') as f:
+    with open(os.path.join(PROJECT_ROOT, 'api', 'search_logger.py'), 'r') as f:
         content = f.read()
     
     # Update the search_results table schema

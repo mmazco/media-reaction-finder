@@ -5,6 +5,8 @@ SerpAPI Search History Extractor and Analyzer
 This tool extracts search history from SerpAPI and categorizes URLs automatically.
 Since SerpAPI doesn't provide direct API access to search history, this tool
 provides multiple methods to import your search data.
+
+Run from project root: python scripts/serpapi_history_extractor.py
 """
 
 import json
@@ -12,6 +14,11 @@ import re
 import requests
 import argparse
 import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from datetime import datetime
 from urllib.parse import urlparse
 from api.search_logger import SearchLogger

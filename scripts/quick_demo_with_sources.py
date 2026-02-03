@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """
 Quick demonstration script that shows sources alongside the analytics
+Run from project root: python scripts/quick_demo_with_sources.py
 """
+
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.search_logger import SearchLogger
 from domain_extractor import extract_domain_info

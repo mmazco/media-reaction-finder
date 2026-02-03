@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """
 Quick update to the SerpAPI extractor to include domain extraction
+Run from project root: python scripts/update_extractor.py
 """
 
+import os
+
+# Get project root directory
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 def update_extractor():
-    with open('serpapi_history_extractor.py', 'r') as f:
+    with open(os.path.join(PROJECT_ROOT, 'scripts', 'serpapi_history_extractor.py'), 'r') as f:
         content = f.read()
     
     # Add domain extractor import

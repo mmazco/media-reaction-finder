@@ -1,137 +1,85 @@
 # Media Reaction Finder
 
-A web application that analyzes public discourse around articles and media content by searching news sources and Reddit discussions.
+Analyze public discourse around articles by searching news sources and Reddit discussions.
 
 ## Features
 
-- **Article Analysis**: Extract metadata and generate summaries from article URLs
-- **News Search**: Find related news articles using Google Search API
-- **Reddit Reactions**: Discover Reddit discussions and reactions to articles
-- **Archive System**: Save and instantly access previous searches
-- **Search Analytics**: Track and analyze all search queries with detailed statistics
-- **Data Export**: Export search history in JSON or CSV formats
-- **Dark Mode**: Toggle between light and dark themes
-- **AI-Powered Summaries**: Generate intelligent summaries of articles and Reddit comments
+- **Article Analysis** — Extract metadata and AI-generated summaries from URLs
+- **News & Reddit Search** — Find related coverage and community reactions
+- **Archive & Analytics** — Save searches, track patterns, export data
+- **Dark Mode** — Toggle light/dark themes
 
 ## Tech Stack
 
-### Backend
-- **Python/Flask**: API server
-- **OpenAI GPT-4**: Text summarization and analysis
-- **SerpAPI**: Google search integration
-- **Reddit PRAW**: Reddit API integration
-- **BeautifulSoup**: Web scraping for article extraction
-- **SQLite**: Search analytics and history database
-
-### Frontend
-- **React**: User interface
-- **Vite**: Build tool and development server
-- **Vanilla CSS**: Styling with dynamic dark mode
+**Backend:** Python/Flask, OpenAI GPT-4, SerpAPI, Reddit PRAW, SQLite  
+**Frontend:** React, Vite
 
 ## Setup
 
 ### Prerequisites
-- Python 3.8+
-- Node.js 16+
-- API Keys for:
-  - OpenAI
-  - SerpAPI
-  - Reddit API
+- Python 3.8+, Node.js 16+
+- API keys: OpenAI, SerpAPI, Reddit
 
-### Installation
+### Install
 
-1. Clone the repository:
 ```bash
-git clone <repository-url>
-cd media-reaction-finder
-```
-
-2. Backend setup:
-```bash
+# Backend
 pip install -r requirements.txt
+
+# Frontend
+cd frontend && npm install
 ```
 
-3. Frontend setup:
-```bash
-cd frontend
-npm install
-```
+### Environment Variables
 
-4. Environment variables:
-Create a `.env` file in the root directory:
+Create `.env` in root:
 ```env
-OPENAI_API_KEY=your_openai_api_key
-SERPAPI_API_KEY=your_serpapi_key
-REDDIT_CLIENT_ID=your_reddit_client_id
-REDDIT_CLIENT_SECRET=your_reddit_client_secret
-REDDIT_USER_AGENT=your_reddit_user_agent
+OPENAI_API_KEY=your_key
+SERPAPI_API_KEY=your_key
+REDDIT_CLIENT_ID=your_id
+REDDIT_CLIENT_SECRET=your_secret
+REDDIT_USER_AGENT=your_agent
 ```
 
-### Development
+### Run
 
-1. Start the backend:
 ```bash
+# Terminal 1 - Backend
 python app.py
+
+# Terminal 2 - Frontend (dev)
+cd frontend && npm run dev
 ```
 
-2. Start the frontend:
-```bash
-cd frontend
-npm run dev
+## Project Structure
+
+```
+├── app.py              # Main Flask server
+├── api/                # Backend modules
+├── frontend/           # React app
+├── scripts/            # CLI tools & utilities
+├── tests/              # Test files
+├── data/               # Sample data
+└── docs/               # Documentation
 ```
 
-3. Open https://media-reaction-finder.replit.app/
-
-## Usage
-
-1. **Analyze an Article**: Paste any article URL and click "ANALYZE REACTIONS"
-2. **View Results**: See article summary, related news, and Reddit discussions
-3. **Archive Access**: Click "ARCHIVE" to view and re-access previous searches
-4. **Search Analytics**: Click "ANALYTICS" to view search statistics and export data
-5. **Dark Mode**: Toggle the theme using the "DARK/LIGHT" button
-
-### Analytics Features
-
-The application now tracks all search queries and provides comprehensive analytics:
-
-#### Web Interface
-- **Analytics Dashboard**: Access via the "ANALYTICS" button
-- **Search Statistics**: View total searches, unique queries, and average results
-- **Top Queries**: See your most frequently searched terms
-- **Data Export**: Download search history in JSON or CSV format
-
-#### Command Line Interface
-Use the analytics CLI tool for advanced data analysis:
+## CLI Tools
 
 ```bash
-# View overall statistics
-python3 analytics_cli.py stats --days 30
-
-# Show recent search history
-python3 analytics_cli.py history --limit 20 --days 7
-
-# Export data to file
-python3 analytics_cli.py export --format csv --output searches.csv
-
-# Search for specific queries
-python3 analytics_cli.py search "climate change"
+python scripts/analytics_cli.py stats --days 30
+python scripts/analytics_cli.py history --limit 20
+python scripts/analytics_cli.py export --format csv --output searches.csv
 ```
 
-#### API Endpoints
-- `GET /api/analytics/dashboard` - Get analytics dashboard data
-- `GET /api/analytics/history` - Get search history with filters
-- `GET /api/analytics/export` - Export search data
-- `GET /api/analytics/stats` - Get quick statistics
-- `GET /api/analytics/trends` - Get search trends and patterns
+## API Endpoints
 
-## Main API Endpoints
-
-- `POST /api/reactions` - Analyze article and get reactions
-- `POST /api/summarize` - Generate text summaries
-
-See the Analytics Features section above for analytics-specific endpoints.
+| Endpoint | Description |
+|----------|-------------|
+| `POST /api/reactions` | Analyze article and get reactions |
+| `POST /api/summarize` | Generate text summaries |
+| `GET /api/analytics/dashboard` | Analytics dashboard data |
+| `GET /api/analytics/export` | Export search data |
 
 ## License
 
-MIT License
-# X (Twitter) icon added to sidebar
+MIT

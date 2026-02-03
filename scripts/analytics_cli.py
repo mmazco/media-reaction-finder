@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 """
 Command-line tool for viewing search analytics
-Usage: python analytics_cli.py [command] [options]
+Usage: python scripts/analytics_cli.py [command] [options]
 """
 
 import argparse
 import json
 import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from datetime import datetime, timedelta
 from api.search_logger import SearchLogger
 

@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """
 Test script to see current search data structure and sources
+Run from project root: python tests/test_sources.py
 """
+
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.search_logger import SearchLogger
 
