@@ -106,6 +106,15 @@ def seed_iran_collection():
             'summary': "First-hand account from Tehran noting layers of complexity: genuine economic grievances mixed with trained foreign agents (Israeli, US-backed MEK, separatists) attempting to manipulate protests. Describes unprecedented violence, magical thinking about US/Israeli intervention, and fear of civil war without viable opposition.",
             'recommended': True
         },
+        {
+            'title': "Iran-Israel AI War Propaganda Is a Warning to the World",
+            'url': 'https://carnegieendowment.org/research/2025/07/iran-israel-ai-war-propaganda-is-a-warning-to-the-world?lang=en',
+            'source': 'Carnegie Endowment for International Peace',
+            'authors': 'Mahsa Alimardani, Sam Gregory',
+            'date': 'July 28, 2025',
+            'summary': "Analysis of AI-generated propaganda during the Iran-Israel war, examining the challenges of detecting synthetic media and the impact on civilian populations navigating information blackouts, disinformation, and conflict narratives.",
+            'recommended': True
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")

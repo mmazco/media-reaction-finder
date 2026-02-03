@@ -263,6 +263,14 @@ def seed_collections():
             'date': 'February 23, 2025',
             'summary': 'Governor Newsom launches a new digital democracy tool with focus on wildfire victim outreach.'
         },
+        {
+            'title': 'Warlords of Information: Palantir, Epstein, & The New York Times',
+            'url': 'https://www.zig.art/p/my-final-message-before-im-on-an',
+            'source': 'Ziggurat',
+            'authors': 'Juan Sebastián Pinto',
+            'date': 'January 9, 2026',
+            'summary': "Former Palantir employee's analysis of AI surveillance technology, ISTAR systems, and the connections between Silicon Valley, defense contractors, and media manipulation in hybrid warfare."
+        },
     ]
     
     # Internet articles
