@@ -4,10 +4,17 @@ Analyze public discourse around articles by searching news sources and Reddit di
 
 ## Features
 
-- **Article Analysis** — Extract metadata and AI-generated summaries from URLs
-- **News & Reddit Search** — Find related coverage and community reactions
-- **Archive & Analytics** — Save searches, track patterns, export data
+- **Article Analysis** — Paste any URL to extract metadata and AI-generated summaries
+- **News Search** — Find related news coverage via Google News
+- **Reddit Reactions** — Discover community discussions and reactions
+- **Curated Collections** — Browse themed article collections (Palestine, Culture, AI, etc.)
+- **Search History** — Access previous searches from the sidebar
 - **Dark Mode** — Toggle light/dark themes
+
+### Beta Features
+
+- **Political Landscape Mapping** — Interactive visualization of Iran's political entities and power structures
+- **Prediction Markets** — Live odds from Polymarket and Kalshi on geopolitical events
 
 ## Tech Stack
 
