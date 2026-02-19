@@ -214,7 +214,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             marginTop: '8px',
             fontFamily: 'Arial, sans-serif'
           }}>
-            Last updated: {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {lastUpdated.toLocaleTimeString()}
+            Last updated: {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {lastUpdated.toLocaleTimeString()} {new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(lastUpdated).find(p => p.type === 'timeZoneName')?.value}
           </div>
         )}
       </div>
