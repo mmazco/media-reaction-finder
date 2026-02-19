@@ -158,6 +158,8 @@ def get_trending_tweets(topic, limit=10):
     """
     # Credible sources for specific topics
     iran_sources = [
+        "ryangrim",         # Ryan Grim - journalist, Drop Site News
+        "RyanRozbiani",     # Ryan Rozbiani - Iran analyst
         "CArdakani",        # Chirinne Ardakani
         "SMohyeddin",       # Samira Mohyeddin
         "realazadeh",       # Azi
