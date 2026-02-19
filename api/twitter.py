@@ -173,51 +173,58 @@ def get_trending_tweets(topic, limit=10):
     ]
     
     if topic.lower() == "iran":
-        # Fetch from each account individually
+        iran_keywords = "(Iran OR Tehran OR IRGC OR Persian OR nuclear OR sanctions OR strike OR bombing)"
+        
+        # Phase 1: Fetch Iran-relevant tweets from each curated account
         account_tweets = {}
         for account in iran_sources:
             try:
-                tweets = search_twitter_posts(f"from:{account} -is:retweet", limit=10)
+                tweets = search_twitter_posts(f"from:{account} {iran_keywords} -is:retweet", limit=10)
                 account_tweets[account] = tweets
-                print(f"   → Got {len(tweets)} tweets from @{account}")
+                print(f"   → Got {len(tweets)} Iran-relevant tweets from @{account}")
             except Exception as e:
                 print(f"   → Error fetching from @{account}: {e}")
                 account_tweets[account] = []
         
-        # Collect the most recent tweet from each account, then fill remaining by recency
-        all_tweets = []
+        # Phase 2: Broad search for high-engagement Iran attack tweets from anyone
+        try:
+            broad_tweets = search_twitter_posts("Iran (attack OR strike OR war OR military OR nuclear) -is:retweet -is:reply lang:en", limit=10)
+            print(f"   → Got {len(broad_tweets)} tweets from broad Iran search")
+        except Exception as e:
+            print(f"   → Error in broad search: {e}")
+            broad_tweets = []
+        
+        # Priority 1: One Iran-relevant tweet per curated account (newest from each)
+        curated_tweets = []
         for account in iran_sources:
-            for t in account_tweets.get(account, []):
-                all_tweets.append(t)
+            tweets = account_tweets.get(account, [])
+            tweets.sort(key=lambda t: t.get("created_at_iso", ""), reverse=True)
+            if tweets:
+                curated_tweets.append(tweets[0])
         
-        # Sort by recency (newest first), using ISO timestamp
-        all_tweets.sort(key=lambda t: t.get("created_at_iso", ""), reverse=True)
+        curated_tweets.sort(key=lambda t: t.get("created_at_iso", ""), reverse=True)
         
-        # Deduplicate while preserving order — ensure source variety
-        seen_authors = {}
         result = []
-        # First pass: one tweet per author (newest from each)
-        for t in all_tweets:
-            author = t.get("author_username", "")
-            if author not in seen_authors:
-                seen_authors[author] = 0
-            if seen_authors[author] < 1:
-                result.append(t)
-                seen_authors[author] += 1
+        seen_ids = set()
+        for t in curated_tweets:
+            result.append(t)
+            seen_ids.add(t.get("id"))
             if len(result) >= limit:
                 break
         
-        # Second pass: fill remaining slots with newest tweets regardless of author
+        # Priority 2: Fill remaining slots with broad search (high-relevance from anyone)
         if len(result) < limit:
-            result_ids = {t.get("id") for t in result}
-            for t in all_tweets:
-                if t.get("id") not in result_ids:
+            broad_tweets.sort(key=lambda t: t.get("created_at_iso", ""), reverse=True)
+            for t in broad_tweets:
+                if t.get("id") not in seen_ids:
                     result.append(t)
-                    result_ids.add(t.get("id"))
+                    seen_ids.add(t.get("id"))
                 if len(result) >= limit:
                     break
         
-        print(f"✅ Total: {len(result)} tweets from {len(iran_sources)} sources (recency-sorted)")
+        curated_count = min(len(curated_tweets), limit)
+        broad_count = len(result) - curated_count
+        print(f"✅ Total: {len(result)} tweets ({curated_count} curated, {broad_count} broad)")
         return result[:limit]
     
     # Default for other topics
