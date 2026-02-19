@@ -741,7 +741,7 @@ def get_trending_reactions(topic):
         
         # Topic-specific search queries
         topic_queries = {
-            'iran': 'Iran protests politics opposition Tehran',
+            'iran': 'Iran attack strike military US nuclear 2026',
             'ai-governance': 'AI governance regulation policy',
             'climate-tech': 'climate technology renewable energy innovation',
         }

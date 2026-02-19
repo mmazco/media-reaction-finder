@@ -214,7 +214,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             marginTop: '8px',
             fontFamily: 'Arial, sans-serif'
           }}>
-            Last updated: {lastUpdated.toLocaleTimeString()}
+            Last updated: {lastUpdated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} at {lastUpdated.toLocaleTimeString()}
           </div>
         )}
       </div>
@@ -318,8 +318,14 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                         <span style={{
                           fontSize: '11px',
                           color: darkMode ? '#999' : '#666',
-                          marginLeft: 'auto'
+                          marginLeft: 'auto',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '8px'
                         }}>
+                          {tweet.created_at && (
+                            <span style={{ color: darkMode ? '#777' : '#888' }}>{tweet.created_at}</span>
+                          )}
                           ❤️ {tweet.likes} · 🔄 {tweet.retweets} · 💬 {tweet.replies}
                         </span>
                       </div>

@@ -99,14 +99,16 @@ def search_twitter_posts(query, limit=10):
             replies = metrics.get("reply_count", 0)
             engagement = likes + (retweets * 2) + replies
             
-            # Format created_at
-            created_at = tweet.get("created_at", "")
-            if created_at:
+            created_at_raw = tweet.get("created_at", "")
+            created_at_display = ""
+            created_at_iso = ""
+            if created_at_raw:
                 try:
-                    dt = datetime.fromisoformat(created_at.replace("Z", "+00:00"))
-                    created_at = dt.strftime("%b %d, %Y")
+                    dt = datetime.fromisoformat(created_at_raw.replace("Z", "+00:00"))
+                    created_at_display = dt.strftime("%b %d, %Y")
+                    created_at_iso = dt.isoformat()
                 except:
-                    pass
+                    created_at_display = created_at_raw
             
             tweet_data = {
                 "id": tweet.get("id", ""),
@@ -120,7 +122,8 @@ def search_twitter_posts(query, limit=10):
                 "retweets": retweets,
                 "replies": replies,
                 "engagement": engagement,
-                "created_at": created_at
+                "created_at": created_at_display,
+                "created_at_iso": created_at_iso
             }
             tweets.append(tweet_data)
         
@@ -179,20 +182,40 @@ def get_trending_tweets(topic, limit=10):
                 print(f"   → Error fetching from @{account}: {e}")
                 account_tweets[account] = []
         
-        # Round-robin: take 1 from each account, then repeat
-        result = []
-        max_per_account = (limit // len(iran_sources)) + 1
+        # Collect the most recent tweet from each account, then fill remaining by recency
+        all_tweets = []
+        for account in iran_sources:
+            for t in account_tweets.get(account, []):
+                all_tweets.append(t)
         
-        for i in range(max_per_account):
-            for account in iran_sources:
-                if i < len(account_tweets.get(account, [])):
-                    result.append(account_tweets[account][i])
-                    if len(result) >= limit:
-                        break
+        # Sort by recency (newest first), using ISO timestamp
+        all_tweets.sort(key=lambda t: t.get("created_at_iso", ""), reverse=True)
+        
+        # Deduplicate while preserving order — ensure source variety
+        seen_authors = {}
+        result = []
+        # First pass: one tweet per author (newest from each)
+        for t in all_tweets:
+            author = t.get("author_username", "")
+            if author not in seen_authors:
+                seen_authors[author] = 0
+            if seen_authors[author] < 1:
+                result.append(t)
+                seen_authors[author] += 1
             if len(result) >= limit:
                 break
         
-        print(f"✅ Total: {len(result)} tweets from {len(iran_sources)} sources (round-robin)")
+        # Second pass: fill remaining slots with newest tweets regardless of author
+        if len(result) < limit:
+            result_ids = {t.get("id") for t in result}
+            for t in all_tweets:
+                if t.get("id") not in result_ids:
+                    result.append(t)
+                    result_ids.add(t.get("id"))
+                if len(result) >= limit:
+                    break
+        
+        print(f"✅ Total: {len(result)} tweets from {len(iran_sources)} sources (recency-sorted)")
         return result[:limit]
     
     # Default for other topics
