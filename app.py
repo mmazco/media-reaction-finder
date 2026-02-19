@@ -752,7 +752,7 @@ def get_trending_reactions(topic):
         # Fetch from all sources in parallel would be ideal, but for now sequential
         reddit_results = search_reddit_posts(query, limit=5)
         web_results = search_news(query, user_ip=user_ip)[:5]
-        twitter_results = get_trending_tweets(topic, limit=5)
+        twitter_results = get_trending_tweets(topic, limit=10)
         
         return jsonify({
             'topic': topic,
