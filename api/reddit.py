@@ -3,12 +3,7 @@ import os
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
-# For local development - use direct imports
-try:
-    from summarize import summarize_text
-except ImportError:
-    # For Vercel deployment - use relative imports
-    from .summarize import summarize_text
+from summarize import summarize_text
 
 load_dotenv()
 

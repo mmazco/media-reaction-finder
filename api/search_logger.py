@@ -1,4 +1,5 @@
 import json
+import hashlib
 import os
 from datetime import datetime
 import sqlite3
@@ -648,8 +649,7 @@ class SearchLogger:
     # ==================== COMMENTARY CACHE ====================
     
     def get_cached_commentary(self, query):
-        """Get cached commentary for a query/URL"""
-        import hashlib
+        """Get cached commentary for a query/URL (cached permanently -- produced artifact)"""
         query_hash = hashlib.md5(query.encode()).hexdigest()
         
         conn = sqlite3.connect(self.db_path)
@@ -667,7 +667,6 @@ class SearchLogger:
     
     def cache_commentary(self, query, text, audio_base64, mime_type):
         """Cache commentary for a query/URL"""
-        import hashlib
         query_hash = hashlib.md5(query.encode()).hexdigest()
         
         conn = sqlite3.connect(self.db_path)
@@ -685,15 +684,14 @@ class SearchLogger:
     # ==================== SEARCH RESULTS CACHE ====================
     
     def get_cached_search(self, query):
-        """Get cached search results for a query/URL"""
-        import hashlib
+        """Get cached search results for a query/URL (expires after 7 days)"""
         query_hash = hashlib.md5(query.encode()).hexdigest()
         
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute('''
             SELECT results_json FROM cached_searches
-            WHERE query_hash = ?
+            WHERE query_hash = ? AND created_at > datetime('now', '-7 days')
         ''', (query_hash,))
         row = cursor.fetchone()
         conn.close()
@@ -704,7 +702,6 @@ class SearchLogger:
     
     def cache_search(self, query, results):
         """Cache search results for a query/URL"""
-        import hashlib
         query_hash = hashlib.md5(query.encode()).hexdigest()
         
         conn = sqlite3.connect(self.db_path)
@@ -721,7 +718,6 @@ class SearchLogger:
     
     def clear_search_cache(self, query):
         """Clear cached search results for a specific query/URL"""
-        import hashlib
         query_hash = hashlib.md5(query.encode()).hexdigest()
         
         conn = sqlite3.connect(self.db_path)
@@ -740,3 +736,18 @@ class SearchLogger:
         
         print(f"🗑️ Cleared cache for query: {query[:50]}... (searches: {deleted_searches}, commentary: {deleted_commentary})")
         return deleted_searches + deleted_commentary > 0
+    
+    def clear_expired_cache(self):
+        """Remove expired search results (commentary is cached permanently)"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        
+        cursor.execute("DELETE FROM cached_searches WHERE created_at <= datetime('now', '-7 days')")
+        expired_searches = cursor.rowcount
+        
+        conn.commit()
+        conn.close()
+        
+        if expired_searches:
+            print(f"🧹 Cleared {expired_searches} expired search cache entries")
+        return expired_searches

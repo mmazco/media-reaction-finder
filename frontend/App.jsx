@@ -4,7 +4,7 @@ import IranPoliticalGraph from './IranPoliticalGraph';
 // v2.1.0 - Simplified error message styling
 
 // Trending Topic Reactions Page Component
-function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery }) {
+function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery, onFileDownloadClick }) {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -474,19 +474,38 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                         }}>
                           Web
                         </span>
-                        <a 
-                          href={article.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer" 
-                          style={{
-                            color: darkMode ? '#ffffff' : '#000000',
-                            textDecoration: 'none',
-                            fontSize: '16px',
-                            fontWeight: '500'
-                          }}
-                        >
-                          {article.title}
-                        </a>
+                        {article.is_file_download ? (
+                          <a 
+                            href="#"
+                            onClick={(e) => onFileDownloadClick(e, article.url, article.title)}
+                            style={{
+                              color: darkMode ? '#ffffff' : '#000000',
+                              textDecoration: 'none',
+                              fontSize: '16px',
+                              fontWeight: '500',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px'
+                            }}
+                          >
+                            <span style={{ fontSize: '14px' }} title="This link may download a file">📎</span>
+                            {article.title}
+                          </a>
+                        ) : (
+                          <a 
+                            href={article.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            style={{
+                              color: darkMode ? '#ffffff' : '#000000',
+                              textDecoration: 'none',
+                              fontSize: '16px',
+                              fontWeight: '500'
+                            }}
+                          >
+                            {article.title}
+                          </a>
+                        )}
                       </div>
                       {article.summary && (
                         <p style={{
@@ -551,6 +570,28 @@ export default function App() {
   const [metaLoading, setMetaLoading] = useState(false);
   const [metaError, setMetaError] = useState(null);
   const [showTranscript, setShowTranscript] = useState(false);
+  
+  // File download confirmation dialog state
+  const [fileDownloadDialog, setFileDownloadDialog] = useState({ show: false, url: '', title: '' });
+  
+  // Handle file download link click with confirmation
+  const handleFileDownloadClick = (e, url, title) => {
+    e.preventDefault();
+    setFileDownloadDialog({ show: true, url, title });
+  };
+  
+  // Confirm and proceed with file download
+  const confirmFileDownload = () => {
+    if (fileDownloadDialog.url) {
+      window.open(fileDownloadDialog.url, '_blank', 'noopener,noreferrer');
+    }
+    setFileDownloadDialog({ show: false, url: '', title: '' });
+  };
+  
+  // Cancel file download
+  const cancelFileDownload = () => {
+    setFileDownloadDialog({ show: false, url: '', title: '' });
+  };
 
 
   // Function to delete history items
@@ -800,7 +841,7 @@ export default function App() {
       const response = await fetch('/api/reactions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: searchQuery })
+        body: JSON.stringify({ query: searchQuery, skip_cache: true })
       });
       
       if (!response.ok) {
@@ -1721,6 +1762,7 @@ export default function App() {
           navigate={navigate}
           performSearch={performSearch}
           setQuery={setQuery}
+          onFileDownloadClick={handleFileDownloadClick}
         />
       )}
       
@@ -2700,7 +2742,18 @@ export default function App() {
                             }}>
                               {item.type}
                             </span>
-                            <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                            {item.is_file_download ? (
+                              <a 
+                                href="#" 
+                                onClick={(e) => handleFileDownloadClick(e, item.url, item.title)}
+                                style={{...styles.link, display: 'flex', alignItems: 'center', gap: '6px'}}
+                              >
+                                <span style={{ fontSize: '14px' }} title="This link may download a file">📎</span>
+                                {item.title}
+                              </a>
+                            ) : (
+                              <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                            )}
                             {item.type === 'Reddit' && item.num_comments > 0 && (
                               <span style={{
                                 fontSize: '11px',
@@ -2748,6 +2801,117 @@ export default function App() {
           </div>
         )}
       </div>
+      )}
+      
+      {/* File Download Confirmation Dialog */}
+      {fileDownloadDialog.show && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 10000
+        }}>
+          <div style={{
+            backgroundColor: darkMode ? '#1e1e1e' : '#fff',
+            borderRadius: '12px',
+            padding: '24px',
+            maxWidth: '450px',
+            width: '90%',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+            border: darkMode ? '1px solid #333' : '1px solid #ddd'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              <span style={{ fontSize: '28px' }}>📎</span>
+              <h3 style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: '600',
+                color: darkMode ? '#fff' : '#000',
+                fontFamily: 'Georgia, serif'
+              }}>
+                File Download Link
+              </h3>
+            </div>
+            <p style={{
+              color: darkMode ? '#b3b3b3' : '#666',
+              fontSize: '14px',
+              lineHeight: '1.6',
+              marginBottom: '8px'
+            }}>
+              This link may download a file directly to your device:
+            </p>
+            <p style={{
+              color: darkMode ? '#4ECDC4' : '#0066cc',
+              fontSize: '13px',
+              wordBreak: 'break-all',
+              padding: '10px',
+              backgroundColor: darkMode ? '#2a2a2a' : '#f5f5f5',
+              borderRadius: '6px',
+              marginBottom: '16px',
+              fontFamily: 'monospace'
+            }}>
+              {fileDownloadDialog.title || fileDownloadDialog.url}
+            </p>
+            <p style={{
+              color: darkMode ? '#ff9800' : '#d35400',
+              fontSize: '13px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '16px' }}>⚠️</span>
+              <span>Downloaded files may contain security risks. Only proceed if you trust the source.</span>
+            </p>
+            <div style={{
+              display: 'flex',
+              gap: '12px',
+              justifyContent: 'flex-end'
+            }}>
+              <button
+                onClick={cancelFileDownload}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: darkMode ? '1px solid #444' : '1px solid #ccc',
+                  backgroundColor: 'transparent',
+                  color: darkMode ? '#b3b3b3' : '#666',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmFileDownload}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  border: 'none',
+                  backgroundColor: '#4ECDC4',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}
+              >
+                Download Anyway
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

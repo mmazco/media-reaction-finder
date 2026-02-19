@@ -6,7 +6,7 @@ Generates AI-powered meta-analysis of article discourse and converts to audio us
 import os
 import base64
 from dotenv import load_dotenv
-from openai import OpenAI
+from summarize import get_openai_client
 import google.generativeai as genai
 
 load_dotenv()
@@ -96,11 +96,10 @@ The commentary should feel like a brief but insightful audio briefing someone wo
     system_prompt = "You are a careful and accurate media analyst who synthesizes article content and online discourse into engaging audio commentaries. You ONLY state facts that are explicitly provided in the context - never invent names, titles, or affiliations. If unsure, use general descriptions instead of guessing."
 
     # Try OpenAI first
-    openai_key = os.getenv("OPENAI_API_KEY")
-    if openai_key:
+    client = get_openai_client()
+    if client:
         try:
             print("📝 Generating commentary with OpenAI GPT-4...")
-            client = OpenAI(api_key=openai_key)
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
@@ -156,12 +155,10 @@ def text_to_speech_openai(text):
         dict with 'audio' (base64 encoded) and 'mime_type', or None on failure
     """
     try:
-        api_key = os.getenv("OPENAI_API_KEY")
-        if not api_key:
+        client = get_openai_client()
+        if not client:
             print("❌ OPENAI_API_KEY not found for TTS")
             return None
-        
-        client = OpenAI(api_key=api_key)
         
         print(f"🎙️ Generating audio with OpenAI TTS ({len(text)} chars)...")
         

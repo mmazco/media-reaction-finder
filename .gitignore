@@ -67,6 +67,9 @@ logs/
 
 # SQLite
 *.db
+
+# Startup lock
+.seed_lock
 .headers
 .mode
 FROM

@@ -34,7 +34,7 @@ def test_serpapi():
     """Test SERP API returns fresh Iran-related results."""
     divider("TEST 1: SERP API (Google Search)")
 
-    from api.search import search_news
+    from search import search_news
 
     query = "Iran attack news today 2025"
     print(f"Query: \"{query}\"")

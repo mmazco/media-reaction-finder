@@ -7,25 +7,99 @@ from summarize import summarize_text
 from api.search_logger import SearchLogger
 from api.meta_commentary import generate_audio_commentary
 import os
+import sqlite3
+from concurrent.futures import ThreadPoolExecutor
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 import re
 from datetime import datetime
 from dotenv import load_dotenv
 
+# File extensions that indicate downloadable files (security risk)
+DOWNLOADABLE_FILE_EXTENSIONS = {
+    # Documents
+    '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.odt', '.ods', '.odp',
+    '.rtf', '.tex', '.wpd', '.pdf',
+    # Archives
+    '.zip', '.rar', '.7z', '.tar', '.gz', '.bz2', '.xz',
+    # Executables (high risk)
+    '.exe', '.msi', '.dmg', '.pkg', '.deb', '.rpm', '.app', '.bat', '.cmd', '.sh',
+    # Other binary formats
+    '.bin', '.iso', '.img',
+    # Media that auto-downloads
+    '.mp3', '.wav', '.mp4', '.avi', '.mov', '.mkv',
+    # Data files
+    '.csv', '.json', '.xml', '.sql',
+}
+
+# URL patterns that suggest file downloads
+FILE_DOWNLOAD_URL_PATTERNS = [
+    r'/download/',
+    r'/downloads/',
+    r'/file/',
+    r'/files/',
+    r'/attachment/',
+    r'/attachments/',
+    r'[?&]download=',
+    r'[?&]action=download',
+    r'/personCV/',  # Academic CV pattern (like Georgia Tech)
+    r'/cv\.',
+    r'/resume\.',
+]
+
+def is_file_download_url(url):
+    """
+    Detect if a URL is likely to trigger a file download.
+    Returns True if the URL appears to be a direct file download link.
+    """
+    if not url:
+        return False
+    
+    try:
+        # Decode URL-encoded characters
+        decoded_url = unquote(url).lower()
+        parsed = urlparse(decoded_url)
+        path = parsed.path.lower()
+        
+        # Check for file extensions
+        for ext in DOWNLOADABLE_FILE_EXTENSIONS:
+            if path.endswith(ext):
+                return True
+        
+        # Check for download URL patterns
+        full_url = decoded_url
+        for pattern in FILE_DOWNLOAD_URL_PATTERNS:
+            if re.search(pattern, full_url, re.IGNORECASE):
+                return True
+        
+        return False
+    except Exception:
+        return False
+
+def add_file_download_flags(results):
+    """
+    Add is_file_download flag to each result in the list.
+    """
+    for result in results:
+        url = result.get('url', '')
+        result['is_file_download'] = is_file_download_url(url)
+    return results
+
 # Load environment variables (check both .env and .env.local)
 load_dotenv()
 load_dotenv('.env.local', override=True)
+
+# Singleton search logger -- reused across all endpoints to avoid
+# repeated DB init and connection overhead per request
+logger = SearchLogger()
 
 # Set up Flask - disable built-in static handling, we handle it ourselves for SPA support
 app = Flask(__name__, static_folder=None)
 
 def update_recommended_articles():
     """Update recommended flags on existing articles (runs every startup)"""
-    import sqlite3
     try:
-        logger = SearchLogger()
         recommended_urls = [
             'https://palestinenexus.com/articles/eugenicism',
             'https://jewishcurrents.org/portrait-of-a-campus-in-crisis',
@@ -56,7 +130,6 @@ def update_recommended_articles():
 def seed_collections_on_startup():
     """Seed collections if they don't exist (for fresh deployments)"""
     try:
-        logger = SearchLogger()
         existing = logger.get_all_collections()
         
         # Only seed if no collections exist
@@ -114,8 +187,6 @@ def seed_collections_on_startup():
                 for title, url, source, authors, date, summary, recommended in articles:
                     logger.add_article_to_collection(tag, title, url, source, authors, date, summary)
                     if recommended:
-                        # Mark as recommended
-                        import sqlite3
                         conn = sqlite3.connect(logger.db_path)
                         cursor = conn.cursor()
                         cursor.execute('UPDATE curated_articles SET recommended = 1 WHERE url = ?', (url,))
@@ -131,7 +202,6 @@ def seed_collections_on_startup():
 def seed_iran_collection():
     """Seed Iran collection if it doesn't exist"""
     try:
-        logger = SearchLogger()
         if not logger.get_collection_by_tag('iran'):
             logger.create_collection(
                 'iran', 
@@ -169,10 +239,29 @@ def seed_iran_collection():
     except Exception as e:
         print(f"⚠️ Error seeding Iran collection: {e}")
 
-# Seed collections on startup
-seed_collections_on_startup()
-seed_iran_collection()
-update_recommended_articles()
+# Seed collections on startup (use file lock to run once across Gunicorn workers)
+_seed_lock_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.seed_lock')
+def _run_startup_tasks():
+    try:
+        # Atomic file creation: only the first worker to create this file proceeds
+        fd = os.open(_seed_lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+        os.close(fd)
+    except FileExistsError:
+        return
+    
+    try:
+        seed_collections_on_startup()
+        seed_iran_collection()
+        update_recommended_articles()
+        logger.clear_expired_cache()
+    finally:
+        # Clean up lock file so next restart can seed again
+        try:
+            os.remove(_seed_lock_path)
+        except OSError:
+            pass
+
+_run_startup_tasks()
 
 # Enable CORS - more permissive in production
 if os.getenv('RAILWAY_ENVIRONMENT') or os.getenv('PORT'):
@@ -420,7 +509,6 @@ def check_cached_reactions():
         if not query:
             return jsonify({'cached': False, 'results': None})
         
-        logger = SearchLogger()
         cached = logger.get_cached_search(query)
         
         if cached:
@@ -449,7 +537,6 @@ def clear_search_cache():
         if not query:
             return jsonify({'error': 'Query is required'}), 400
         
-        logger = SearchLogger()
         cleared = logger.clear_search_cache(query)
         
         if cleared:
@@ -471,17 +558,18 @@ def get_reactions():
     try:
         data = request.get_json()
         query = data.get('query', '')
+        skip_cache = data.get('skip_cache', False)
         
         if not query:
             return jsonify({'error': 'No query provided'}), 400
         
-        # Check cache first
-        logger = SearchLogger()
-        cached = logger.get_cached_search(query)
-        if cached:
-            print(f"✅ Returning cached search results for: {query[:50]}...")
-            cached['cached'] = True
-            return jsonify(cached)
+        # Check cache first (skipped when frontend already checked via /api/reactions/check)
+        if not skip_cache:
+            cached = logger.get_cached_search(query)
+            if cached:
+                print(f"✅ Returning cached search results for: {query[:50]}...")
+                cached['cached'] = True
+                return jsonify(cached)
         
         # Extract article metadata if URL is provided
         article_metadata = None
@@ -533,13 +621,18 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not build smart query, using URL: {e}")
         
-        news_results = search_news(search_query, user_ip=user_ip)
+        # Run web search and Reddit search in parallel
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            news_future = executor.submit(search_news, search_query, user_ip=user_ip)
+            reddit_future = executor.submit(search_reddit_posts, query, article_title=article_title)
+            
+            news_results = news_future.result(timeout=30)
+            reddit_results = reddit_future.result(timeout=30)
         
         # Filter out results from the same domain if query is a URL (backup filter)
         if query.startswith('http'):
             try:
                 query_domain = urlparse(query).netloc.replace('www.', '').lower()
-                # Filter out results from same domain and exact URL
                 news_results = [
                     result for result in news_results 
                     if result.get('url', '') != query and 
@@ -549,15 +642,8 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
-        # Search Reddit - for URLs, pass the URL and article title for better topic matching
-        print("📣 Searching Reddit...")
-        reddit_results = search_reddit_posts(query, article_title=article_title)
-        
-        # Add summaries to Reddit posts
-        for post in reddit_results:
-            if post.get("comments"):
-                combined = " ".join(post["comments"][:5])
-                post["summary"] = summarize_text(combined)
+        # Add file download flags to web results for security warnings
+        news_results = add_file_download_flags(news_results)
         
         # Format response to match frontend expectations
         response = {
@@ -611,7 +697,6 @@ def get_collections():
     Get all curated collections with article counts
     """
     try:
-        logger = SearchLogger()
         collections = logger.get_all_collections()
         return jsonify({'collections': collections})
     except Exception as e:
@@ -624,7 +709,6 @@ def get_collection(tag):
     Get articles in a specific collection
     """
     try:
-        logger = SearchLogger()
         collection = logger.get_collection_by_tag(tag)
         if not collection:
             return jsonify({'error': 'Collection not found'}), 404
@@ -655,7 +739,6 @@ def add_to_collection(tag):
         if not url or not title:
             return jsonify({'error': 'URL and title are required'}), 400
         
-        logger = SearchLogger()
         article_id = logger.add_article_to_collection(
             tag, title, url, source, authors, date, summary
         )
@@ -675,7 +758,6 @@ def get_archive():
     """
     try:
         limit = request.args.get('limit', 50, type=int)
-        logger = SearchLogger()
         archive = logger.get_shared_archive(limit=limit)
         return jsonify({'archive': archive})
     except Exception as e:
@@ -751,10 +833,14 @@ def get_trending_reactions(topic):
         query = topic_queries.get(topic.lower(), topic.replace('-', ' '))
         user_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         
-        # Fetch from all sources in parallel would be ideal, but for now sequential
-        reddit_results = search_reddit_posts(query, limit=5)
-        web_results = search_news(query, user_ip=user_ip)[:5]
-        twitter_results = get_trending_tweets(topic, limit=10)
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            reddit_future = executor.submit(search_reddit_posts, query, limit=5)
+            web_future = executor.submit(search_news, query, user_ip=user_ip)
+            twitter_future = executor.submit(get_trending_tweets, topic, limit=10)
+            
+            reddit_results = reddit_future.result(timeout=30)
+            web_results = web_future.result(timeout=30)[:5]
+            twitter_results = twitter_future.result(timeout=30)
         
         return jsonify({
             'topic': topic,
@@ -768,54 +854,41 @@ def get_trending_reactions(topic):
         print(f"Error fetching trending reactions: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/debug-keys', methods=['GET'])
-def debug_keys():
-    """
-    Debug endpoint to check if API keys are configured (does not expose actual keys)
-    """
-    serpapi_key = os.getenv("SERPAPI_API_KEY") or os.getenv("SERPAPI_KEY")
-    reddit_client_id = os.getenv("REDDIT_CLIENT_ID")
-    reddit_client_secret = os.getenv("REDDIT_CLIENT_SECRET")
-    reddit_user_agent = os.getenv("REDDIT_USER_AGENT")
-    openai_key = os.getenv("OPENAI_API_KEY")
-    gemini_key = os.getenv("GEMINI_API_KEY")
-    twitter_key = os.getenv("TWITTER_BEARER_TOKEN")
-    
-    return jsonify({
-        'SERPAPI_API_KEY': 'configured' if serpapi_key else 'MISSING',
-        'REDDIT_CLIENT_ID': 'configured' if reddit_client_id else 'MISSING',
-        'REDDIT_CLIENT_SECRET': 'configured' if reddit_client_secret else 'MISSING',
-        'REDDIT_USER_AGENT': 'configured' if reddit_user_agent else 'MISSING',
-        'OPENAI_API_KEY': 'configured' if openai_key else 'MISSING',
-        'GEMINI_API_KEY': 'configured' if gemini_key else 'MISSING',
-        'TWITTER_BEARER_TOKEN': 'configured' if twitter_key else 'MISSING',
-        'environment': 'railway' if os.getenv('RAILWAY_ENVIRONMENT') else 'local'
-    })
+# Debug endpoints -- only registered in local development
+if not os.getenv('RAILWAY_ENVIRONMENT'):
+    @app.route('/api/debug-keys', methods=['GET'])
+    def debug_keys():
+        """Check if API keys are configured (does not expose actual keys)"""
+        return jsonify({
+            'SERPAPI_API_KEY': 'configured' if (os.getenv("SERPAPI_API_KEY") or os.getenv("SERPAPI_KEY")) else 'MISSING',
+            'REDDIT_CLIENT_ID': 'configured' if os.getenv("REDDIT_CLIENT_ID") else 'MISSING',
+            'REDDIT_CLIENT_SECRET': 'configured' if os.getenv("REDDIT_CLIENT_SECRET") else 'MISSING',
+            'REDDIT_USER_AGENT': 'configured' if os.getenv("REDDIT_USER_AGENT") else 'MISSING',
+            'OPENAI_API_KEY': 'configured' if os.getenv("OPENAI_API_KEY") else 'MISSING',
+            'GEMINI_API_KEY': 'configured' if os.getenv("GEMINI_API_KEY") else 'MISSING',
+            'TWITTER_BEARER_TOKEN': 'configured' if os.getenv("TWITTER_BEARER_TOKEN") else 'MISSING',
+            'environment': 'local'
+        })
 
-@app.route('/api/debug-tts', methods=['GET'])
-def debug_tts():
-    """
-    Debug endpoint to test TTS functionality with a simple message.
-    This helps diagnose TTS issues in production.
-    """
-    from api.meta_commentary import text_to_speech_openai, text_to_speech_gemini
-    
-    test_text = "This is a test of the text to speech system."
-    
-    result = {
-        'test_text': test_text,
-        'openai_key_configured': bool(os.getenv("OPENAI_API_KEY")),
-        'gemini_key_configured': bool(os.getenv("GEMINI_API_KEY")),
-    }
-    
-    # Test OpenAI TTS directly
-    try:
-        openai_result = text_to_speech_openai(test_text)
-        result['openai_tts'] = 'success' if openai_result and openai_result.get('audio') else 'failed - no audio returned'
-    except Exception as e:
-        result['openai_tts'] = f'error: {str(e)}'
-    
-    return jsonify(result)
+    @app.route('/api/debug-tts', methods=['GET'])
+    def debug_tts():
+        """Test TTS functionality with a simple message."""
+        from api.meta_commentary import text_to_speech_openai, text_to_speech_gemini
+        
+        test_text = "This is a test of the text to speech system."
+        result = {
+            'test_text': test_text,
+            'openai_key_configured': bool(os.getenv("OPENAI_API_KEY")),
+            'gemini_key_configured': bool(os.getenv("GEMINI_API_KEY")),
+        }
+        
+        try:
+            openai_result = text_to_speech_openai(test_text)
+            result['openai_tts'] = 'success' if openai_result and openai_result.get('audio') else 'failed - no audio returned'
+        except Exception as e:
+            result['openai_tts'] = f'error: {str(e)}'
+        
+        return jsonify(result)
 
 @app.route('/api/meta-commentary/check', methods=['POST'])
 def check_cached_commentary():
@@ -830,7 +903,6 @@ def check_cached_commentary():
         cache_key = article.get('url') or article.get('title', '')
         
         if cache_key:
-            logger = SearchLogger()
             cached = logger.get_cached_commentary(cache_key)
             
             if cached and cached.get('audio'):
@@ -881,9 +953,6 @@ def meta_commentary():
         
         if cache_key:
             try:
-                logger = SearchLogger()
-                
-                # Check cache first
                 cached = logger.get_cached_commentary(cache_key)
                 if cached and cached.get('audio'):
                     print(f"✅ Returning cached commentary for: {cache_key[:50]}...")
@@ -922,7 +991,6 @@ def meta_commentary():
         # Cache the result if successful
         if cache_key and audio:
             try:
-                logger = SearchLogger()
                 logger.cache_commentary(
                     cache_key,
                     text,
