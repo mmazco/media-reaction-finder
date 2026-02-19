@@ -237,7 +237,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
               margin: '0 auto 16px'
             }} />
             <p style={{ color: darkMode ? '#888' : '#666', fontStyle: 'italic' }}>
-              Fetching reactions from Reddit, X, and the web...
+              Fetching results from X, Reddit and the web...
             </p>
           </div>
         ) : error ? (
