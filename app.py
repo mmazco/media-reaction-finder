@@ -40,6 +40,8 @@ def update_recommended_articles():
             'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews',
             'https://www.jadaliyya.com/Details/46906',
             'https://carnegieendowment.org/research/2025/07/iran-israel-ai-war-propaganda-is-a-warning-to-the-world?lang=en',
+            # AI collection
+            'https://ai-frontiers.org/articles/ai-will-be-your-personal-political-proxy',
         ]
         conn = sqlite3.connect(logger.db_path)
         cursor = conn.cursor()

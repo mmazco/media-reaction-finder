@@ -624,6 +624,15 @@ class SearchLogger:
             'source': row[6] or 'Unknown'
         } for row in rows]
     
+    def set_article_recommended(self, article_id, recommended=True):
+        """Set or unset the recommended flag on an article"""
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+        cursor.execute('UPDATE curated_articles SET recommended = ? WHERE id = ?', (1 if recommended else 0, article_id))
+        conn.commit()
+        conn.close()
+        return cursor.rowcount > 0
+
     def remove_article_from_collection(self, article_id):
         """Remove an article from a collection"""
         conn = sqlite3.connect(self.db_path)

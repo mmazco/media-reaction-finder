@@ -219,6 +219,31 @@ def seed_collections():
             'date': None,
             'summary': 'Deep dive into AI industry trends and implications.'
         },
+        {
+            'title': 'AI Will Be Your Personal Political Proxy',
+            'url': 'https://ai-frontiers.org/articles/ai-will-be-your-personal-political-proxy',
+            'source': 'AI Frontiers',
+            'authors': 'Bruce Schneier, Nathan E. Sanders',
+            'date': 'October 21, 2025',
+            'summary': 'By learning our views and engaging on our behalf, AI could make government more representative and responsive — but not if we allow it to erode our democratic instincts. Excerpt from "Rewiring Democracy."',
+            'recommended': True,
+        },
+        {
+            'title': 'The AI Apocalypse',
+            'url': 'https://just-tech.ssrc.org/articles/the-ai-apocalypse/',
+            'source': 'Just Tech (SSRC)',
+            'authors': 'Ruby Thelot',
+            'date': 'February 4, 2026',
+            'summary': 'Explores how AI doomer narratives mirror classical Judeo-Christian eschatological structures, from tribulation to utopia, and asks who gets to be saved by the machine.',
+        },
+        {
+            'title': 'Large Language Models (LLMs) as Agents for Augmented Democracy',
+            'url': 'https://www.tse-fr.eu/articles/large-language-models-llms-agents-augmented-democracy',
+            'source': 'Philosophical Transactions of the Royal Society A',
+            'authors': 'Jairo F. Gudino, Umberto Grandi, César Hidalgo',
+            'date': 'December 2024',
+            'summary': 'Research showing LLMs fine-tuned on citizen preference data can predict individual political choices and augment population-level preference estimates more accurately than party-line heuristics.',
+        },
     ]
     
     # Culture articles
@@ -275,6 +300,14 @@ def seed_collections():
             'date': 'January 9, 2026',
             'summary': "Former Palantir employee's analysis of AI surveillance technology, ISTAR systems, and the connections between Silicon Valley, defense contractors, and media manipulation in hybrid warfare."
         },
+        {
+            'title': 'How Anti-Semitism Helped Create Israel',
+            'url': 'https://foreignpolicy.com/2010/09/08/how-anti-semitism-helped-create-israel-2/',
+            'source': 'Foreign Policy',
+            'authors': 'Jonathan Schneer',
+            'date': 'September 8, 2010',
+            'summary': "How British leaders' anti-Semitic beliefs about the power of 'international Jewry' drove them to issue the Balfour Declaration during WWI, paradoxically laying the foundation for modern Israel."
+        },
     ]
     
     # Internet articles
@@ -312,6 +345,9 @@ def seed_collections():
             )
             if result:
                 print(f"  📄 Added: {article['title'][:50]}...")
+                if article.get('recommended'):
+                    logger.set_article_recommended(result, True)
+                    print(f"     ⭐ Marked as recommended")
             else:
                 print(f"  ⏭️  Already exists: {article['title'][:50]}...")
     
