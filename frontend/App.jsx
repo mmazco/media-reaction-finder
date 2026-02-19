@@ -323,8 +323,12 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                           alignItems: 'center',
                           gap: '8px'
                         }}>
-                          {tweet.created_at && (
-                            <span style={{ color: darkMode ? '#777' : '#888' }}>{tweet.created_at}</span>
+                          {(tweet.created_at_iso || tweet.created_at) && (
+                            <span style={{ color: darkMode ? '#777' : '#888' }}>
+                              {tweet.created_at_iso
+                                ? new Date(tweet.created_at_iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                                : tweet.created_at}
+                            </span>
                           )}
                           ❤️ {tweet.likes} · 🔄 {tweet.retweets} · 💬 {tweet.replies}
                         </span>
