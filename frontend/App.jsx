@@ -2900,7 +2900,7 @@ export default function App() {
                   padding: '10px 20px',
                   borderRadius: '6px',
                   border: 'none',
-                  backgroundColor: '#4ECDC4',
+                  backgroundColor: '#000',
                   color: '#fff',
                   cursor: 'pointer',
                   fontSize: '14px',
