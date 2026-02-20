@@ -1190,8 +1190,9 @@ def meta_commentary():
         return jsonify({'error': str(e), 'text': None, 'audio': None}), 500
 
 # Serve static files and SPA routing
-# Get the directory where this file (app.py) lives - this is our static root
-STATIC_ROOT = os.path.dirname(os.path.abspath(__file__))
+# Primary: Vite build output. Fallback: project root (favicons, etc.)
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'frontend', 'dist')
 
 @app.route('/')
 def serve_index():
@@ -1201,14 +1202,14 @@ def serve_index():
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files or fallback to index.html for SPA routing"""
-    # Build absolute path to check if file exists
-    full_path = os.path.join(STATIC_ROOT, path)
-    
-    # Check if it's a static asset (file exists and is a file, not directory)
-    if os.path.isfile(full_path):
+    dist_path = os.path.join(STATIC_ROOT, path)
+    if os.path.isfile(dist_path):
         return send_from_directory(STATIC_ROOT, path)
     
-    # Fallback to index.html for SPA routing (React Router handles client-side routes)
+    root_path = os.path.join(PROJECT_ROOT, path)
+    if os.path.isfile(root_path):
+        return send_from_directory(PROJECT_ROOT, path)
+    
     return send_from_directory(STATIC_ROOT, 'index.html')
 
 if __name__ == '__main__':
