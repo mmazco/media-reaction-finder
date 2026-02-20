@@ -16,6 +16,8 @@ When a user submits a query, the system searches for reactions across web and Re
 ```
 User Input
     ↓
+Check cache (7-day TTL)
+    ↓  (miss)
 ┌─────────────────────────────────────┐
 │  URL?  →  Extract Article Metadata  │
 │         (title, source, date, content)
@@ -23,16 +25,16 @@ User Input
 └─────────────────────────────────────┘
     ↓
 ┌──────────────────┬──────────────────┐
-│   Web Search     │   Reddit Search  │
+│   Web Search     │   Reddit Search  │  ← run in parallel
 │   (SerpAPI)      │   (PRAW)         │
 └──────────────────┴──────────────────┘
     ↓
 Filter same-domain results
     ↓
-Combine & Display
+Cache results → Combine & Display
 ```
 
-## Web Search (`api/search.py`)
+## Web Search (`search.py`)
 
 - Uses SerpAPI Google search
 - Passes raw query (URL or text) directly
@@ -88,9 +90,11 @@ Combine & Display
 
 | File | Purpose |
 |------|---------|
-| `api/reactions.py` | Main endpoint, orchestrates search |
-| `api/search.py` | SerpAPI web search |
+| `app.py` | Main Flask server, `/api/reactions` endpoint |
+| `search.py` | SerpAPI web search |
 | `api/reddit.py` | Reddit search via PRAW |
 | `api/summarize.py` | OpenAI summarization |
+| `api/search_logger.py` | DB logging, caching, collections |
+| `api/meta_commentary.py` | AI audio commentary generation |
 | `frontend/App.jsx` | UI, displays combined results |
 

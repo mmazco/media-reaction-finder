@@ -66,7 +66,6 @@ cd frontend && npm run dev
 ├── api/                # Backend modules
 ├── frontend/           # React app
 ├── scripts/            # CLI tools & utilities
-├── tests/              # Test files
 ├── data/               # Sample data
 └── docs/               # Documentation
 ```
@@ -85,8 +84,8 @@ python scripts/analytics_cli.py export --format csv --output searches.csv
 |----------|-------------|
 | `POST /api/reactions` | Analyze article and get reactions |
 | `POST /api/summarize` | Generate text summaries |
-| `GET /api/analytics/dashboard` | Analytics dashboard data |
-| `GET /api/analytics/export` | Export search data |
+| `GET /api/collections` | List curated collections |
+| `GET /api/meta-commentary` | AI audio commentary on results |
 
 ## License
 
