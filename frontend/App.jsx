@@ -19,17 +19,17 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
   
   const topicInfo = {
     'iran': {
-      title: "What's Happening in Iran?",
+      title: "What's happening in Iran?",
       description: 'Political landscape and updates on events',
       category: 'Geopolitics'
     },
     'ai-governance': {
-      title: 'AI Governance & Regulation',
+      title: 'AI governance & regulation',
       description: 'Policy discussions around artificial intelligence',
       category: 'Technology'
     },
     'climate-tech': {
-      title: 'Climate Technology',
+      title: 'Climate technology',
       description: 'Innovation in renewable energy and sustainability',
       category: 'Climate'
     }
@@ -72,8 +72,8 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
     <div style={{
       position: 'fixed',
       top: 0,
-      left: isMobile ? 0 : '56px',
-      width: isMobile ? '100vw' : 'calc(100vw - 56px)',
+      left: 0,
+      width: '100vw',
       height: '100vh',
       backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
       zIndex: 1000,
@@ -93,7 +93,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
         position: 'sticky',
         top: 0,
         backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
-        padding: isMobile ? '60px 20px 20px 20px' : '20px 30px',
+        padding: isMobile ? '60px 20px 20px 20px' : '20px 30px 20px 70px',
         borderBottom: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
         zIndex: 10
       }}>
@@ -200,7 +200,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                   fontFamily: 'Arial, sans-serif'
                 }}
               >
-                VIEW POLITICAL MAP (BETA)
+                View political map (beta)
               </button>
             )}
           </div>
@@ -363,7 +363,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 gap: '10px',
                 fontFamily: 'Georgia, serif'
               }}>
-                Reddit Discussions
+                Reddit discussions
                 <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400', fontFamily: 'Arial, sans-serif' }}>
                   ({reddit.length})
                 </span>
@@ -374,13 +374,13 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                     <div
                       key={i}
                       style={{
-                        marginBottom: '20px',
+                        marginBottom: '12px',
                         padding: '15px',
                         backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
                         borderRadius: '5px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px', flexWrap: 'wrap' }}>
                         <span style={{
                           fontSize: '12px',
                           padding: '2px 8px',
@@ -398,8 +398,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                           style={{
                             color: darkMode ? '#ffffff' : '#000000',
                             textDecoration: 'none',
-                            fontSize: '16px',
-                            fontWeight: '500'
+                            fontSize: '15px',
+                            fontWeight: '500',
+                            fontFamily: 'Arial, sans-serif'
                           }}
                         >
                           {post.title}
@@ -408,27 +409,61 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                           <span style={{
                             fontSize: '11px',
                             color: darkMode ? '#999' : '#666',
-                            marginLeft: 'auto'
+                            marginLeft: 'auto',
+                            fontStyle: 'italic',
+                            whiteSpace: 'nowrap'
                           }}>
-                            💬 {post.num_comments} comments
+                            💬 {post.num_comments} comment{post.num_comments !== 1 ? 's' : ''}
                           </span>
                         )}
                       </div>
-                      {post.summary && (
+                      {post.summary && !post.summary.startsWith('Discussion with') && !post.summary.startsWith('Reddit discussion') && !post.summary.startsWith('Unable to') && !post.summary.startsWith('Summarization unavailable') && (
                         <p style={{
                           marginTop: '8px',
-                          color: darkMode ? '#b3b3b3' : '#666',
-                          fontSize: '14px',
-                          lineHeight: '1.5'
+                          color: darkMode ? '#999' : '#666',
+                          fontSize: '13px',
+                          lineHeight: '1.5',
+                          fontFamily: 'Arial, sans-serif',
+                          backgroundColor: darkMode ? '#161616' : '#f0f0f0',
+                          padding: '10px 14px',
+                          borderRadius: '4px',
+                          borderLeft: `3px solid ${darkMode ? '#333' : '#ddd'}`
                         }}>
                           {post.summary}
                         </p>
+                      )}
+                      {post.top_comments && post.top_comments.length > 0 && (
+                        <div style={{ marginTop: '10px', borderLeft: `2px solid ${darkMode ? '#333' : '#ddd'}`, paddingLeft: '12px' }}>
+                          {post.top_comments.map((comment, ci) => (
+                            <div key={ci} style={{ marginBottom: ci < post.top_comments.length - 1 ? '10px' : 0 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                                <span style={{ fontSize: '12px', fontWeight: '600', color: darkMode ? '#ccc' : '#444', fontFamily: 'Arial, sans-serif' }}>
+                                  u/{comment.author}
+                                </span>
+                                <span style={{ fontSize: '11px', color: darkMode ? '#666' : '#999', fontFamily: 'Arial, sans-serif' }}>
+                                  {comment.score} pts
+                                </span>
+                              </div>
+                              <p style={{
+                                fontSize: '13px',
+                                color: darkMode ? '#aaa' : '#555',
+                                lineHeight: '1.5',
+                                margin: 0,
+                                fontFamily: 'Arial, sans-serif',
+                                wordBreak: 'break-word',
+                                overflowWrap: 'anywhere'
+                              }}>
+                                {comment.body}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <p style={{ color: darkMode ? '#666' : '#888' }}>
+                <p style={{ color: darkMode ? '#666' : '#888', fontFamily: 'Arial, sans-serif' }}>
                   No Reddit discussions found.
                 </p>
               )}
@@ -446,7 +481,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                 gap: '10px',
                 fontFamily: 'Georgia, serif'
               }}>
-                Web Articles
+                Web articles
                 <span style={{ fontSize: '14px', color: darkMode ? '#666' : '#999', fontWeight: '400', fontFamily: 'Arial, sans-serif' }}>
                   ({web.length})
                 </span>
@@ -457,13 +492,13 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                     <div
                       key={i}
                       style={{
-                        marginBottom: '20px',
+                        marginBottom: '12px',
                         padding: '15px',
                         backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
                         borderRadius: '5px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px', flexWrap: 'wrap' }}>
                         <span style={{
                           fontSize: '12px',
                           padding: '2px 8px',
@@ -474,6 +509,26 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                         }}>
                           Web
                         </span>
+                        {article.category_label && (() => {
+                          const categoryColors = {
+                            'Mainstream Coverage': { bg: '#e87b35', color: '#fff' },
+                            'Analysis': { bg: '#7c3aed', color: '#fff' },
+                            'Opinion': { bg: '#2563eb', color: '#fff' }
+                          };
+                          const colors = categoryColors[article.category_label] || { bg: darkMode ? '#2a2a2a' : '#f0f0f0', color: darkMode ? '#ccc' : '#555' };
+                          return (
+                            <span style={{
+                              fontSize: '11px',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              backgroundColor: colors.bg,
+                              color: colors.color,
+                              fontWeight: '500'
+                            }}>
+                              {article.category_label}
+                            </span>
+                          );
+                        })()}
                         {article.is_file_download ? (
                           <a 
                             href="#"
@@ -481,8 +536,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                             style={{
                               color: darkMode ? '#ffffff' : '#000000',
                               textDecoration: 'none',
-                              fontSize: '16px',
+                              fontSize: '15px',
                               fontWeight: '500',
+                              fontFamily: 'Arial, sans-serif',
                               display: 'flex',
                               alignItems: 'center',
                               gap: '6px'
@@ -499,20 +555,26 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                             style={{
                               color: darkMode ? '#ffffff' : '#000000',
                               textDecoration: 'none',
-                              fontSize: '16px',
-                              fontWeight: '500'
+                              fontSize: '15px',
+                              fontWeight: '500',
+                              fontFamily: 'Arial, sans-serif'
                             }}
                           >
                             {article.title}
                           </a>
                         )}
                       </div>
-                      {article.summary && (
+                      {article.summary && !article.summary.startsWith('Unable to') && !article.summary.startsWith('Summarization unavailable') && (
                         <p style={{
                           marginTop: '8px',
-                          color: darkMode ? '#b3b3b3' : '#666',
-                          fontSize: '14px',
-                          lineHeight: '1.5'
+                          color: darkMode ? '#999' : '#666',
+                          fontSize: '13px',
+                          lineHeight: '1.5',
+                          fontFamily: 'Arial, sans-serif',
+                          backgroundColor: darkMode ? '#161616' : '#f0f0f0',
+                          padding: '10px 14px',
+                          borderRadius: '4px',
+                          borderLeft: `3px solid ${darkMode ? '#333' : '#ddd'}`
                         }}>
                           {article.summary}
                         </p>
@@ -521,7 +583,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                   ))}
                 </div>
               ) : (
-                <p style={{ color: darkMode ? '#666' : '#888' }}>
+                <p style={{ color: darkMode ? '#666' : '#888', fontFamily: 'Arial, sans-serif' }}>
                   No web articles found.
                 </p>
               )}
@@ -551,6 +613,10 @@ export default function App() {
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [curatedFeed, setCuratedFeed] = useState([]);
+  const [curatedIndex, setCuratedIndex] = useState(0);
+  const [curatedLoading, setCuratedLoading] = useState(true);
   
   // Handle window resize for mobile detection
   useEffect(() => {
@@ -564,6 +630,14 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
+  useEffect(() => {
+    fetch('/api/curated-feed')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => { if (Array.isArray(data)) setCuratedFeed(data); })
+      .catch(() => {})
+      .finally(() => setCuratedLoading(false));
+  }, []);
+
   // Meta Commentary state
   const [metaAudio, setMetaAudio] = useState(null);
   const [metaText, setMetaText] = useState('');
@@ -680,6 +754,7 @@ export default function App() {
     setNews([]);
     setReddit([]);
     setArticle(null);
+    setHasSearched(false);
     setMetaAudio(null);
     setMetaText('');
     setMetaError(null);
@@ -726,7 +801,7 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          article: article,
+          article: article || { title: query, source: 'Topic Search', summary: '' },
           web: news,
           reddit: reddit
         })
@@ -794,7 +869,7 @@ export default function App() {
   };
 
   // Separate function to perform search (used by both handleSearch and URL parameter loading)
-  const performSearch = async (searchQuery) => {
+  const performSearch = async (searchQuery, sourcePost = null) => {
     // First, check if we have cached results (for shared links)
     try {
       const cacheCheck = await fetch('/api/reactions/check', {
@@ -815,20 +890,38 @@ export default function App() {
           const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
           
           setNews(cleanNews);
+          if (sourcePost) {
+            const sourceTitle = sourcePost.title.toLowerCase().trim();
+            const isDuplicate = cleanReddit.some(r => {
+              const t = (r.title || '').toLowerCase().trim();
+              return r.url === sourcePost.url || t === sourceTitle || t.includes(sourceTitle) || sourceTitle.includes(t);
+            });
+            if (!isDuplicate) {
+              cleanReddit.unshift(sourcePost);
+            } else {
+              const idx = cleanReddit.findIndex(r => {
+                const t = (r.title || '').toLowerCase().trim();
+                return r.url === sourcePost.url || t === sourceTitle || t.includes(sourceTitle) || sourceTitle.includes(t);
+              });
+              if (idx >= 0) {
+                cleanReddit[idx] = { ...cleanReddit[idx], match_type: 'curated_source', summary: cleanReddit[idx].summary || sourcePost.summary, top_comments: cleanReddit[idx].top_comments && cleanReddit[idx].top_comments.length > 0 ? cleanReddit[idx].top_comments : sourcePost.top_comments };
+              }
+            }
+          }
           setReddit(cleanReddit);
           setArticle(cleanArticle);
+          setHasSearched(true);
           
-          // Reset and check for cached commentary
           setMetaAudio(null);
           setMetaText('');
           setMetaError(null);
           setShowTranscript(false);
           
-          if (cleanArticle && (cleanNews.length > 0 || cleanReddit.length > 0)) {
-            checkCachedCommentary(cleanArticle);
+          if (cleanNews.length > 0 || cleanReddit.length > 0) {
+            checkCachedCommentary(cleanArticle || { title: searchQuery, source: 'Topic Search', summary: '' });
           }
           
-          return; // Early return - no need to proceed with full search
+          return;
         }
       }
     } catch (cacheError) {
@@ -857,19 +950,35 @@ export default function App() {
       const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
       
       setNews(cleanNews);
+      if (sourcePost) {
+        const sourceTitle = sourcePost.title.toLowerCase().trim();
+        const isDuplicate = cleanReddit.some(r => {
+          const t = (r.title || '').toLowerCase().trim();
+          return r.url === sourcePost.url || t === sourceTitle || t.includes(sourceTitle) || sourceTitle.includes(t);
+        });
+        if (!isDuplicate) {
+          cleanReddit.unshift(sourcePost);
+        } else {
+          const idx = cleanReddit.findIndex(r => {
+            const t = (r.title || '').toLowerCase().trim();
+            return r.url === sourcePost.url || t === sourceTitle || t.includes(sourceTitle) || sourceTitle.includes(t);
+          });
+          if (idx >= 0) {
+            cleanReddit[idx] = { ...cleanReddit[idx], match_type: 'curated_source', summary: cleanReddit[idx].summary || sourcePost.summary, top_comments: cleanReddit[idx].top_comments && cleanReddit[idx].top_comments.length > 0 ? cleanReddit[idx].top_comments : sourcePost.top_comments };
+          }
+        }
+      }
       setReddit(cleanReddit);
       setArticle(cleanArticle);
-      console.log('Article set to:', cleanArticle); // Debug log
+      setHasSearched(true);
       
-      // Reset meta commentary state for new search
       setMetaAudio(null);
       setMetaText('');
       setMetaError(null);
       setShowTranscript(false);
       
-      // Check for cached commentary if we have results
-      if (cleanArticle && (cleanNews.length > 0 || cleanReddit.length > 0)) {
-        checkCachedCommentary(cleanArticle);
+      if (cleanNews.length > 0 || cleanReddit.length > 0) {
+        checkCachedCommentary(cleanArticle || { title: searchQuery, source: 'Topic Search', summary: '' });
       }
       
       // Save to search history - for URLs use article data, for text queries create basic entry
@@ -1044,11 +1153,12 @@ export default function App() {
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
-      justifyContent: (news.length > 0 || reddit.length > 0 || article) ? 'flex-start' : 'center',
+      justifyContent: 'flex-start',
       padding: '20px',
-      paddingLeft: window.innerWidth <= 768 ? '20px' : '76px', // Account for left sidebar on desktop
+      paddingLeft: '20px',
       paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
-        (window.innerWidth <= 768 ? '100px' : '80px') : '20px',
+        (window.innerWidth <= 768 ? '100px' : '80px') : 
+        (window.innerWidth <= 768 ? '80px' : '12vh'),
       position: 'relative',
       backgroundColor: baseColors.bg,
       color: baseColors.text
@@ -1061,8 +1171,8 @@ export default function App() {
       title: {
       fontSize: window.innerWidth <= 768 ? '32px' : '48px',
       fontWeight: 'normal',
-      marginBottom: window.innerWidth <= 768 ? '12px' : '20px',
-      marginTop: window.innerWidth <= 768 ? '60px' : '0',
+      marginBottom: window.innerWidth <= 768 ? '16px' : '24px',
+      marginTop: 0,
       color: baseColors.text,
       fontFamily: 'Georgia, serif',
       cursor: 'pointer',
@@ -1071,35 +1181,36 @@ export default function App() {
       subtitle: {
       fontSize: window.innerWidth <= 768 ? '14px' : '16px',
       color: baseColors.textSecondary,
-      marginBottom: window.innerWidth <= 768 ? '30px' : '50px',
-      fontFamily: 'Georgia, serif'
+      marginBottom: window.innerWidth <= 768 ? '40px' : '56px',
+      fontFamily: 'Arial, sans-serif'
     },
       form: {
-      marginBottom: '40px'
+      marginBottom: '56px'
     },
       label: {
       display: 'block',
       fontSize: '14px',
       fontWeight: '600',
-      marginBottom: '10px',
+      marginBottom: '14px',
       textAlign: 'left',
       color: baseColors.text,
       fontFamily: 'Arial, sans-serif'
     },
       input: {
       width: '100%',
-      padding: '12px 16px',
+      padding: '14px 18px',
       fontSize: '15px',
-      border: 'none',
-      borderBottom: '1px solid #ccc',
+      border: `1px solid ${darkMode ? '#444' : '#ccc'}`,
+      borderRadius: '8px',
       outline: 'none',
-      backgroundColor: 'transparent',
-      fontFamily: 'Georgia, serif',
-      fontStyle: 'italic',
-      color: '#666'
+      backgroundColor: darkMode ? '#111' : '#fff',
+      fontFamily: 'Arial, sans-serif',
+      color: darkMode ? '#ddd' : '#333',
+      boxSizing: 'border-box'
     },
       button: {
-      marginTop: '40px',
+      marginTop: '36px',
+      marginBottom: '24px',
       padding: '14px 32px',
       fontSize: '12px',
       letterSpacing: '1.5px',
@@ -1119,7 +1230,7 @@ export default function App() {
       fontSize: '16px',
       color: '#666',
       fontStyle: 'italic',
-      fontFamily: 'Georgia, serif',
+      fontFamily: 'Arial, sans-serif',
       marginBottom: '10px'
     },
       loadingSpinner: {
@@ -1154,27 +1265,36 @@ export default function App() {
       color: darkMode ? '#ffffff' : '#000000',
       textDecoration: 'none',
       fontSize: '16px',
-      fontWeight: '500'
+      fontWeight: '500',
+      wordBreak: 'break-word',
+      overflowWrap: 'anywhere'
     },
       summary: {
       marginTop: '8px',
-      color: darkMode ? '#b3b3b3' : '#666',
-      fontSize: '14px',
-      lineHeight: '1.5'
+      color: darkMode ? '#999' : '#666',
+      fontSize: '13px',
+      lineHeight: '1.6',
+      padding: '8px 12px',
+      backgroundColor: darkMode ? '#111' : '#f0f0f0',
+      borderRadius: '4px',
+      borderLeft: `3px solid ${darkMode ? '#444' : '#ccc'}`,
+      fontFamily: 'Arial, sans-serif'
     },
       sidebar: {
       position: 'fixed',
       top: 0,
-      left: window.innerWidth <= 768 ? 0 : '56px',
+      left: 0,
       height: '100vh',
-      width: window.innerWidth <= 768 ? '100%' : '320px',
+      width: window.innerWidth <= 768 ? '100%' : '300px',
       backgroundColor: baseColors.bg,
       borderRight: window.innerWidth <= 768 ? 'none' : `1px solid ${baseColors.border}`,
       transform: 'translateX(-100%)',
       transition: 'transform 0.3s ease',
-      zIndex: 1000,
-      padding: '20px',
-      overflowY: 'auto'
+      zIndex: 1100,
+      padding: '70px 20px 20px',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
     },
       sidebarOpen: {
       transform: 'translateX(0)'
@@ -1223,11 +1343,11 @@ export default function App() {
       overlay: {
       position: 'fixed',
       top: 0,
-      left: '56px',
-      width: 'calc(100vw - 56px)',
+      left: 0,
+      width: '100vw',
       height: '100vh',
       backgroundColor: 'rgba(0, 0, 0, 0.3)',
-      zIndex: 999
+      zIndex: 1099
     },
       articleSummary: {
       marginTop: '40px',
@@ -1260,21 +1380,20 @@ export default function App() {
       fontSize: '14px',
       color: darkMode ? '#d4d4d4' : '#666',
       flex: 1,
-      fontFamily: 'Georgia, serif'
+      fontFamily: 'Arial, sans-serif'
     },
       summaryText: {
       fontSize: '14px',
       color: darkMode ? '#d4d4d4' : '#444',
       lineHeight: '1.6',
       marginTop: '10px',
-      fontFamily: 'Georgia, serif',
+      fontFamily: 'Arial, sans-serif',
       textAlign: 'left'
     },
       shareButton: {
       marginTop: '20px',
       padding: '10px 24px',
-      fontSize: '11px',
-      letterSpacing: '1px',
+      fontSize: '13px',
       fontWeight: '600',
       backgroundColor: darkMode ? '#333' : '#f0f0f0',
       color: darkMode ? '#fff' : '#333',
@@ -1312,92 +1431,114 @@ export default function App() {
 
   return (
     <div style={styles.container}>
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
+      `}</style>
       {/* Sidebar overlay */}
       {sidebarOpen && (
         <div style={styles.overlay} onClick={() => setSidebarOpen(false)} />
       )}
       
-      {/* History Sidebar */}
+      {/* Sidebar */}
       <div style={{
         ...styles.sidebar,
         ...(sidebarOpen ? styles.sidebarOpen : {})
       }}>
+        {/* Navigation */}
+        <div style={{ marginBottom: '20px', borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`, paddingBottom: '16px' }}>
+          <div
+            onClick={() => { setSidebarOpen(false); navigate('/'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            style={{ padding: '10px 0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: darkMode ? '#ccc' : '#333', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+            Search
+          </div>
+          <div
+            onClick={() => { setSidebarOpen(false); setSelectedCollection(null); setCollectionArticles([]); navigate('/collections'); }}
+            style={{ padding: '10px 0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: darkMode ? '#ccc' : '#333', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+            Collections
+          </div>
+          <div
+            onClick={toggleDarkMode}
+            style={{ padding: '10px 0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', color: darkMode ? '#ccc' : '#333', fontSize: '14px', fontFamily: 'Arial, sans-serif' }}
+          >
+            {darkMode ? (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line></svg>
+            ) : (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            )}
+            {darkMode ? 'Light mode' : 'Dark mode'}
+          </div>
+        </div>
+
+        {/* Search history */}
+        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.5px', color: darkMode ? '#666' : '#999', marginBottom: '12px', fontFamily: 'Arial, sans-serif', textTransform: 'uppercase' }}>
+          Search history
+        </div>
         {searchHistory.length > 0 ? (
           searchHistory.map((item) => (
             <div
               key={item.id}
-            style={{
-                ...styles.historyItem,
-                position: 'relative'
+              onClick={async () => {
+                const searchQuery = item.query || item.url;
+                setQuery(searchQuery);
+                setSidebarOpen(false);
+                updateURL(searchQuery);
+                if (item.cachedResults) {
+                  setNews(item.cachedResults.web || []);
+                  setReddit(item.cachedResults.reddit || []);
+                  setArticle(item.cachedResults.article || null);
+                } else {
+                  setTimeout(() => { performSearch(searchQuery); }, 100);
+                }
               }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#2a2a2a' : '#e8e8e8'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#1e1e1e' : '#f8f8f8'}
+              style={{
+                padding: '8px 0',
+                cursor: 'pointer',
+                borderBottom: `1px solid ${darkMode ? '#1a1a1a' : '#f0f0f0'}`,
+                fontFamily: 'Arial, sans-serif'
+              }}
             >
-              <div
-                onClick={async () => {
-                  const searchQuery = item.query || item.url;
-                  setQuery(searchQuery);
-                  setSidebarOpen(false);
-                  
-                  // Update URL when loading from history
-                  updateURL(searchQuery);
-                  
-                  // Restore cached results if available
-                  if (item.cachedResults) {
-                    setNews(item.cachedResults.web || []);
-                    setReddit(item.cachedResults.reddit || []);
-                    setArticle(item.cachedResults.article || null);
-                  } else {
-                    // Fallback: trigger a new search for older items without cache
-                    setTimeout(() => {
-                      performSearch(searchQuery);
-                    }, 100);
-                  }
-                }}
-                style={{cursor: 'pointer', paddingRight: '35px'}}
-              >
-                <div style={styles.historyTitle}>{item.title}</div>
-                <div style={styles.historySource}>{item.source}</div>
-                <div style={styles.historyDate}>{item.date}</div>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '500',
+                color: darkMode ? '#ccc' : '#333',
+                lineHeight: '1.4',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {item.title}
               </div>
-          <button
-                onClick={(e) => deleteHistoryItem(item.id, e)}
-            style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  background: 'transparent',
-              border: 'none',
-                  color: darkMode ? '#666' : '#999',
-              cursor: 'pointer',
-                  fontSize: '18px',
-                  padding: '5px',
-                  width: '25px',
-                  height: '25px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = darkMode ? '#333' : '#ddd';
-                  e.target.style.color = darkMode ? '#fff' : '#333';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'transparent';
-                  e.target.style.color = darkMode ? '#666' : '#999';
-                }}
-              >
-                ×
-          </button>
+              <div style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', marginTop: '2px' }}>
+                {item.source}
+              </div>
             </div>
           ))
         ) : (
-          <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '14px', fontStyle: 'italic'}}>
+          <div style={{color: darkMode ? '#b3b3b3' : '#666', fontSize: '13px', fontFamily: 'Arial, sans-serif'}}>
             No search history yet
           </div>
         )}
+
+        {/* Footer links */}
+        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`, display: 'flex', gap: '16px' }}>
+          <a href="https://github.com/mmazco/media-reaction-finder" target="_blank" rel="noreferrer" style={{ color: darkMode ? '#fff' : '#1a1a1a', display: 'flex' }} title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <a href="https://x.com/mmazco" target="_blank" rel="noreferrer" style={{ color: darkMode ? '#fff' : '#1a1a1a', display: 'flex' }} title="X">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
         </div>
 
       {/* Collections Page Overlay */}
@@ -1405,8 +1546,8 @@ export default function App() {
         <div style={{
           position: 'fixed',
           top: 0,
-          left: '56px',
-          width: 'calc(100vw - 56px)',
+          left: 0,
+          width: '100vw',
           height: '100vh',
           backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
           zIndex: 1000,
@@ -1541,7 +1682,7 @@ export default function App() {
                     gap: '6px'
               }}
             >
-                  ← All Collections
+                  ← All collections
             </button>
             {selectedCollection.description && (
                   <p style={{
@@ -1549,7 +1690,7 @@ export default function App() {
                     fontSize: '15px',
                     marginBottom: '25px',
                     fontStyle: 'italic',
-                    fontFamily: 'Georgia, serif'
+                    fontFamily: 'Arial, sans-serif'
               }}>
                 {selectedCollection.description}
                   </p>
@@ -1644,13 +1785,13 @@ export default function App() {
                             </>
                           )}
                         </div>
-                        {article.summary && (
+                        {article.summary && !article.summary.startsWith('Unable to') && !article.summary.startsWith('Summarization unavailable') && (
                           <p style={{
                             fontSize: '14px',
                             color: darkMode ? '#aaa' : '#555',
                             lineHeight: '1.6',
                             marginBottom: '16px',
-                            fontFamily: 'Georgia, serif'
+                            fontFamily: 'Arial, sans-serif'
                           }}>
                             {article.summary.length > 200 
                               ? article.summary.substring(0, 200) + '...' 
@@ -1743,8 +1884,8 @@ export default function App() {
         <div style={{
           position: 'fixed',
           top: 0,
-          left: isMobile ? 0 : '56px',
-          width: isMobile ? '100vw' : 'calc(100vw - 56px)',
+          left: 0,
+          width: '100vw',
           height: '100vh',
           backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
           zIndex: 1000,
@@ -1766,50 +1907,34 @@ export default function App() {
         />
       )}
       
-      {/* Mobile Burger Menu */}
+      {/* Mobile Menu Toggle */}
       {isMobile && (
         <>
-          {/* Burger Icon */}
           <div
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             style={{
               position: 'fixed',
               top: '16px',
-              right: '16px',
-              zIndex: 1002,
-              width: '40px',
-              height: '40px',
+              left: '16px',
+              zIndex: 1200,
+              width: '44px',
+              height: '44px',
               display: 'flex',
-              flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
               cursor: 'pointer',
-              backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
               borderRadius: '8px',
-              gap: '5px'
+              backgroundColor: darkMode ? '#fff' : '#1a1a1a',
+              transition: 'opacity 0.2s ease'
             }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
-            <div style={{
-              width: '20px',
-              height: '2px',
-              backgroundColor: darkMode ? '#fff' : '#333',
-              transition: 'all 0.3s ease',
-              transform: mobileMenuOpen ? 'rotate(45deg) translateY(7px)' : 'none'
-            }} />
-            <div style={{
-              width: '20px',
-              height: '2px',
-              backgroundColor: darkMode ? '#fff' : '#333',
-              transition: 'all 0.3s ease',
-              opacity: mobileMenuOpen ? 0 : 1
-            }} />
-            <div style={{
-              width: '20px',
-              height: '2px',
-              backgroundColor: darkMode ? '#fff' : '#333',
-              transition: 'all 0.3s ease',
-              transform: mobileMenuOpen ? 'rotate(-45deg) translateY(-7px)' : 'none'
-            }} />
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#1a1a1a' : '#fff'} strokeWidth="2.5" strokeLinecap="round">
+              <line x1="4" y1="6" x2="20" y2="6"></line>
+              <line x1="4" y1="12" x2="20" y2="12"></line>
+              <line x1="4" y1="18" x2="20" y2="18"></line>
+            </svg>
           </div>
 
           {/* Mobile Menu Overlay */}
@@ -1823,7 +1948,7 @@ export default function App() {
                 right: 0,
                 bottom: 0,
                 backgroundColor: 'rgba(0,0,0,0.5)',
-                zIndex: 1000
+                zIndex: 1150
               }}
             />
           )}
@@ -1837,7 +1962,7 @@ export default function App() {
             width: '280px',
             backgroundColor: darkMode ? '#0a0a0a' : '#f5f5f5',
             borderRight: `1px solid ${darkMode ? '#222' : '#ddd'}`,
-            zIndex: 1001,
+            zIndex: 1160,
             transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
             transition: 'transform 0.3s ease',
             padding: '80px 20px 20px 20px',
@@ -1895,20 +2020,16 @@ export default function App() {
                 <path d="M3 3v5h5"></path>
                 <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"></path>
               </svg>
-              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>Search History</span>
+              <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>Search history</span>
             </div>
 
             <div
               onClick={() => {
                 setMobileMenuOpen(false);
                 setSidebarOpen(false);
-                if (location.pathname === '/collections') {
-                  setSelectedCollection(null);
-                  setCollectionArticles([]);
-                  navigate('/');
-                } else {
-                  navigate('/collections');
-                }
+                setSelectedCollection(null);
+                setCollectionArticles([]);
+                navigate('/collections');
               }}
               style={{
                 padding: '16px',
@@ -1960,7 +2081,7 @@ export default function App() {
                 </svg>
               )}
               <span style={{ color: darkMode ? '#fff' : '#333', fontWeight: '500' }}>
-                {darkMode ? 'Light Mode' : 'Dark Mode'}
+                {darkMode ? 'Light mode' : 'Dark mode'}
               </span>
             </div>
 
@@ -1981,10 +2102,10 @@ export default function App() {
                 marginBottom: '8px'
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={darkMode ? '#888' : '#666'}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={darkMode ? '#fff' : '#1a1a1a'}>
                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
               </svg>
-              <span style={{ color: darkMode ? '#888' : '#666', fontWeight: '500' }}>GitHub</span>
+              <span style={{ color: darkMode ? '#fff' : '#1a1a1a', fontWeight: '500' }}>GitHub</span>
             </div>
 
             <div
@@ -2001,211 +2122,45 @@ export default function App() {
                 borderRadius: '8px'
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill={darkMode ? '#888' : '#666'}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill={darkMode ? '#fff' : '#1a1a1a'}>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
               </svg>
-              <span style={{ color: darkMode ? '#888' : '#666', fontWeight: '500' }}>X (Twitter)</span>
+              <span style={{ color: darkMode ? '#fff' : '#1a1a1a', fontWeight: '500' }}>X (Twitter)</span>
             </div>
           </div>
         </>
       )}
 
-      {/* Left Icon Sidebar - Desktop Only */}
-      <div style={{
-        position: 'fixed',
-        left: 0,
-        top: 0,
-        height: '100vh',
-        width: '56px',
-        backgroundColor: darkMode ? '#0a0a0a' : '#1a1a1a',
-        borderRight: `1px solid ${darkMode ? '#222' : '#333'}`,
-        display: isMobile ? 'none' : 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: '16px',
-        zIndex: 1001,
-        gap: '4px'
-      }}>
-        {/* Search Icon (also serves as Home) */}
-        <div 
-          onClick={() => {
-            // Close any open views first
-            setSidebarOpen(false);
-            setSelectedCollection(null);
-            setCollectionArticles([]);
-            // Navigate to home
-            navigate('/');
-            // Scroll to top and focus search input
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(() => {
-              document.querySelector('input[type="text"]')?.focus();
-            }, 100);
-          }}
-                  style={{
-            width: '40px',
-            height: '40px',
+      {/* Menu Toggle Button - Desktop */}
+      {!isMobile && (
+        <div
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          style={{
+            position: 'fixed',
+            left: '16px',
+            top: '16px',
+            width: '36px',
+            height: '36px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
+            zIndex: 1200,
+            backgroundColor: darkMode ? '#fff' : '#1a1a1a',
+            transition: 'opacity 0.2s ease'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title="Search"
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          title="Menu"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="M21 21l-4.35-4.35"></path>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#1a1a1a' : '#fff'} strokeWidth="2.5" strokeLinecap="round">
+            <line x1="4" y1="6" x2="20" y2="6"></line>
+            <line x1="4" y1="12" x2="20" y2="12"></line>
+            <line x1="4" y1="18" x2="20" y2="18"></line>
           </svg>
         </div>
-
-        {/* History Icon (Clock with counterclockwise arrow) */}
-        <div 
-          onClick={() => {
-            // Close collections if on collections page
-            if (location.pathname === '/collections') {
-              setSelectedCollection(null);
-              setCollectionArticles([]);
-            }
-            // Toggle history sidebar
-            setSidebarOpen(!sidebarOpen);
-          }}
-          style={{
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title="Search History"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-            <path d="M3 3v5h5"></path>
-            <path d="M12 7v5l4 2"></path>
-          </svg>
-        </div>
-
-        {/* Bookmark/Collections Icon */}
-        <div 
-          onClick={() => {
-            // Close history sidebar if open
-            setSidebarOpen(false);
-            // Toggle collections page via URL
-            if (location.pathname === '/collections') {
-              setSelectedCollection(null);
-              setCollectionArticles([]);
-              navigate('/');
-            } else {
-              navigate('/collections');
-            }
-          }}
-          style={{
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title="Collections"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-                  </div>
-
-        {/* Dark Mode Icon */}
-        <div 
-          onClick={toggleDarkMode}
-                    style={{
-            width: '40px',
-            height: '40px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title={darkMode ? "Light Mode" : "Dark Mode"}
-        >
-          {darkMode ? (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
-          ) : (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-        )}
-      </div>
-      
-        {/* GitHub Icon */}
-        <div 
-          onClick={() => window.open('https://github.com/mmazco/media-reaction-finder', '_blank')}
-          style={{
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title="GitHub"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="#888">
-            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-          </svg>
-        </div>
-        
-        {/* X (Twitter) Icon */}
-        <div 
-          onClick={() => window.open('https://x.com/mmazco', '_blank')}
-          style={{
-            width: '40px',
-            height: '40px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-          title="X (Twitter)"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#888">
-            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-          </svg>
-        </div>
-      </div>
+      )}
       
       {/* Main Content - only show when not on collections page */}
       {location.pathname !== '/collections' && (
@@ -2224,196 +2179,327 @@ export default function App() {
         <p style={styles.subtitle}>Discover reactions around any published article, media and content across the web and socials</p>
         
         <div style={styles.form}>
-          <label style={styles.label}>Insert URL or Topic</label>
-          <input
-            type="text"
-            placeholder="https://example.com/article or search topic"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={styles.input}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          />
           <div style={{
-            fontSize: '14px',
-            color: darkMode ? '#999' : '#666',
-            marginTop: '8px',
-            fontStyle: 'italic',
-            textAlign: 'left',
-            lineHeight: '1.5'
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '12px 14px',
+            borderRadius: '16px',
+            border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+            backgroundColor: darkMode ? '#111' : '#fff',
+            transition: 'border-color 0.2s ease'
           }}>
-            💡 Note: Some premium publications (WSJ, NYT, etc.) may require subscriptions to access content.
-            Try publicly accessible articles for best results.
+            <input
+              type="text"
+              placeholder="Paste a URL or type a topic to discover reactions"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              style={{
+                flex: 1,
+                padding: '6px 4px',
+                fontSize: '15px',
+                border: 'none',
+                outline: 'none',
+                backgroundColor: 'transparent',
+                fontFamily: 'Arial, sans-serif',
+                color: darkMode ? '#ddd' : '#333'
+              }}
+            />
+            {!loading ? (
+              <div
+                onClick={handleSearch}
+                style={{
+                  width: isMobile ? '44px' : '36px',
+                  height: isMobile ? '44px' : '36px',
+                  borderRadius: '50%',
+                  backgroundColor: darkMode ? '#fff' : '#1a1a1a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                  transition: 'opacity 0.2s ease'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#1a1a1a' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+              </div>
+            ) : (
+              <div style={{
+                width: isMobile ? '44px' : '36px',
+                height: isMobile ? '44px' : '36px',
+                borderRadius: '50%',
+                border: `2px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                borderTop: `2px solid ${darkMode ? '#fff' : '#1a1a1a'}`,
+                animation: 'spin 1s linear infinite',
+                flexShrink: 0
+              }}></div>
+            )}
           </div>
-          {!loading ? (
-            <button 
-              onClick={handleSearch} 
-              style={styles.button}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#333'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#1a1a1a'}
-            >
-              ANALYZE REACTIONS
-            </button>
-          ) : (
-            <div style={styles.loadingContainer}>
+          {loading && (
+            <div style={{ marginTop: '12px', textAlign: 'center' }}>
               <div style={styles.loadingText}>Searching for reactions across the web...</div>
-              <div style={styles.loadingSpinner}></div>
             </div>
           )}
         </div>
 
-        {/* Unified Examples Section (after search bar) */}
-        {!loading && !article && news.length === 0 && reddit.length === 0 && (
+        {/* Homepage Feed */}
+        {!loading && !hasSearched && !article && news.length === 0 && reddit.length === 0 && (
+          <div style={{ width: '100%', maxWidth: '700px', marginTop: '48px', textAlign: 'left' }}>
+
+            {/* Curated topics */}
+            <div style={{
+              marginBottom: '48px',
+              backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+              borderRadius: '5px',
+              overflow: 'hidden'
+            }}>
+              <h2 style={{
+                fontSize: '22px',
+                fontFamily: 'Georgia, serif',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
+                padding: '16px 16px 12px 16px',
+                margin: 0
+              }}>
+                Curated topics
+              </h2>
+              {[
+                { label: "What's happening in Iran?", action: () => navigate('/trending/iran'), beta: true },
+                { label: 'Faith in Silicon Valley', action: () => { const u = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion'; setQuery(u); updateURL(u); performSearch(u); } },
+                { label: 'AI & decentralized governance', action: () => { const u = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale'; setQuery(u); updateURL(u); performSearch(u); } },
+                { label: 'Machines of loving grace', action: () => { const u = 'https://darioamodei.com/machines-of-loving-grace'; setQuery(u); updateURL(u); performSearch(u); } }
+              ].map((item, i, arr) => (
+                <div key={i} onClick={item.action} style={{
+                  padding: '14px 16px',
+                  borderBottom: i < arr.length - 1 ? `1px solid ${darkMode ? '#2a2a2a' : '#eee'}` : 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  transition: 'background-color 0.15s ease'
+                }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? '#252525' : '#f0f0f0'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                    <span style={{ fontSize: '14px', color: darkMode ? '#ccc' : '#333', fontWeight: '500', fontFamily: 'Arial, sans-serif' }}>{item.label}</span>
+                    {item.beta && <span style={{ padding: '2px 6px', backgroundColor: darkMode ? '#ffd54f' : '#b8860b', color: darkMode ? '#000' : '#fff', fontSize: '9px', fontWeight: '700', letterSpacing: '0.5px', borderRadius: '3px', fontFamily: 'Arial, sans-serif' }}>BETA</span>}
+                  </div>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+              ))}
+            </div>
+
+            {/* Loading state for curated feed */}
+            {curatedLoading && curatedFeed.length === 0 && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                padding: '20px',
+                backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                borderRadius: '5px',
+                marginBottom: '32px'
+              }}>
+                <div style={{
+                  width: '18px',
+                  height: '18px',
+                  border: `2px solid ${darkMode ? '#333' : '#ddd'}`,
+                  borderTop: `2px solid ${darkMode ? '#888' : '#666'}`,
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  flexShrink: 0
+                }} />
+                <span style={{
+                  fontSize: '14px',
+                  color: darkMode ? '#888' : '#666',
+                  fontFamily: 'Arial, sans-serif',
+                  fontStyle: 'italic'
+                }}>
+                  Loading top discussions from Reddit...
+                </span>
+              </div>
+            )}
+
+            {/* Curated Subreddit Feed — one at a time */}
+            {curatedFeed.length > 0 && (() => {
+              const subredditDescriptions = {
+                'worldnews': 'Breaking international news and current affairs from around the globe',
+                'CriticalTheory': 'Philosophy, cultural critique, and deep analysis of society and power',
+                'AI_Agents': 'Building, deploying, and discussing autonomous AI systems',
+                'PredictionsMarkets': 'Forecasting events through prediction markets and collective intelligence'
+              };
+              const channel = curatedFeed[curatedIndex % curatedFeed.length];
+              const desc = subredditDescriptions[channel.subreddit] || '';
+              return (
+                <div style={{ marginBottom: '32px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+                    <h2 style={{
+                      fontSize: '22px',
+                      fontFamily: 'Georgia, serif',
+                      fontWeight: 'normal',
+                      color: darkMode ? '#fff' : '#1a1a1a',
+                      margin: 0
+                    }}>
+                      Top discussions
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      {curatedFeed.map((ch, ci) => (
+                        <button
+                          key={ci}
+                          onClick={() => setCuratedIndex(ci)}
+                          style={{
+                            padding: '4px 10px',
+                            fontSize: '12px',
+                            fontFamily: 'Arial, sans-serif',
+                            border: `1px solid ${ci === curatedIndex % curatedFeed.length ? (darkMode ? '#fff' : '#1a1a1a') : (darkMode ? '#333' : '#ddd')}`,
+                            borderRadius: '4px',
+                            backgroundColor: ci === curatedIndex % curatedFeed.length ? (darkMode ? '#fff' : '#1a1a1a') : 'transparent',
+                            color: ci === curatedIndex % curatedFeed.length ? (darkMode ? '#1a1a1a' : '#fff') : (darkMode ? '#888' : '#666'),
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          {ch.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {desc && (
+                    <p style={{
+                      fontSize: '13px',
+                      color: darkMode ? '#888' : '#888',
+                      fontFamily: 'Arial, sans-serif',
+                      margin: '0 0 20px',
+                      lineHeight: '1.4'
+                    }}>
+                      {desc}
+                    </p>
+                  )}
+
+                  <div style={{
+                    backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                    borderRadius: '5px',
+                    overflow: 'hidden'
+                  }}>
+                    {channel.posts.filter(p => p.num_comments > 0).map((post, pi, filteredArr) => (
+                      <div key={pi} style={{
+                        padding: '15px',
+                        borderBottom: pi < filteredArr.length - 1 ? `1px solid ${darkMode ? '#2a2a2a' : '#eee'}` : 'none'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px', flexWrap: 'wrap' }}>
+                          <span style={{
+                            fontSize: '12px',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            backgroundColor: '#FF6B6B',
+                            color: '#fff',
+                            fontWeight: '500',
+                            flexShrink: 0
+                          }}>
+                            Reddit
+                          </span>
+                          <a
+                            href={post.url}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              const source = {
+                                title: post.title,
+                                url: post.url,
+                                score: post.score,
+                                num_comments: post.num_comments,
+                                summary: post.summary || '',
+                                top_comments: post.top_comments || [],
+                                match_type: 'curated_source',
+                                type: 'Reddit'
+                              };
+                              setQuery(post.title);
+                              updateURL(post.title);
+                              performSearch(post.title, source);
+                            }}
+                            style={{...styles.link, flex: 1, minWidth: 0}}
+                          >
+                            {post.title}
+                          </a>
+                          {post.num_comments > 0 && (
+                            <span style={{
+                              fontSize: '11px',
+                              color: darkMode ? '#999' : '#666',
+                              marginLeft: 'auto',
+                              fontStyle: 'italic',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0
+                            }}>
+                              💬 {post.num_comments} comment{post.num_comments !== 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
+                        {post.top_comments && post.top_comments.length > 0 && (
+                          <div style={{ marginTop: '10px', borderLeft: `2px solid ${darkMode ? '#333' : '#ddd'}`, paddingLeft: '12px' }}>
+                            {post.top_comments.map((comment, ci) => (
+                              <div key={ci} style={{ marginBottom: ci < post.top_comments.length - 1 ? '10px' : 0 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                                  <span style={{ fontSize: '12px', fontWeight: '600', color: darkMode ? '#ccc' : '#444' }}>
+                                    u/{comment.author}
+                                  </span>
+                                  <span style={{ fontSize: '11px', color: darkMode ? '#666' : '#999' }}>
+                                    {comment.score} pts
+                                  </span>
+                                </div>
+                                <p style={{
+                                  fontSize: '13px',
+                                  color: darkMode ? '#aaa' : '#555',
+                                  lineHeight: '1.5',
+                                  margin: 0,
+                                  wordBreak: 'break-word',
+                                  overflowWrap: 'anywhere'
+                                }}>
+                                  {comment.body}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
+
+          </div>
+        )}
+
+        {/* No results empty state */}
+        {!loading && hasSearched && news.length === 0 && reddit.length === 0 && !article && (
           <div style={{
             width: '100%',
             maxWidth: '700px',
-            marginTop: '24px'
+            marginTop: '40px',
+            textAlign: 'center',
+            padding: '40px 20px'
           }}>
-            {/* Iran Trending Topic - with BETA badge */}
-            <div
-              onClick={() => navigate('/trending/iran')}
-              style={{
-                padding: '16px 0',
-                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span style={{
-                  fontSize: '15px',
-                  color: darkMode ? '#ccc' : '#333',
-                  fontWeight: '500'
-                }}>
-                  What's Happening in Iran?
-                </span>
-                <span style={{
-                  padding: '2px 6px',
-                  backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
-                  color: darkMode ? '#000' : '#fff',
-                  fontSize: '9px',
-                  fontWeight: '700',
-                  letterSpacing: '0.5px',
-                  borderRadius: '3px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  BETA
-                </span>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
+            <div style={{
+              fontSize: '32px',
+              marginBottom: '16px'
+            }}>
+              No reactions found
             </div>
-
-            {/* Example 1: Faith in Silicon Valley */}
-            <div
-              onClick={() => {
-                const exampleUrl = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion';
-                setQuery(exampleUrl);
-                updateURL(exampleUrl);
-                performSearch(exampleUrl);
-              }}
-              style={{
-                padding: '16px 0',
-                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span style={{
-                  fontSize: '15px',
-                  color: darkMode ? '#ccc' : '#333',
-                  fontWeight: '500'
-                }}>
-                  Faith in Silicon Valley
-                </span>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
-
-            {/* Example 2: AI & Decentralized Governance */}
-            <div
-              onClick={() => {
-                const exampleUrl = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale';
-                setQuery(exampleUrl);
-                updateURL(exampleUrl);
-                performSearch(exampleUrl);
-              }}
-              style={{
-                padding: '16px 0',
-                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span style={{
-                  fontSize: '15px',
-                  color: darkMode ? '#ccc' : '#333',
-                  fontWeight: '500'
-                }}>
-                  AI & Decentralized Governance
-                </span>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
-
-            {/* Example 3: Machines of Loving Grace */}
-            <div
-              onClick={() => {
-                const exampleUrl = 'https://darioamodei.com/machines-of-loving-grace';
-                setQuery(exampleUrl);
-                updateURL(exampleUrl);
-                performSearch(exampleUrl);
-              }}
-              style={{
-                padding: '16px 0',
-                borderBottom: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#888' : '#666'} strokeWidth="2">
-                  <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                  <polyline points="17 6 23 6 23 12"></polyline>
-                </svg>
-                <span style={{
-                  fontSize: '15px',
-                  color: darkMode ? '#ccc' : '#333',
-                  fontWeight: '500'
-                }}>
-                  Machines of Loving Grace
-                </span>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </div>
+            <p style={{
+              fontSize: '15px',
+              color: darkMode ? '#888' : '#666',
+              lineHeight: '1.6',
+              marginBottom: '20px'
+            }}>
+              We couldn't find any discussions or news coverage for this search. Try pasting a different article URL or searching for a broader topic.
+            </p>
           </div>
         )}
 
@@ -2439,7 +2525,7 @@ export default function App() {
                 {article ? (article.date || 'Date not available') : 'Date not available'}
               </div>
             </div>
-            {article && article.summary && (
+            {article && article.summary && !article.summary.startsWith('Unable to') && !article.summary.startsWith('Summarization unavailable') && (
               <div style={{
                 ...styles.summaryText,
                 color: darkMode ? '#999' : '#666'
@@ -2485,7 +2571,7 @@ export default function App() {
                 color: darkMode ? '#fff' : '#000',
                 fontFamily: 'Georgia, serif'
               }}>
-                Meta Commentary
+                Meta commentary
               </span>
             </div>
             
@@ -2494,7 +2580,7 @@ export default function App() {
               color: darkMode ? '#999' : '#666',
               marginBottom: '15px',
               fontStyle: 'italic',
-              fontFamily: 'Georgia, serif'
+              fontFamily: 'Arial, sans-serif'
             }}>
               Generate an audio analysis of your content - what people are saying, key themes, and broader implications.
             </p>
@@ -2518,8 +2604,7 @@ export default function App() {
                 onClick={generateMetaCommentary}
                 style={{
                   padding: '12px 24px',
-                  fontSize: '12px',
-                  letterSpacing: '1px',
+                  fontSize: '13px',
                   fontWeight: '600',
                   backgroundColor: darkMode ? '#fff' : '#000',
                   color: darkMode ? '#000' : '#fff',
@@ -2538,7 +2623,7 @@ export default function App() {
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
-                GENERATE COMMENTARY
+                Generate commentary
               </button>
             )}
             
@@ -2557,7 +2642,7 @@ export default function App() {
                   color: darkMode ? '#999' : '#666',
                   fontStyle: 'italic'
                 }}>
-                  Generating meta commentary...
+                  Generating commentary...
                 </span>
               </div>
             )}
@@ -2607,7 +2692,7 @@ export default function App() {
                     fontFamily: 'Arial, sans-serif'
                   }}
                 >
-                  {showTranscript ? '▼' : '▶'} {showTranscript ? 'Hide' : 'Show'} Transcript
+                  {showTranscript ? '▼' : '▶'} {showTranscript ? 'Hide' : 'Show'} transcript
                 </button>
                 {showTranscript && (
                   <div style={{
@@ -2619,7 +2704,7 @@ export default function App() {
                     fontSize: '14px',
                     lineHeight: '1.7',
                     color: darkMode ? '#ccc' : '#444',
-                    fontFamily: 'Georgia, serif'
+                    fontFamily: 'Arial, sans-serif'
                   }}>
                     {metaText}
                   </div>
@@ -2633,10 +2718,11 @@ export default function App() {
           <div style={styles.results}>
             {/* Split Reddit results by match type */}
             {(() => {
-              const directReactions = reddit.filter(r => r.match_type === 'url_exact');
+              const directReactions = reddit.filter(r => r.match_type === 'url_exact' && r.num_comments > 0);
               const topicReddit = reddit.filter(r => r.match_type !== 'url_exact');
+              const filteredTopicReddit = topicReddit.filter(r => r.match_type === 'curated_source' || r.num_comments > 0);
               const topicDiscussions = [
-                ...topicReddit.map(post => ({ ...post, type: 'Reddit' })),
+                ...filteredTopicReddit.map(post => ({ ...post, type: 'Reddit' })),
                 ...news.map(article => ({ ...article, type: 'Web' }))
               ];
               
@@ -2651,7 +2737,7 @@ export default function App() {
                         alignItems: 'center',
                         gap: '10px'
                       }}>
-                        Direct Reactions
+                        Direct reactions
                         <span style={{
                           fontSize: '14px',
                           fontWeight: '500',
@@ -2671,34 +2757,101 @@ export default function App() {
                       </p>
                       {directReactions.map((item, i) => (
                         <div key={`direct-${i}`} style={styles.resultItem}>
-                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px', flexWrap: 'wrap'}}>
                             <span style={{
                               fontSize: '12px',
                               padding: '2px 8px',
                               borderRadius: '4px',
                               backgroundColor: '#FF6B6B',
                               color: '#fff',
-                              fontWeight: '500'
+                              fontWeight: '500',
+                              flexShrink: 0
                             }}>
                               Reddit
                             </span>
-                            <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                            <a href={item.url} target="_blank" rel="noreferrer" style={{...styles.link, flex: 1, minWidth: 0}}>{item.title}</a>
                             {item.num_comments > 0 && (
                               <span style={{
                                 fontSize: '11px',
                                 color: darkMode ? '#999' : '#666',
                                 marginLeft: 'auto',
-                                fontStyle: 'italic'
+                                fontStyle: 'italic',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0
                               }}>
                                 💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
                               </span>
                             )}
                           </div>
-                          {item.summary && (
+                          {item.summary && !item.summary.startsWith('Discussion with') && !item.summary.startsWith('Unable to') && !item.summary.startsWith('Summarization unavailable') && (
                             <p style={styles.summary}>{item.summary}</p>
+                          )}
+                          {item.top_comments && item.top_comments.length > 0 && (
+                            <div style={{ marginTop: '10px', borderLeft: `2px solid ${darkMode ? '#333' : '#ddd'}`, paddingLeft: '12px' }}>
+                              {item.top_comments.map((comment, ci) => (
+                                <div key={ci} style={{ marginBottom: ci < item.top_comments.length - 1 ? '10px' : 0 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '600', color: darkMode ? '#ccc' : '#444' }}>
+                                      u/{comment.author}
+                                    </span>
+                                    <span style={{ fontSize: '11px', color: darkMode ? '#666' : '#999' }}>
+                                      {comment.score} pts
+                                    </span>
+                                  </div>
+                                  <p style={{
+                                    fontSize: '13px',
+                                    color: darkMode ? '#aaa' : '#555',
+                                    lineHeight: '1.5',
+                                    margin: 0,
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'anywhere'
+                                  }}>
+                                    {comment.body}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                       ))}
+                    </div>
+                  )}
+
+                  {/* Empty state: no Reddit discussions */}
+                  {reddit.length === 0 && news.length > 0 && (
+                    <div style={{
+                      padding: '16px 20px',
+                      backgroundColor: darkMode ? '#1a1a1a' : '#f8f8f8',
+                      borderRadius: '6px',
+                      marginBottom: '20px',
+                      border: `1px solid ${darkMode ? '#2a2a2a' : '#eee'}`
+                    }}>
+                      <p style={{
+                        fontSize: '14px',
+                        color: darkMode ? '#888' : '#777',
+                        margin: 0
+                      }}>
+                        No Reddit discussions found for this article. Try searching for a broader topic to find community conversations.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Empty state: no web articles */}
+                  {news.length === 0 && reddit.length > 0 && (
+                    <div style={{
+                      padding: '16px 20px',
+                      backgroundColor: darkMode ? '#1a1a1a' : '#f8f8f8',
+                      borderRadius: '6px',
+                      marginBottom: '20px',
+                      border: `1px solid ${darkMode ? '#2a2a2a' : '#eee'}`
+                    }}>
+                      <p style={{
+                        fontSize: '14px',
+                        color: darkMode ? '#888' : '#777',
+                        margin: 0
+                      }}>
+                        No related web articles found. The search returned Reddit discussions only.
+                      </p>
                     </div>
                   )}
 
@@ -2711,7 +2864,7 @@ export default function App() {
                         alignItems: 'center',
                         gap: '10px'
                       }}>
-                        Topic Discussions
+                        Topic discussions
                         <span style={{
                           fontSize: '14px',
                           fontWeight: '500',
@@ -2731,7 +2884,7 @@ export default function App() {
                       </p>
                       {topicDiscussions.map((item, i) => (
                         <div key={`topic-${i}`} style={styles.resultItem}>
-                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px'}}>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px', flexWrap: 'wrap'}}>
                             <span style={{
                               fontSize: '12px',
                               padding: '2px 8px',
@@ -2742,31 +2895,91 @@ export default function App() {
                             }}>
                               {item.type}
                             </span>
+                            {item.match_type === 'curated_source' && (
+                              <span style={{
+                                fontSize: '11px',
+                                padding: '2px 8px',
+                                borderRadius: '4px',
+                                backgroundColor: darkMode ? '#333' : '#1a1a1a',
+                                color: '#fff',
+                                fontWeight: '500'
+                              }}>
+                                Source
+                              </span>
+                            )}
+                            {item.category_label && (() => {
+                              const categoryColors = {
+                                'Mainstream Coverage': { bg: '#e87b35', color: '#fff' },
+                                'Analysis': { bg: '#7c3aed', color: '#fff' },
+                                'Opinion': { bg: '#2563eb', color: '#fff' }
+                              };
+                              const colors = categoryColors[item.category_label] || { bg: darkMode ? '#2a2a2a' : '#f0f0f0', color: darkMode ? '#ccc' : '#555' };
+                              return (
+                                <span style={{
+                                  fontSize: '11px',
+                                  padding: '2px 8px',
+                                  borderRadius: '4px',
+                                  backgroundColor: colors.bg,
+                                  color: colors.color,
+                                  fontWeight: '500'
+                                }}>
+                                  {item.category_label}
+                                </span>
+                              );
+                            })()}
                             {item.is_file_download ? (
                               <a 
                                 href="#" 
                                 onClick={(e) => handleFileDownloadClick(e, item.url, item.title)}
-                                style={{...styles.link, display: 'flex', alignItems: 'center', gap: '6px'}}
+                                style={{...styles.link, flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: '6px'}}
                               >
                                 <span style={{ fontSize: '14px' }} title="This link may download a file">📎</span>
                                 {item.title}
                               </a>
                             ) : (
-                              <a href={item.url} target="_blank" rel="noreferrer" style={styles.link}>{item.title}</a>
+                              <a href={item.url} target="_blank" rel="noreferrer" style={{...styles.link, flex: 1, minWidth: 0}}>{item.title}</a>
                             )}
                             {item.type === 'Reddit' && item.num_comments > 0 && (
                               <span style={{
                                 fontSize: '11px',
                                 color: darkMode ? '#999' : '#666',
                                 marginLeft: 'auto',
-                                fontStyle: 'italic'
+                                fontStyle: 'italic',
+                                whiteSpace: 'nowrap',
+                                flexShrink: 0
                               }}>
                                 💬 {item.num_comments} comment{item.num_comments !== 1 ? 's' : ''}
                               </span>
                             )}
                           </div>
-                          {item.summary && (
+                          {item.summary && !item.summary.startsWith('Discussion with') && !item.summary.startsWith('Unable to') && !item.summary.startsWith('Summarization unavailable') && (
                             <p style={styles.summary}>{item.summary}</p>
+                          )}
+                          {item.type === 'Reddit' && item.top_comments && item.top_comments.length > 0 && (
+                            <div style={{ marginTop: '10px', borderLeft: `2px solid ${darkMode ? '#333' : '#ddd'}`, paddingLeft: '12px' }}>
+                              {item.top_comments.map((comment, ci) => (
+                                <div key={ci} style={{ marginBottom: ci < item.top_comments.length - 1 ? '10px' : 0 }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px' }}>
+                                    <span style={{ fontSize: '12px', fontWeight: '600', color: darkMode ? '#ccc' : '#444' }}>
+                                      u/{comment.author}
+                                    </span>
+                                    <span style={{ fontSize: '11px', color: darkMode ? '#666' : '#999' }}>
+                                      {comment.score} pts
+                                    </span>
+                                  </div>
+                                  <p style={{
+                                    fontSize: '13px',
+                                    color: darkMode ? '#aaa' : '#555',
+                                    lineHeight: '1.5',
+                                    margin: 0,
+                                    wordBreak: 'break-word',
+                                    overflowWrap: 'anywhere'
+                                  }}>
+                                    {comment.body}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
                           )}
                         </div>
                       ))}
@@ -2789,7 +3002,7 @@ export default function App() {
                 }}
               >
                 <span>🔗</span>
-                SHARE RESULTS
+                Share results
               </button>
               <div style={{
                 ...styles.copyNotification,

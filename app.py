@@ -3,8 +3,9 @@ from flask_cors import CORS
 from search import search_news
 from api.reddit import search_reddit_posts, get_title_from_url
 from api.twitter import search_twitter_posts, get_trending_tweets
-from summarize import summarize_text
+from summarize import summarize_text, get_openai_client
 from api.search_logger import SearchLogger
+import json as json_module
 from api.meta_commentary import generate_audio_commentary
 import os
 import sqlite3
@@ -85,6 +86,79 @@ def add_file_download_flags(results):
         url = result.get('url', '')
         result['is_file_download'] = is_file_download_url(url)
     return results
+
+_CATEGORY_LABELS = ["Mainstream Coverage", "Analysis", "Opinion"]
+
+def classify_web_results(results, article_title=None):
+    """
+    Classify each web result into a category with a one-line reason.
+    Uses a single LLM call for all results to keep costs low.
+    """
+    if not results:
+        return results
+
+    titles_block = "\n".join(
+        f'{i+1}. "{r.get("title", "")}" — {r.get("summary", "")[:120]}'
+        for i, r in enumerate(results)
+    )
+
+    context = f'Article: "{article_title}"\n\n' if article_title else ""
+    prompt = (
+        f"{context}Classify each search result below into ONE of these categories: "
+        f"{', '.join(_CATEGORY_LABELS)}.\n"
+        "For each result, output ONLY a JSON array of objects with keys \"index\" (1-based), "
+        "\"category\", and \"reason\" (one short sentence explaining why).\n\n"
+        f"Results:\n{titles_block}\n\n"
+        "Output ONLY valid JSON — no markdown fences, no commentary."
+    )
+
+    system_msg = "You classify news/web results. Respond with raw JSON only."
+    raw = None
+
+    # Try OpenAI first
+    try:
+        client = get_openai_client()
+        if client:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": system_msg},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.2
+            )
+            raw = response.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"⚠️ OpenAI classification failed, trying Gemini: {e}")
+
+    # Fallback to Gemini
+    if raw is None:
+        try:
+            import google.generativeai as genai
+            gemini_key = os.getenv("GEMINI_API_KEY")
+            if gemini_key:
+                genai.configure(api_key=gemini_key)
+                model = genai.GenerativeModel('gemini-2.0-flash')
+                response = model.generate_content(f"{system_msg}\n\n{prompt}")
+                raw = response.text.strip()
+        except Exception as e:
+            print(f"⚠️ Gemini classification also failed: {e}")
+
+    if raw:
+        try:
+            if raw.startswith("```"):
+                raw = raw.split("\n", 1)[1].rsplit("```", 1)[0]
+            classifications = json_module.loads(raw)
+            lookup = {c["index"]: c for c in classifications}
+            for i, result in enumerate(results):
+                entry = lookup.get(i + 1, {})
+                result["category_label"] = entry.get("category", "")
+                result["category_reason"] = entry.get("reason", "")
+        except Exception as e:
+            print(f"⚠️ Classification parse failed (non-blocking): {e}")
+
+    return results
+
 
 # Load environment variables (check both .env and .env.local)
 load_dotenv()
@@ -642,8 +716,24 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
+        # Filter Reddit URLs out of web results — they belong in the Reddit section
+        news_results = [
+            r for r in news_results
+            if 'reddit.com' not in (r.get('url', '') or '').lower()
+        ]
+        
+        # Deduplicate web results against Reddit results by title similarity
+        reddit_titles = {(r.get('title') or '').lower().strip() for r in reddit_results}
+        news_results = [
+            r for r in news_results
+            if (r.get('title') or '').lower().strip() not in reddit_titles
+        ]
+        
         # Add file download flags to web results for security warnings
         news_results = add_file_download_flags(news_results)
+        
+        # Classify web results (non-blocking — failures leave results untagged)
+        news_results = classify_web_results(news_results, article_title=article_title)
         
         # Format response to match frontend expectations
         response = {
@@ -766,13 +856,92 @@ def get_archive():
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    """
-    Health check endpoint
-    """
     return jsonify({
         'status': 'healthy',
         'message': 'Media Reaction Finder API is running'
     })
+
+
+CURATED_SUBREDDITS = [
+    {'name': 'worldnews', 'label': 'r/worldnews'},
+    {'name': 'CriticalTheory', 'label': 'r/CriticalTheory'},
+    {'name': 'AI_Agents', 'label': 'r/AI_Agents'},
+    {'name': 'PredictionsMarkets', 'label': 'r/PredictionsMarkets'}
+]
+
+_curated_cache = {'data': None, 'fetched_at': None}
+
+@app.route('/api/curated-feed', methods=['GET'])
+def curated_feed():
+    from datetime import timedelta
+    import praw
+
+    now = datetime.utcnow()
+    if _curated_cache['data'] and _curated_cache['fetched_at']:
+        age = now - _curated_cache['fetched_at']
+        if age < timedelta(hours=48):
+            return jsonify(_curated_cache['data'])
+
+    client_id = os.getenv("REDDIT_CLIENT_ID")
+    client_secret = os.getenv("REDDIT_CLIENT_SECRET")
+    user_agent = os.getenv("REDDIT_USER_AGENT")
+    if not all([client_id, client_secret, user_agent]):
+        return jsonify({'error': 'Reddit credentials missing'}), 500
+
+    reddit = praw.Reddit(
+        client_id=client_id,
+        client_secret=client_secret,
+        user_agent=user_agent
+    )
+
+    from api.reddit import _fetch_top_comments, _clean_text_for_llm, _has_llm_refusal
+
+    channels = []
+    for sub_info in CURATED_SUBREDDITS:
+        try:
+            subreddit = reddit.subreddit(sub_info['name'])
+            posts = []
+            seen_ids = set()
+
+            for source in [subreddit.hot(limit=15), subreddit.top(time_filter='week', limit=10)]:
+                for post in source:
+                    if post.stickied or post.id in seen_ids:
+                        continue
+                    seen_ids.add(post.id)
+                    if post.num_comments == 0:
+                        continue
+                    top_comments = _fetch_top_comments(reddit, post.permalink, limit=2)
+
+                    posts.append({
+                        'title': post.title,
+                        'url': f"https://www.reddit.com{post.permalink}",
+                        'permalink': post.permalink,
+                        'score': post.score,
+                        'num_comments': post.num_comments,
+                        'created_utc': post.created_utc,
+                        'top_comments': top_comments
+                    })
+                    if len(posts) >= 3:
+                        break
+                if len(posts) >= 3:
+                    break
+            channels.append({
+                'subreddit': sub_info['name'],
+                'label': sub_info['label'],
+                'posts': posts
+            })
+        except Exception as e:
+            print(f"⚠️ Failed to fetch r/{sub_info['name']}: {e}")
+            channels.append({
+                'subreddit': sub_info['name'],
+                'label': sub_info['label'],
+                'posts': []
+            })
+
+    _curated_cache['data'] = channels
+    _curated_cache['fetched_at'] = now
+    return jsonify(channels)
+
 
 @app.route('/api/twitter', methods=['POST'])
 def get_twitter_reactions():

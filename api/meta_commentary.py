@@ -127,7 +127,7 @@ The commentary should feel like a brief but insightful audio briefing someone wo
         try:
             print("📝 Generating commentary with Gemini...")
             genai.configure(api_key=gemini_key)
-            model = genai.GenerativeModel('gemini-1.5-flash')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             full_prompt = f"{system_prompt}\n\n{prompt}"
             response = model.generate_content(full_prompt)
@@ -209,7 +209,7 @@ def text_to_speech_gemini(text):
             genai.configure(api_key=gemini_key)
             
             # Try the TTS model
-            model = genai.GenerativeModel('gemini-2.0-flash-exp')
+            model = genai.GenerativeModel('gemini-2.0-flash')
             
             print(f"🎙️ Attempting Gemini TTS ({len(text)} chars)...")
             

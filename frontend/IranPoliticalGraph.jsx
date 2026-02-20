@@ -434,7 +434,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       background: theme.bg,
       fontFamily: "'Georgia', serif",
       color: theme.text,
-      padding: isMobile ? '60px 16px 20px 16px' : '20px',
+      padding: isMobile ? '60px 16px 20px 16px' : '20px 20px 20px 70px',
     }}>
       <style>{`
         .filter-btn-${darkMode ? 'dark' : 'light'} {
@@ -504,7 +504,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               color: theme.text,
               fontFamily: "'Georgia', serif",
             }}>
-              Iran Political Landscape
+              Iran political landscape
             </h1>
             <span style={{
               padding: '3px 8px',

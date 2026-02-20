@@ -1,9 +1,51 @@
+import re
 import praw
 import os
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from summarize import summarize_text
+
+_LLM_REFUSAL_PATTERNS = [
+    'as an ai', 'as an llm', 'as a language model', 'i cannot browse',
+    'i cannot access', 'i cannot visit', 'i cannot open', 'i cannot search',
+    'i cannot follow', 'i\'m unable to access', 'i am unable to access'
+]
+
+
+def _clean_text_for_llm(text):
+    """Strip URLs and markdown link syntax so the LLM doesn't try to browse them."""
+    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r'https?://\S+', '[link]', text)
+    return text
+
+
+def _has_llm_refusal(text):
+    lower = text.lower()
+    return any(p in lower for p in _LLM_REFUSAL_PATTERNS)
+
+
+def _fetch_top_comments(reddit_client, permalink, limit=3):
+    """Fetch the top-level comments for a post, sorted by score."""
+    try:
+        submission_id = permalink.split('/comments/')[1].split('/')[0]
+        submission = reddit_client.submission(id=submission_id)
+        submission.comment_sort = 'best'
+        submission.comments.replace_more(limit=0)
+        comments = []
+        for comment in submission.comments[:limit]:
+            body = comment.body.strip()
+            if not body or body == '[deleted]' or body == '[removed]':
+                continue
+            comments.append({
+                'author': str(comment.author) if comment.author else '[deleted]',
+                'body': body[:500],
+                'score': comment.score
+            })
+        return comments
+    except Exception as e:
+        print(f"⚠️ Could not fetch comments: {e}")
+        return []
 
 load_dotenv()
 
@@ -92,11 +134,12 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "permalink": post.permalink,
                                 "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
                                 "score": post.score if hasattr(post, 'score') else 0,
-                                "match_type": "url_exact"  # Tag for debugging
+                                "match_type": "url_exact"
                             }
                             results.append(post_data)
                             seen_permalinks.add(post.permalink)
@@ -175,6 +218,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "permalink": post.permalink,
                                 "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
@@ -216,6 +260,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_data = {
                                 "title": post.title,
                                 "url": f"https://reddit.com{post.permalink}",
+                                "permalink": post.permalink,
                                 "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                                 "selftext": post.selftext if hasattr(post, 'selftext') else "",
                                 "num_comments": num_comments,
@@ -254,6 +299,7 @@ def search_reddit_posts(query, limit=5, article_title=None):
                         post_data = {
                             "title": post.title,
                             "url": f"https://reddit.com{post.permalink}",
+                            "permalink": post.permalink,
                             "subreddit": str(post.subreddit) if hasattr(post, 'subreddit') else "unknown",
                             "selftext": post.selftext if hasattr(post, 'selftext') else "",
                             "num_comments": num_comments,
@@ -288,24 +334,52 @@ def search_reddit_posts(query, limit=5, article_title=None):
         print(f"📊 Found {len(results)} total Reddit discussions")
         print(f"   - Returning top {min(limit, len(results))} by engagement")
         
-        # Generate AI summaries for top results with meaningful content
         top_results = results[:limit]
+
+        # Fetch top comments first so we can use them for summaries if needed
+        for post in top_results:
+            permalink = post.get('permalink', '')
+            if permalink:
+                post['top_comments'] = _fetch_top_comments(reddit, permalink, limit=2)
+
         for post in top_results:
             selftext = post.get('selftext', '').strip()
-            if selftext and len(selftext) > 100:  # Only summarize posts with substantial content
+            if selftext and len(selftext) > 100:
                 try:
                     print(f"🤖 Generating summary for: {post['title'][:50]}...")
-                    summary_task = "Provide a very brief 2-sentence summary of this Reddit post's main point and sentiment."
-                    post['summary'] = summarize_text(selftext[:2000], summary_task)  # Limit to 2000 chars
+                    cleaned = _clean_text_for_llm(selftext[:2000])
+                    summary_task = (
+                        "Provide a very brief 2-sentence summary of this Reddit post's main point and sentiment. "
+                        "Ignore any [link] placeholders — summarize only the written text."
+                    )
+                    summary = summarize_text(cleaned, summary_task)
+                    if _has_llm_refusal(summary):
+                        print(f"⚠️ LLM refusal detected, using raw text fallback")
+                        summary = selftext[:200] + "..." if len(selftext) > 200 else selftext
+                    post['summary'] = summary
                 except Exception as e:
                     print(f"Error generating summary: {e}")
-                    # Use first 200 chars as fallback
                     post['summary'] = selftext[:200] + "..." if len(selftext) > 200 else selftext
+            elif post.get('top_comments') and len(post['top_comments']) > 0:
+                try:
+                    comment_text = ' '.join([c.get('body', '')[:300] for c in post['top_comments'][:3]])
+                    if len(comment_text) > 80:
+                        cleaned = _clean_text_for_llm(comment_text[:2000])
+                        summary = summarize_text(
+                            cleaned,
+                            f"Based on these Reddit comments about '{post['title'][:100]}', provide a brief 2-sentence summary of the key reactions and sentiment."
+                        )
+                        if _has_llm_refusal(summary):
+                            post['summary'] = ''
+                        else:
+                            post['summary'] = summary
+                    else:
+                        post['summary'] = ''
+                except Exception:
+                    post['summary'] = ''
             else:
-                # For posts without content or short posts, create a basic summary
-                post['summary'] = f"Reddit discussion with {post['num_comments']} comments"
+                post['summary'] = ''
         
-        # Return only the requested number of results (limit to 5)
         return top_results
 
     except Exception as e:
