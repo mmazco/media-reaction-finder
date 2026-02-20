@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from search import search_news
+from search import search_news, search_substack
 from api.reddit import search_reddit_posts, get_title_from_url
 from api.twitter import search_twitter_posts, get_trending_tweets
 from summarize import summarize_text, get_openai_client
@@ -695,13 +695,15 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not build smart query, using URL: {e}")
         
-        # Run web search and Reddit search in parallel
-        with ThreadPoolExecutor(max_workers=2) as executor:
+        # Run web search, Reddit search, and Substack search in parallel
+        with ThreadPoolExecutor(max_workers=3) as executor:
             news_future = executor.submit(search_news, search_query, user_ip=user_ip)
             reddit_future = executor.submit(search_reddit_posts, query, article_title=article_title)
+            substack_future = executor.submit(search_substack, search_query)
             
             news_results = news_future.result(timeout=30)
             reddit_results = reddit_future.result(timeout=30)
+            substack_results = substack_future.result(timeout=30)
         
         # Filter out results from the same domain if query is a URL (backup filter)
         if query.startswith('http'):
@@ -716,17 +718,18 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
-        # Filter Reddit URLs out of web results — they belong in the Reddit section
+        # Filter Reddit and Substack URLs out of web results — they have dedicated sections
         news_results = [
             r for r in news_results
             if 'reddit.com' not in (r.get('url', '') or '').lower()
+            and 'substack.com' not in (r.get('url', '') or '').lower()
         ]
         
-        # Deduplicate web results against Reddit results by title similarity
-        reddit_titles = {(r.get('title') or '').lower().strip() for r in reddit_results}
+        # Deduplicate web results against Reddit and Substack results by title similarity
+        other_titles = {(r.get('title') or '').lower().strip() for r in reddit_results + substack_results}
         news_results = [
             r for r in news_results
-            if (r.get('title') or '').lower().strip() not in reddit_titles
+            if (r.get('title') or '').lower().strip() not in other_titles
         ]
         
         # Add file download flags to web results for security warnings
@@ -737,9 +740,10 @@ Highlight the main points and key information. Use the author's name from the ti
         
         # Format response to match frontend expectations
         response = {
-            'web': news_results,  # Frontend expects 'web' key for web search results
+            'web': news_results,
             'reddit': reddit_results,
-            'article': article_metadata,  # Include article metadata if URL was provided
+            'substack': substack_results,
+            'article': article_metadata,
             'cached': False
         }
         

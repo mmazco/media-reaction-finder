@@ -602,6 +602,7 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [news, setNews] = useState([]);
   const [reddit, setReddit] = useState([]);
+  const [substack, setSubstack] = useState([]);
   const [article, setArticle] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
@@ -753,6 +754,7 @@ export default function App() {
     setQuery('');
     setNews([]);
     setReddit([]);
+    setSubstack([]);
     setArticle(null);
     setHasSearched(false);
     setMetaAudio(null);
@@ -887,9 +889,11 @@ export default function App() {
           // Set results directly without loading state
           const cleanNews = Array.isArray(data.web) ? data.web : [];
           const cleanReddit = Array.isArray(data.reddit) ? data.reddit : [];
+          const cleanSubstack = Array.isArray(data.substack) ? data.substack : [];
           const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
           
           setNews(cleanNews);
+          setSubstack(cleanSubstack);
           if (sourcePost) {
             const sourceTitle = sourcePost.title.toLowerCase().trim();
             const isDuplicate = cleanReddit.some(r => {
@@ -917,7 +921,7 @@ export default function App() {
           setMetaError(null);
           setShowTranscript(false);
           
-          if (cleanNews.length > 0 || cleanReddit.length > 0) {
+          if (cleanNews.length > 0 || cleanReddit.length > 0 || cleanSubstack.length > 0) {
             checkCachedCommentary(cleanArticle || { title: searchQuery, source: 'Topic Search', summary: '' });
           }
           
@@ -947,9 +951,11 @@ export default function App() {
       // Validate and clean the response data
       const cleanNews = Array.isArray(data.web) ? data.web : [];
       const cleanReddit = Array.isArray(data.reddit) ? data.reddit : [];
+      const cleanSubstack = Array.isArray(data.substack) ? data.substack : [];
       const cleanArticle = data.article && typeof data.article === 'object' ? data.article : null;
       
       setNews(cleanNews);
+      setSubstack(cleanSubstack);
       if (sourcePost) {
         const sourceTitle = sourcePost.title.toLowerCase().trim();
         const isDuplicate = cleanReddit.some(r => {
@@ -977,7 +983,7 @@ export default function App() {
       setMetaError(null);
       setShowTranscript(false);
       
-      if (cleanNews.length > 0 || cleanReddit.length > 0) {
+      if (cleanNews.length > 0 || cleanReddit.length > 0 || cleanSubstack.length > 0) {
         checkCachedCommentary(cleanArticle || { title: searchQuery, source: 'Topic Search', summary: '' });
       }
       
@@ -1054,6 +1060,7 @@ export default function App() {
         historyItem.cachedResults = {
           web: cleanNews,
           reddit: cleanReddit,
+          substack: cleanSubstack,
           article: cleanArticle
         };
         
@@ -1156,7 +1163,7 @@ export default function App() {
       justifyContent: 'flex-start',
       padding: '20px',
       paddingLeft: '20px',
-      paddingTop: (news.length > 0 || reddit.length > 0 || article) ? 
+      paddingTop: (news.length > 0 || reddit.length > 0 || substack.length > 0 || article) ? 
         (window.innerWidth <= 768 ? '100px' : '80px') : 
         (window.innerWidth <= 768 ? '80px' : '12vh'),
       position: 'relative',
@@ -1496,6 +1503,7 @@ export default function App() {
                 if (item.cachedResults) {
                   setNews(item.cachedResults.web || []);
                   setReddit(item.cachedResults.reddit || []);
+                  setSubstack(item.cachedResults.substack || []);
                   setArticle(item.cachedResults.article || null);
                 } else {
                   setTimeout(() => { performSearch(searchQuery); }, 100);
@@ -2168,7 +2176,7 @@ export default function App() {
         <h1 
           style={{
             ...styles.title,
-            marginTop: (news.length > 0 || reddit.length > 0 || article) ? '60px' : '0'
+            marginTop: (news.length > 0 || reddit.length > 0 || substack.length > 0 || article) ? '60px' : '0'
           }}
           onClick={resetToHome}
           onMouseEnter={(e) => e.target.style.opacity = '0.7'}
@@ -2249,7 +2257,7 @@ export default function App() {
         </div>
 
         {/* Homepage Feed */}
-        {!loading && !hasSearched && !article && news.length === 0 && reddit.length === 0 && (
+        {!loading && !hasSearched && !article && news.length === 0 && reddit.length === 0 && substack.length === 0 && (
           <div style={{ width: '100%', maxWidth: '700px', marginTop: '48px', textAlign: 'left' }}>
 
             {/* Curated topics */}
@@ -2478,7 +2486,7 @@ export default function App() {
         )}
 
         {/* No results empty state */}
-        {!loading && hasSearched && news.length === 0 && reddit.length === 0 && !article && (
+        {!loading && hasSearched && news.length === 0 && reddit.length === 0 && substack.length === 0 && !article && (
           <div style={{
             width: '100%',
             maxWidth: '700px',
@@ -2504,7 +2512,7 @@ export default function App() {
         )}
 
         {/* Article Summary - Also show for any URL that was searched */}
-        {(article || (query.startsWith('http') && (news.length > 0 || reddit.length > 0))) && (
+        {(article || (query.startsWith('http') && (news.length > 0 || reddit.length > 0 || substack.length > 0))) && (
           <div style={styles.articleSummary}>
             <div style={styles.summaryTitle}>Summary</div>
             <div style={styles.summaryRow}>
@@ -2544,7 +2552,7 @@ export default function App() {
 
 
         {/* Meta Commentary Section */}
-        {(news.length > 0 || reddit.length > 0) && (
+        {(news.length > 0 || reddit.length > 0 || substack.length > 0) && (
           <div style={{
             marginTop: '30px',
             padding: '20px',
@@ -2714,7 +2722,7 @@ export default function App() {
           </div>
         )}
 
-        {(news.length > 0 || reddit.length > 0) && (
+        {(news.length > 0 || reddit.length > 0 || substack.length > 0) && (
           <div style={styles.results}>
             {/* Split Reddit results by match type */}
             {(() => {
@@ -2723,6 +2731,7 @@ export default function App() {
               const filteredTopicReddit = topicReddit.filter(r => r.match_type === 'curated_source' || r.num_comments > 0);
               const topicDiscussions = [
                 ...filteredTopicReddit.map(post => ({ ...post, type: 'Reddit' })),
+                ...substack.map(item => ({ ...item, type: 'Substack' })),
                 ...news.map(article => ({ ...article, type: 'Web' }))
               ];
               
@@ -2837,7 +2846,7 @@ export default function App() {
                   )}
 
                   {/* Empty state: no web articles */}
-                  {news.length === 0 && reddit.length > 0 && (
+                  {news.length === 0 && substack.length === 0 && reddit.length > 0 && (
                     <div style={{
                       padding: '16px 20px',
                       backgroundColor: darkMode ? '#1a1a1a' : '#f8f8f8',
@@ -2889,7 +2898,7 @@ export default function App() {
                               fontSize: '12px',
                               padding: '2px 8px',
                               borderRadius: '4px',
-                              backgroundColor: item.type === 'Web' ? '#4ECDC4' : '#FF6B6B',
+                              backgroundColor: item.type === 'Substack' ? '#FF6719' : item.type === 'Web' ? '#4ECDC4' : '#FF6B6B',
                               color: '#fff',
                               fontWeight: '500'
                             }}>

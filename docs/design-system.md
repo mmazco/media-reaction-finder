@@ -47,6 +47,7 @@ Single source of truth for all UI decisions in Media Reaction Finder. Reference 
 |---|---|---|
 | Web | `#4ECDC4` (teal) | `#fff` |
 | Reddit | `#FF6B6B` (red) | `#fff` |
+| Substack | `#FF6719` (orange) | `#fff` |
 
 ### Utility
 

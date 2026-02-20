@@ -82,3 +82,47 @@ def search_news(query, num_results=5, user_ip=None):
         
         print(f"Error in search_news: {e}")
         return []
+
+
+def search_substack(query, num_results=3, user_ip=None):
+    """Search for Substack articles relevant to the query using SerpAPI site:substack.com"""
+    start_time = time.time()
+    
+    if not SERP_API_KEY:
+        return []
+    
+    url = "https://serpapi.com/search"
+    params = {
+        "q": f"site:substack.com {query}",
+        "api_key": SERP_API_KEY,
+        "num": num_results,
+        "engine": "google",
+        "hl": "en",
+        "gl": "us"
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        data = response.json()
+        results = data.get("organic_results", [])
+        
+        substack_results = []
+        for res in results:
+            link = res.get("link", "")
+            if "/p/" not in link:
+                continue
+            substack_results.append({
+                "title": res.get("title", ""),
+                "url": link,
+                "summary": res.get("snippet", ""),
+                "type": "Substack"
+            })
+        
+        processing_time = time.time() - start_time
+        print(f"📰 Substack search returned {len(substack_results)} results in {processing_time:.2f}s")
+        
+        return substack_results
+        
+    except Exception as e:
+        print(f"Error in search_substack: {e}")
+        return []
