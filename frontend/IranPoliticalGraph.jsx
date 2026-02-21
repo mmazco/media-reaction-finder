@@ -641,7 +641,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
           {/* Pan/Zoom hint - positioned over the SVG */}
           <div style={{
             position: 'absolute',
-            bottom: '70px',
+            bottom: isMobile ? '10px' : '70px',
             left: '10px',
             zIndex: 10,
             fontSize: '10px',
@@ -653,7 +653,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
             border: `1px solid ${theme.cardBorder}`,
             pointerEvents: 'none',
           }}>
-            Scroll to zoom • Drag background to pan • Drag nodes to move
+            {isMobile ? 'Pinch to zoom • Drag to pan' : 'Scroll to zoom • Drag background to pan • Drag nodes to move'}
           </div>
           
           <svg
@@ -775,7 +775,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
           <div style={{
             display: 'flex',
             gap: '20px',
-            marginTop: '12px',
+            marginTop: isMobile ? '24px' : '12px',
             flexWrap: 'wrap',
             padding: '10px 12px',
             background: theme.cardBg,

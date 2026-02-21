@@ -282,15 +282,15 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                     <div
                       key={i}
                       style={{
-                        marginBottom: '20px',
+                        marginBottom: '12px',
                         padding: '15px',
                         backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
                         borderRadius: '5px'
                       }}
                     >
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '5px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
                         <span style={{
-                          fontSize: '12px',
+                          fontSize: '11px',
                           padding: '2px 8px',
                           borderRadius: '4px',
                           backgroundColor: '#1DA1F2',
@@ -299,6 +299,26 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                         }}>
                           X
                         </span>
+                        {(tweet.created_at_iso || tweet.created_at) && (
+                          <span style={{ fontSize: '11px', color: darkMode ? '#777' : '#888', fontFamily: 'Arial, sans-serif' }}>
+                            {tweet.created_at_iso
+                              ? new Date(tweet.created_at_iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                              : tweet.created_at}
+                          </span>
+                        )}
+                        <span style={{
+                          fontSize: '11px',
+                          color: darkMode ? '#999' : '#666',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          marginLeft: 'auto',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          ❤️ {tweet.likes} · 🔄 {tweet.retweets} · 💬 {tweet.replies}
+                        </span>
+                      </div>
+                      <div style={{ marginBottom: '6px' }}>
                         <a 
                           href={tweet.url} 
                           target="_blank" 
@@ -306,8 +326,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                           style={{
                             color: darkMode ? '#ffffff' : '#000000',
                             textDecoration: 'none',
-                            fontSize: '16px',
-                            fontWeight: '500'
+                            fontSize: '15px',
+                            fontWeight: '500',
+                            fontFamily: 'Arial, sans-serif'
                           }}
                         >
                           {tweet.author_name}
@@ -315,29 +336,16 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                             @{tweet.author_username}
                           </span>
                         </a>
-                        <span style={{
-                          fontSize: '11px',
-                          color: darkMode ? '#999' : '#666',
-                          marginLeft: 'auto',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '8px'
-                        }}>
-                          {(tweet.created_at_iso || tweet.created_at) && (
-                            <span style={{ color: darkMode ? '#777' : '#888' }}>
-                              {tweet.created_at_iso
-                                ? new Date(tweet.created_at_iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-                                : tweet.created_at}
-                            </span>
-                          )}
-                          ❤️ {tweet.likes} · 🔄 {tweet.retweets} · 💬 {tweet.replies}
-                        </span>
                       </div>
                       <p style={{
                         marginTop: '8px',
-                        color: darkMode ? '#b3b3b3' : '#666',
-                        fontSize: '14px',
-                        lineHeight: '1.5'
+                        color: darkMode ? '#aaa' : '#555',
+                        fontSize: '13px',
+                        lineHeight: '1.5',
+                        margin: 0,
+                        fontFamily: 'Arial, sans-serif',
+                        wordBreak: 'break-word',
+                        overflowWrap: 'anywhere'
                       }}>
                         {tweet.text}
                       </p>
@@ -1940,13 +1948,15 @@ export default function App() {
               alignItems: 'center',
               cursor: 'pointer',
               borderRadius: '8px',
-              backgroundColor: darkMode ? '#fff' : '#1a1a1a',
+              backgroundColor: darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(26,26,26,0.1)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               transition: 'opacity 0.2s ease'
             }}
             onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
             onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#1a1a1a' : '#fff'} strokeWidth="2.5" strokeLinecap="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#fff' : '#1a1a1a'} strokeWidth="2.5" strokeLinecap="round">
               <line x1="4" y1="6" x2="20" y2="6"></line>
               <line x1="4" y1="12" x2="20" y2="12"></line>
               <line x1="4" y1="18" x2="20" y2="18"></line>
