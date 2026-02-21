@@ -1983,15 +1983,15 @@ export default function App() {
           <div style={{
             position: 'fixed',
             top: 0,
-            left: 0,
+            right: 0,
             height: '100vh',
             width: '280px',
             backgroundColor: darkMode ? 'rgba(10, 10, 10, 0.92)' : 'rgba(245, 245, 245, 0.92)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
-            borderRight: `1px solid ${darkMode ? '#222' : '#ddd'}`,
+            borderLeft: `1px solid ${darkMode ? '#222' : '#ddd'}`,
             zIndex: 1160,
-            transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(100%)',
             transition: 'transform 0.3s ease',
             padding: '80px 20px 20px 20px',
             overflowY: 'auto'
