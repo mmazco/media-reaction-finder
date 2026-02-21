@@ -37,7 +37,7 @@ Single source of truth for all UI decisions in Media Reaction Finder. Reference 
 
 | Label | Background | Text | Meaning |
 |---|---|---|---|
-| Mainstream Coverage | `#e87b35` (orange) | `#fff` | Standard news reporting — factual, widely distributed |
+| Mainstream Coverage | `#22c55e` (green) | `#fff` | Standard news reporting — factual, widely distributed |
 | Analysis | `#7c3aed` (purple) | `#fff` | Think-pieces, explainers, research-backed |
 | Opinion | `#2563eb` (blue) | `#fff` | Editorials, op-eds, personal viewpoint |
 

@@ -1,4 +1,4 @@
-# Product Roadmap
+# Product Roadmap Log 19022026 - 20022026 et al
 
 Items already shipped are in [backend_performance_improvements_19022026](../.cursor/plans/backend_performance_improvements_19022026_b8cdd256.plan.md). Raw feedback is in [userfeedback.md](userfeedback.md).
 
@@ -53,6 +53,12 @@ If someone hits this on their first visit via the curated feed, it destroys trus
 
 Label results as "Mainstream Coverage," "Analysis," "Opinion" with colour-coded badges. This maps the discourse landscape rather than just summarizing — the core differentiator from ChatGPT/Perplexity. The summarize pipeline is already in place; this layers a classification prompt on top.
 
+| Label | Colour | Meaning |
+|---|---|---|
+| Mainstream Coverage | Green `#22c55e` | Standard news reporting from established outlets — factual, widely distributed |
+| Analysis | Purple `#7c3aed` | Deeper examination of the topic — think-pieces, explainers, research-backed |
+| Opinion | Blue `#2563eb` | Author's personal viewpoint or argument — editorials, op-eds, blog posts |
+
 ### E. Reddit embeds alongside AI summaries ✅
 
 **Source:** User #1 (most requested feature)
@@ -73,7 +79,7 @@ Show 2-3 actual top comments with author/score, keep the AI summary as a TLDR ab
 
 PDFs cover academic/policy papers (fits the r/CriticalTheory audience). Tweet URLs cover social-media-native users. For PDFs: extract text with PyPDF2 or pdfplumber. For tweets: detect twitter.com/x.com URLs and use the existing Twitter API.
 
-### G. Substack integration (two parts)
+### G. Substack integration (two parts) 🟠
 
 **Source:** Growth strategy — our discussion
 

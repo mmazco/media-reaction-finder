@@ -1,10 +1,11 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from search import search_news, search_substack
+from search import search_news, search_substack, is_likely_substack
 from api.reddit import search_reddit_posts, get_title_from_url
 from api.twitter import search_twitter_posts, get_trending_tweets
 from summarize import summarize_text, get_openai_client
 from api.search_logger import SearchLogger
+from api.substack_authors import get_curated_authors
 import json as json_module
 from api.meta_commentary import generate_audio_commentary
 import os
@@ -718,12 +719,29 @@ Highlight the main points and key information. Use the author's name from the ti
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
-        # Filter Reddit and Substack URLs out of web results — they have dedicated sections
+        # Filter Reddit URLs out of web results
         news_results = [
             r for r in news_results
             if 'reddit.com' not in (r.get('url', '') or '').lower()
-            and 'substack.com' not in (r.get('url', '') or '').lower()
         ]
+        
+        # Detect and move Substack articles from web results to substack results
+        substack_urls = {(r.get('url') or '').lower() for r in substack_results}
+        reclassified = []
+        remaining_news = []
+        for r in news_results:
+            url_lower = (r.get('url') or '').lower()
+            if url_lower in substack_urls:
+                continue
+            if is_likely_substack(r):
+                r['type'] = 'Substack'
+                reclassified.append(r)
+            else:
+                remaining_news.append(r)
+        substack_results.extend(reclassified)
+        news_results = remaining_news
+        if reclassified:
+            print(f"📰 Re-classified {len(reclassified)} web result(s) as Substack")
         
         # Deduplicate web results against Reddit and Substack results by title similarity
         other_titles = {(r.get('title') or '').lower().strip() for r in reddit_results + substack_results}
@@ -945,6 +963,17 @@ def curated_feed():
     _curated_cache['data'] = channels
     _curated_cache['fetched_at'] = now
     return jsonify(channels)
+
+
+@app.route('/api/substack-authors', methods=['GET'])
+def substack_authors():
+    """Return curated Substack author profiles with latest posts."""
+    try:
+        authors = get_curated_authors()
+        return jsonify(authors)
+    except Exception as e:
+        print(f"Error fetching substack authors: {e}")
+        return jsonify([])
 
 
 @app.route('/api/twitter', methods=['POST'])

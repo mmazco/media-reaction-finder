@@ -117,9 +117,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
               Trending: {info.category}
             </div>
             <h1 style={{
-              fontSize: '24px',
-              fontWeight: '600',
-              color: darkMode ? '#fff' : '#000',
+              fontSize: '22px',
+              fontWeight: 'normal',
+              color: darkMode ? '#fff' : '#1a1a1a',
               margin: 0,
               fontFamily: 'Georgia, serif'
             }}>
@@ -250,9 +250,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             {/* Twitter/X Section */}
             <div>
               <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: darkMode ? '#fff' : '#000',
+                fontSize: '22px',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -354,9 +354,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             {/* Reddit Section */}
             <div>
               <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: darkMode ? '#fff' : '#000',
+                fontSize: '22px',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -472,9 +472,9 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             {/* Web Section */}
             <div>
               <h2 style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: darkMode ? '#fff' : '#000',
+                fontSize: '22px',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
                 marginBottom: '16px',
                 display: 'flex',
                 alignItems: 'center',
@@ -511,7 +511,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                         </span>
                         {article.category_label && (() => {
                           const categoryColors = {
-                            'Mainstream Coverage': { bg: '#e87b35', color: '#fff' },
+                            'Mainstream Coverage': { bg: '#22c55e', color: '#fff' },
                             'Analysis': { bg: '#7c3aed', color: '#fff' },
                             'Opinion': { bg: '#2563eb', color: '#fff' }
                           };
@@ -618,6 +618,8 @@ export default function App() {
   const [curatedFeed, setCuratedFeed] = useState([]);
   const [curatedIndex, setCuratedIndex] = useState(0);
   const [curatedLoading, setCuratedLoading] = useState(true);
+  const [substackAuthors, setSubstackAuthors] = useState([]);
+  const [pubCategory, setPubCategory] = useState('All');
   
   // Handle window resize for mobile detection
   useEffect(() => {
@@ -637,6 +639,11 @@ export default function App() {
       .then(data => { if (Array.isArray(data)) setCuratedFeed(data); })
       .catch(() => {})
       .finally(() => setCuratedLoading(false));
+
+    fetch('/api/substack-authors')
+      .then(res => res.ok ? res.json() : [])
+      .then(data => { if (Array.isArray(data)) setSubstackAuthors(data); })
+      .catch(() => {});
   }, []);
 
   // Meta Commentary state
@@ -1257,7 +1264,8 @@ export default function App() {
       marginBottom: '40px'
     },
       resultTitle: {
-      fontSize: '24px',
+      fontSize: '22px',
+      fontWeight: 'normal',
       marginBottom: '20px',
       color: darkMode ? '#ffffff' : '#1a1a1a',
       fontFamily: 'Georgia, serif'
@@ -1365,8 +1373,8 @@ export default function App() {
       textAlign: 'left'
     },
       summaryTitle: {
-      fontSize: '18px',
-      fontWeight: '600',
+      fontSize: '22px',
+      fontWeight: 'normal',
       marginBottom: '15px',
       color: baseColors.text,
       fontFamily: 'Georgia, serif',
@@ -1575,10 +1583,10 @@ export default function App() {
             zIndex: 10
           }}>
             <h2 style={{
-              fontSize: '20px',
-              fontWeight: '600',
+              fontSize: '22px',
+              fontWeight: 'normal',
               fontFamily: 'Georgia, serif',
-              color: darkMode ? '#fff' : '#000',
+              color: darkMode ? '#fff' : '#1a1a1a',
               margin: 0
             }}>
               {selectedCollection ? selectedCollection.display_name : 'Collections'}
@@ -2383,7 +2391,7 @@ export default function App() {
                   {desc && (
                     <p style={{
                       fontSize: '13px',
-                      color: darkMode ? '#888' : '#888',
+                      color: darkMode ? '#bbb' : '#444',
                       fontFamily: 'Arial, sans-serif',
                       margin: '0 0 20px',
                       lineHeight: '1.4'
@@ -2482,6 +2490,231 @@ export default function App() {
               );
             })()}
 
+            {/* Featured Publications */}
+            {substackAuthors.length > 0 && (() => {
+              const categories = ['All', 'News', 'Tech', 'Culture'];
+              const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter(a => a.category === pubCategory);
+              return (
+              <div style={{ marginBottom: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+                  <h2 style={{
+                    fontSize: '22px',
+                    fontFamily: 'Georgia, serif',
+                    fontWeight: 'normal',
+                    color: darkMode ? '#fff' : '#1a1a1a',
+                    margin: 0
+                  }}>
+                    Featured publications
+                    <span style={{ padding: '2px 6px', marginLeft: '8px', backgroundColor: darkMode ? '#ffd54f' : '#b8860b', color: darkMode ? '#000' : '#fff', fontSize: '9px', fontWeight: '700', letterSpacing: '0.5px', borderRadius: '3px', fontFamily: 'Arial, sans-serif' }}>BETA</span>
+                  </h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setPubCategory(cat)}
+                        style={{
+                          padding: '4px 10px',
+                          fontSize: '12px',
+                          fontFamily: 'Arial, sans-serif',
+                          border: `1px solid ${cat === pubCategory ? (darkMode ? '#fff' : '#1a1a1a') : (darkMode ? '#333' : '#ddd')}`,
+                          borderRadius: '4px',
+                          backgroundColor: cat === pubCategory ? (darkMode ? '#fff' : '#1a1a1a') : 'transparent',
+                          color: cat === pubCategory ? (darkMode ? '#1a1a1a' : '#fff') : (darkMode ? '#888' : '#666'),
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <p style={{
+                  fontSize: '13px',
+                  color: darkMode ? '#bbb' : '#444',
+                  fontFamily: 'Arial, sans-serif',
+                  margin: '0 0 16px',
+                  lineHeight: '1.4'
+                }}>
+                  Independent voices covering tech, politics and culture
+                </p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {filtered.map((author) => (
+                    <div
+                      key={author.handle}
+                      style={{
+                        display: 'flex',
+                        gap: isMobile ? '12px' : '16px',
+                        padding: isMobile ? '14px' : '16px',
+                        backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                        borderRadius: '8px',
+                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
+                        transition: 'background-color 0.15s ease'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#1a1a1a' : '#f5f5f5'; }}
+                    >
+                      <a href={author.profile_url} target="_blank" rel="noopener noreferrer" style={{ flexShrink: 0, textDecoration: 'none' }}>
+                        {author.avatar_url ? (
+                          <img
+                            src={author.avatar_url}
+                            alt={author.name}
+                            style={{
+                              width: isMobile ? '44px' : '48px',
+                              height: isMobile ? '44px' : '48px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              display: 'block',
+                              border: `1px solid ${darkMode ? '#333' : '#ddd'}`
+                            }}
+                            onError={(e) => {
+                              e.target.onerror = null;
+                              e.target.style.display = 'none';
+                              if (e.target.nextSibling) e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div style={{
+                          width: isMobile ? '44px' : '48px',
+                          height: isMobile ? '44px' : '48px',
+                          borderRadius: '50%',
+                          backgroundColor: '#FF6719',
+                          display: author.avatar_url ? 'none' : 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#fff',
+                          fontSize: '18px',
+                          fontWeight: '700',
+                          fontFamily: 'Georgia, serif'
+                        }}>
+                          {author.name.charAt(0)}
+                        </div>
+                      </a>
+
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '3px', flexWrap: 'wrap' }}>
+                          <a
+                            href={author.profile_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              fontSize: '15px',
+                              fontWeight: '600',
+                              color: darkMode ? '#fff' : '#1a1a1a',
+                              textDecoration: 'none',
+                              fontFamily: 'Arial, sans-serif'
+                            }}
+                            onMouseEnter={(e) => { e.target.style.textDecoration = 'underline'; }}
+                            onMouseLeave={(e) => { e.target.style.textDecoration = 'none'; }}
+                          >
+                            {author.name}
+                          </a>
+                          <span style={{ fontSize: '12px', color: darkMode ? '#666' : '#999', fontFamily: 'Arial, sans-serif' }}>
+                            @{author.handle}
+                          </span>
+                        </div>
+
+                        <p style={{
+                          fontSize: '13px',
+                          color: darkMode ? '#aaa' : '#555',
+                          fontFamily: 'Arial, sans-serif',
+                          lineHeight: '1.4',
+                          margin: '0 0 8px',
+                          wordBreak: 'break-word'
+                        }}>
+                          {author.bio}
+                        </p>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: author.latest_post ? '10px' : 0 }}>
+                          <span style={{
+                            fontSize: '11px',
+                            padding: '2px 8px',
+                            borderRadius: '3px',
+                            backgroundColor: '#FF6719',
+                            color: '#fff',
+                            fontWeight: '500',
+                            fontFamily: 'Arial, sans-serif'
+                          }}>
+                            {author.publication}
+                          </span>
+                          {author.subscribers && (
+                            <span style={{
+                              fontSize: '11px',
+                              color: darkMode ? '#666' : '#999',
+                              fontFamily: 'Arial, sans-serif'
+                            }}>
+                              {author.subscribers} subscribers
+                            </span>
+                          )}
+                          {author.leaderboard && (
+                            <span style={{
+                              fontSize: '10px',
+                              padding: '2px 6px',
+                              borderRadius: '3px',
+                              backgroundColor: darkMode ? '#1a2e1a' : '#e6f4e6',
+                              color: darkMode ? '#6dca6d' : '#2d7d2d',
+                              fontWeight: '500',
+                              fontFamily: 'Arial, sans-serif'
+                            }}>
+                              {author.leaderboard}
+                            </span>
+                          )}
+                        </div>
+
+                        {author.latest_post && (
+                          <a
+                            href={author.latest_post.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              gap: '8px',
+                              padding: '8px 12px',
+                              backgroundColor: darkMode ? '#252525' : '#fff',
+                              borderRadius: '6px',
+                              border: `1px solid ${darkMode ? '#333' : '#e0e0e0'}`,
+                              textDecoration: 'none',
+                              transition: 'border-color 0.15s ease'
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#FF6719'; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.borderColor = darkMode ? '#333' : '#e0e0e0'; }}
+                          >
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{
+                                fontSize: '13px',
+                                color: darkMode ? '#ccc' : '#333',
+                                fontWeight: '500',
+                                fontFamily: 'Arial, sans-serif',
+                                lineHeight: '1.4',
+                                wordBreak: 'break-word'
+                              }}>
+                                {author.latest_post.title}
+                              </div>
+                              {author.latest_post.date && (
+                                <div style={{
+                                  fontSize: '11px',
+                                  color: darkMode ? '#555' : '#aaa',
+                                  fontFamily: 'Arial, sans-serif',
+                                  marginTop: '2px'
+                                }}>
+                                  {new Date(author.latest_post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </div>
+                              )}
+                            </div>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#999'} strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              );
+            })()}
+
           </div>
         )}
 
@@ -2574,9 +2807,9 @@ export default function App() {
                 <line x1="8" y1="23" x2="16" y2="23"></line>
               </svg>
               <span style={{
-                fontSize: '18px',
-                fontWeight: '600',
-                color: darkMode ? '#fff' : '#000',
+                fontSize: '22px',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
                 fontFamily: 'Georgia, serif'
               }}>
                 Meta commentary
@@ -2584,11 +2817,11 @@ export default function App() {
             </div>
             
             <p style={{
-              fontSize: '14px',
-              color: darkMode ? '#999' : '#666',
+              fontSize: '13px',
+              color: darkMode ? '#bbb' : '#444',
               marginBottom: '15px',
-              fontStyle: 'italic',
-              fontFamily: 'Arial, sans-serif'
+              fontFamily: 'Arial, sans-serif',
+              lineHeight: '1.4'
             }}>
               Generate an audio analysis of your content - what people are saying, key themes, and broader implications.
             </p>
@@ -2758,9 +2991,10 @@ export default function App() {
                       </h2>
                       <p style={{
                         fontSize: '13px',
-                        color: darkMode ? '#888' : '#777',
+                        color: darkMode ? '#bbb' : '#444',
                         marginBottom: '15px',
-                        fontStyle: 'italic'
+                        fontFamily: 'Arial, sans-serif',
+                        lineHeight: '1.4'
                       }}>
                         Posts that directly link to or discuss this specific article
                       </p>
@@ -2885,9 +3119,10 @@ export default function App() {
                       </h2>
                       <p style={{
                         fontSize: '13px',
-                        color: darkMode ? '#888' : '#777',
+                        color: darkMode ? '#bbb' : '#444',
                         marginBottom: '15px',
-                        fontStyle: 'italic'
+                        fontFamily: 'Arial, sans-serif',
+                        lineHeight: '1.4'
                       }}>
                         Broader conversations about the topic
                       </p>
@@ -2918,7 +3153,7 @@ export default function App() {
                             )}
                             {item.category_label && (() => {
                               const categoryColors = {
-                                'Mainstream Coverage': { bg: '#e87b35', color: '#fff' },
+                                'Mainstream Coverage': { bg: '#22c55e', color: '#fff' },
                                 'Analysis': { bg: '#7c3aed', color: '#fff' },
                                 'Opinion': { bg: '#2563eb', color: '#fff' }
                               };
@@ -3057,12 +3292,12 @@ export default function App() {
               <span style={{ fontSize: '28px' }}>📎</span>
               <h3 style={{
                 margin: 0,
-                fontSize: '18px',
-                fontWeight: '600',
-                color: darkMode ? '#fff' : '#000',
+                fontSize: '22px',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
                 fontFamily: 'Georgia, serif'
               }}>
-                File Download Link
+                File download link
               </h3>
             </div>
             <p style={{
