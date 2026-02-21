@@ -639,22 +639,24 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
           </div>
           
           {/* Pan/Zoom hint - positioned over the SVG */}
-          <div style={{
-            position: 'absolute',
-            bottom: isMobile ? '10px' : '70px',
-            left: '10px',
-            zIndex: 10,
-            fontSize: '10px',
-            color: theme.textFaint,
-            fontFamily: "Arial, sans-serif",
-            background: theme.svgBg,
-            padding: '6px 10px',
-            borderRadius: '4px',
-            border: `1px solid ${theme.cardBorder}`,
-            pointerEvents: 'none',
-          }}>
-            {isMobile ? 'Pinch to zoom • Drag to pan' : 'Scroll to zoom • Drag background to pan • Drag nodes to move'}
-          </div>
+          {!isMobile && (
+            <div style={{
+              position: 'absolute',
+              bottom: '70px',
+              left: '10px',
+              zIndex: 10,
+              fontSize: '10px',
+              color: theme.textFaint,
+              fontFamily: "Arial, sans-serif",
+              background: theme.svgBg,
+              padding: '6px 10px',
+              borderRadius: '4px',
+              border: `1px solid ${theme.cardBorder}`,
+              pointerEvents: 'none',
+            }}>
+              Scroll to zoom • Drag background to pan • Drag nodes to move
+            </div>
+          )}
           
           <svg
             ref={svgRef}
@@ -771,11 +773,28 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
             </g>
           </svg>
 
+          {/* Mobile hint - below SVG, above legend */}
+          {isMobile && (
+            <div style={{
+              fontSize: '10px',
+              color: theme.textFaint,
+              fontFamily: 'Arial, sans-serif',
+              background: theme.svgBg,
+              padding: '6px 10px',
+              borderRadius: '4px',
+              border: `1px solid ${theme.cardBorder}`,
+              marginTop: '12px',
+              display: 'inline-block',
+            }}>
+              Pinch to zoom • Drag to pan
+            </div>
+          )}
+
           {/* Legend */}
           <div style={{
             display: 'flex',
             gap: '20px',
-            marginTop: isMobile ? '24px' : '12px',
+            marginTop: '12px',
             flexWrap: 'wrap',
             padding: '10px 12px',
             background: theme.cardBg,

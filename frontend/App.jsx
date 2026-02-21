@@ -78,6 +78,8 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
       backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
       zIndex: 1000,
       overflowY: 'auto',
+      overscrollBehavior: 'contain',
+      WebkitOverflowScrolling: 'touch',
       padding: '0'
     }}>
       {/* CSS Animation for refresh spinner */}
@@ -1913,7 +1915,9 @@ export default function App() {
           height: '100vh',
           backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
           zIndex: 1000,
-          overflowY: 'auto'
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch'
         }}>
           <IranPoliticalGraph darkMode={darkMode} isMobile={isMobile} />
         </div>
@@ -2261,7 +2265,7 @@ export default function App() {
         </div>
 
         {/* Homepage Feed */}
-        {!loading && !hasSearched && !article && news.length === 0 && reddit.length === 0 && substack.length === 0 && (
+        {!loading && !hasSearched && !article && news.length === 0 && reddit.length === 0 && substack.length === 0 && location.pathname === '/' && (
           <div style={{ width: '100%', maxWidth: '700px', marginTop: '48px', textAlign: 'left' }}>
 
             {/* Curated topics */}
