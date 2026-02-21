@@ -79,7 +79,7 @@ Show 2-3 actual top comments with author/score, keep the AI summary as a TLDR ab
 
 PDFs cover academic/policy papers (fits the r/CriticalTheory audience). Tweet URLs cover social-media-native users. For PDFs: extract text with PyPDF2 or pdfplumber. For tweets: detect twitter.com/x.com URLs and use the existing Twitter API.
 
-### G. Substack integration (two parts) 🟠
+### G. Substack integration (two parts) ✅
 
 **Source:** Growth strategy — our discussion
 
@@ -97,29 +97,38 @@ It returns profile metadata (handle, profileUrl, leaderboard rank, publication n
 
 **Limitations:** Requires a LinkedIn handle as input (self-reported, unverified by Substack). Not all profiles are queryable. Data refreshes daily, not real-time. Rate limits may apply.
 
-#### G1. Substack in search results (SerpAPI `site:substack.com`)
+#### G1. Substack in search results (SerpAPI `site:substack.com`) ✅
 
-When a user searches for a topic or URL, run an additional SerpAPI query with `site:substack.com` to surface relevant Substack articles. Display these with a **Substack source badge** (distinct from Web and Reddit badges) in the results. This uses existing infrastructure (SerpAPI) and positions Substack as a higher-signal opinion/analysis source.
+When a user searches for a topic or URL, run an additional SerpAPI query with `site:substack.com` to surface relevant Substack articles. Display these with a **Substack source badge** (`#FF6719` orange, distinct from Web and Reddit badges) in the results.
 
-**Implementation:** Add a parallel SerpAPI call with `site:substack.com {query}`, return results under a new `substack` key, display in a dedicated "Substack" section or interleaved with web results using a Substack badge.
+**Implementation:**
+- Parallel SerpAPI call with `site:substack.com {query}` and `"substack" {query}` (for custom domains)
+- Results returned under `substack` key, interleaved in Topic discussions with orange Substack badge
+- Custom domain detection via `is_likely_substack()` — reclassifies web results that match Substack signals (e.g. `/p/` in URL + "substack" in title/snippet)
+- Cross-source deduplication: web results are filtered against Substack results by URL and title
 
-#### G2. Curated Substack authors on homepage
+#### G2. Curated Substack authors on homepage ✅
 
-A homepage section (below curated topics, above or alongside top discussions) featuring 4 handpicked Substack authors. For each author:
+"Featured publications" section on the homepage (below top discussions) with category toggle buttons. For each author: profile photo, name, handle, bio, publication badge (orange), subscriber count, and latest post via RSS.
 
-- **Profile metadata** from the Substack API (publication name, category, subscriber count, bestseller tier) — looked up by LinkedIn handle, cached long-term since profile data changes rarely.
-- **What they write about** — a short editorial description (hardcoded or pulled from the publication tagline).
-- **Latest post** via RSS feed (`{publication}.substack.com/feed`) — title, date, excerpt.
+**Curated authors (5):**
 
-The 4 authors and their LinkedIn handles are curated by us (no user input). The API calls are lightweight GETs, cached for 48-72 hours. RSS feeds are fetched on the same schedule.
+| Author | Handle | Publication | Category | Feed URL |
+|---|---|---|---|---|
+| Ryan Grim | @ryangrim | Drop Site News | News | dropsitenews.com/feed |
+| Anu | @anu | Working Theorys | Tech | anu.substack.com/feed |
+| Catherine Liu | @cliuanon | CLiuAnon | Culture | cliuanon.substack.com/feed |
+| Juan Sebastián Pinto | @cafepinto | Ziggurat | Tech | zig.art/feed |
+| Nader Dabit | @nader | Nader's Thoughts | Tech | nader.substack.com/feed |
 
-**Efficiency considerations:**
-- Cache aggressively — author profiles change rarely, RSS feeds update at most daily.
-- Fetch in parallel on server startup or first homepage load, then serve from cache.
-- Keep the UI compact: author avatar/name + one-liner + latest post title as a link. Expand on click if needed.
-- Avoid blocking the homepage render — load this section async like the Reddit curated feed.
+**Implementation:**
+- Backend: `api/substack_authors.py` — hardcoded author data + parallel RSS feed fetching (5 feeds via ThreadPoolExecutor)
+- Profile images: sourced from `substack-post-media.s3.amazonaws.com` (publicly accessible, not the CDN-proxied URLs which require tokens)
+- Caching: 72-hour in-memory TTL, same pattern as curated Reddit feed
+- Frontend: category toggles (All / News / Tech / Culture), individual cards with `8px` border-radius matching existing card style, async fetch on homepage load
+- BETA badge shown next to section title
 
-**Next step:** Maryam to provide top 4 author examples + their LinkedIn handles. Then: apply for Substack API access, build the endpoint, integrate RSS feeds.
+**To add/remove authors:** Edit the `CURATED_AUTHORS` list in `api/substack_authors.py`, restart Flask. Profile images must use `substack-post-media.s3.amazonaws.com` URLs (not `bucketeer` S3 which returns 403).
 
 ---
 
@@ -172,6 +181,10 @@ Pull transcripts via youtube-transcript-api and run sentiment/summary. A unique 
 | Fix LLM refusal leak (link stripping, raw-comment fallback) | 1C | ✅ Done |
 | Result categorization — Mainstream Coverage / Analysis / Opinion badges | 2D | ✅ Done |
 | Reddit top comments alongside AI summaries | 2E | ✅ Done |
+| Substack articles in search results (SerpAPI `site:substack.com`) | 3G1 | ✅ Done |
+| Custom domain Substack detection (`is_likely_substack`) | 3G1 | ✅ Done |
+| Featured publications on homepage (5 curated Substack authors, RSS) | 3G2 | ✅ Done |
+| Category toggles for featured publications (All / News / Tech / Culture) | 3G2 | ✅ Done |
 
 ### Search quality
 
@@ -198,6 +211,8 @@ Pull transcripts via youtube-transcript-api and run sentiment/summary. A unique 
 | IranPoliticalGraph left padding fix (sidebar overlap) | UI | ✅ Done |
 | Design system documentation (`docs/design-system.md`) | UI | ✅ Done |
 | Font consistency — Georgia headings, Arial body | UI | ✅ Done |
+| Heading weight normalization — all Georgia headings 22px, font-weight normal | UI | ✅ Done |
+| Subheading readability — dark text (#444) instead of grey (#888) | UI | ✅ Done |
 | Sidebar history simplified to plain text list | UI | ✅ Done |
 | Example articles on homepage | 1A | ✅ Done |
 
@@ -214,6 +229,8 @@ Pull transcripts via youtube-transcript-api and run sentiment/summary. A unique 
 | Startup task guards (file lock) | Infra | ✅ Done |
 | Debug endpoint security (local only) | Infra | ✅ Done |
 | Remove duplicate Reddit summarization calls | Infra | ✅ Done |
+| Substack authors parallel RSS fetch (72h cache, ThreadPoolExecutor) | Infra | ✅ Done |
+| Substack custom domain reclassification in search pipeline | Infra | ✅ Done |
 
 ---
 
@@ -291,13 +308,23 @@ Things we discovered the hard way. Reference these before making similar changes
 
 **Rule of thumb:** Any feature that depends on `article` state must handle the topic-search case where no article metadata exists.
 
-### L8. Curated feed cache requires server restart to refresh
+### L8. Substack profile images: use `substack-post-media` S3, not `bucketeer`
 
-**Context:** The curated feed uses in-memory caching (`_curated_cache` dict in `app.py`). Unlike the SQLite search cache, this has no persistent store.
+**Context:** Profile pictures for curated Substack authors loaded as broken images.
 
-**Current behaviour:** Cache lives for 48 hours. A server restart (deploy, crash, manual restart) clears it and forces a fresh fetch on next request.
+**Root cause:** Initial scraping pulled `bucketeer-*.s3.amazonaws.com` URLs for avatars. These CDN-proxied URLs require signed tokens and return 403 Forbidden when accessed directly from a browser or `<img>` tag.
 
-**Implication:** If subreddit lists change or a post is problematic, restarting the Flask server is the quickest way to force a refresh. There is no admin endpoint to clear the cache without restarting.
+**Fix:** Scraped fresh image URLs from Substack profile pages, using the `substack-post-media.s3.amazonaws.com/public/images/` prefix which is publicly accessible without authentication. Hardcoded these URLs in `api/substack_authors.py` so the frontend never hits an auth wall.
+
+**Rule of thumb:** When caching external image URLs, always verify the URL returns 200 without cookies/tokens. Substack's public S3 bucket (`substack-post-media.s3.amazonaws.com`) is stable; `bucketeer-*.s3.amazonaws.com` is not.
+
+### L9. In-memory caches require server restart to refresh
+
+**Context:** Both the curated Reddit feed (`_curated_cache` in `app.py`, 48h TTL) and the featured publications feed (`_substack_cache` in `api/substack_authors.py`, 72h TTL) use in-memory caching with no persistent store.
+
+**Current behaviour:** Cache lives for 48h (Reddit) or 72h (Substack). A server restart (deploy, crash, manual restart) clears both and forces fresh fetches on next request.
+
+**Implication:** If subreddit lists change, author data needs updating, or a post is problematic, restarting the Flask server is the quickest way to force a refresh. There is no admin endpoint to clear either cache without restarting.
 
 ---
 
@@ -319,6 +346,14 @@ Reference before making changes to avoid repeat mistakes.
 1. Verify `summarize.py` never returns user-visible error strings (should return empty string on failure)
 2. Check both Direct reactions and Topic discussions sections in the frontend for any hard-coded fallback text
 3. Clear `cached_searches` to purge stale summaries
+
+### After adding/removing a curated Substack author
+1. Edit the `CURATED_AUTHORS` list in `api/substack_authors.py`
+2. Profile image must use a `substack-post-media.s3.amazonaws.com` URL (not `bucketeer` — see L8)
+3. Verify the RSS feed URL returns valid XML: `curl -s {feed_url} | head -5` should start with `<?xml`
+4. Assign a `category` (News, Tech, or Culture) — the frontend category toggles rely on this field
+5. Restart Flask server to clear the 72h in-memory cache
+6. Rebuild frontend: `npm run build` from `frontend/`
 
 ### After adding a new content source (web, social, etc.)
 1. Add cross-source deduplication in `app.py` (filter URLs of source X from section Y)
