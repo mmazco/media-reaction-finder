@@ -899,7 +899,8 @@ def curated_feed():
     import praw
 
     now = datetime.utcnow()
-    if _curated_cache['data'] and _curated_cache['fetched_at']:
+    force_refresh = request.args.get('refresh') == '1'
+    if not force_refresh and _curated_cache['data'] and _curated_cache['fetched_at']:
         age = now - _curated_cache['fetched_at']
         if age < timedelta(hours=48):
             return jsonify(_curated_cache['data'])
@@ -960,8 +961,10 @@ def curated_feed():
                 'posts': []
             })
 
-    _curated_cache['data'] = channels
-    _curated_cache['fetched_at'] = now
+    has_posts = any(len(ch['posts']) > 0 for ch in channels)
+    if has_posts:
+        _curated_cache['data'] = channels
+        _curated_cache['fetched_at'] = now
     return jsonify(channels)
 
 
