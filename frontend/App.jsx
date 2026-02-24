@@ -2375,7 +2375,7 @@ export default function App() {
               const channel = curatedFeed[curatedIndex % curatedFeed.length];
               const desc = subredditDescriptions[channel.subreddit] || '';
               return (
-                <div style={{ marginBottom: '32px' }}>
+                <div style={{ marginBottom: '44px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
                     <h2 style={{
                       fontSize: '22px',
@@ -2509,12 +2509,142 @@ export default function App() {
               );
             })()}
 
+            {/* Iran Prediction Market Snapshot */}
+            <div style={{ marginBottom: '44px' }}>
+              <h2 style={{
+                fontSize: '22px',
+                fontFamily: 'Georgia, serif',
+                fontWeight: 'normal',
+                color: darkMode ? '#fff' : '#1a1a1a',
+                margin: '0 0 6px'
+              }}>
+                Iran markets snapshot
+                <span style={{ padding: '2px 6px', marginLeft: '8px', backgroundColor: darkMode ? '#ffd54f' : '#b8860b', color: darkMode ? '#000' : '#fff', fontSize: '9px', fontWeight: '700', letterSpacing: '0.5px', borderRadius: '3px', fontFamily: 'Arial, sans-serif' }}>BETA</span>
+              </h2>
+              <p style={{
+                fontSize: '13px',
+                color: darkMode ? '#bbb' : '#444',
+                fontFamily: 'Arial, sans-serif',
+                margin: '0 0 16px',
+                lineHeight: '1.4'
+              }}>
+                Live prediction market odds from Polymarket and Kalshi on Iran-related events
+              </p>
+
+              <div style={{
+                backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
+                borderRadius: '8px',
+                overflow: 'hidden'
+              }}>
+                {/* Top 2 polls */}
+                <div style={{ padding: '10px 16px 0', textAlign: 'right' }}>
+                  <span style={{ fontSize: '10px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>
+                    Updated Feb 23, 2026
+                  </span>
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                  {[
+                    { title: 'US strikes Iran by March 31?', prob: 63, prev: 63, volume: '$15M', platform: 'Polymarket', change: 0 },
+                    { title: 'Khamenei out as Supreme Leader in 2026?', prob: 48, prev: 64, volume: '$2.8M', platform: 'Polymarket', change: -16 },
+                  ].map((poll, i) => (
+                    <div key={i} style={{
+                      flex: '1 1 250px',
+                      padding: '16px',
+                      borderRight: i === 0 ? `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}` : 'none',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                        <span style={{
+                          fontSize: '10px',
+                          padding: '2px 6px',
+                          borderRadius: '3px',
+                          backgroundColor: poll.platform === 'Polymarket' ? '#1652F0' : '#00D26A',
+                          color: '#fff',
+                          fontWeight: '600',
+                          fontFamily: 'Arial, sans-serif'
+                        }}>
+                          {poll.platform}
+                        </span>
+                        <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>
+                          {poll.volume} vol.
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
+                        {poll.title}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                        <span style={{ fontSize: '28px', fontWeight: '700', color: darkMode ? '#fff' : '#1a1a1a', fontFamily: 'Arial, sans-serif' }}>
+                          {poll.prob}%
+                        </span>
+                        <span style={{
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          fontFamily: 'Arial, sans-serif',
+                          color: poll.change > 0 ? '#22c55e' : poll.change < 0 ? '#ef4444' : (darkMode ? '#666' : '#999')
+                        }}>
+                          {poll.change > 0 ? '\u25B2' : poll.change < 0 ? '\u25BC' : '\u2014'} {poll.change !== 0 ? `${Math.abs(poll.change)}pts` : 'No change'}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Analysis summary - greyed out box matching Reddit AI summary style */}
+                <div style={{
+                  padding: '14px 16px',
+                  backgroundColor: darkMode ? '#161616' : '#f0f0f0',
+                  borderLeft: `3px solid ${darkMode ? '#ffd54f' : '#b8860b'}`,
+                  margin: '0',
+                }}>
+                  <div style={{ fontSize: '9px', color: darkMode ? '#888' : '#999', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
+                    Analysis
+                  </div>
+                  <div style={{ fontSize: '12px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: darkMode ? '#aaa' : '#555' }}>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
+                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Regime fall before 2027</strong> dropped from 54% to 37% ({'\u2212'}17pts) — largest move across Iran markets</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
+                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei out by 2026</strong> fell from 64% to 48% ({'\u2212'}16pts) — timeline for leadership change has lengthened</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
+                      <span style={{ color: darkMode ? '#666' : '#999' }}>{'\u2014'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>US strikes by Mar 31</strong> steady at 63% — highest-conviction near-term bet with $383M total volume</span>
+                    </div>
+                  </div>
+                  <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
+                    Markets are pricing sustained military pressure but have cooled on quick regime change. The gap between strike probability (63%) and regime fall (37%) implies traders expect military action without toppling the government.
+                  </p>
+                </div>
+
+                {/* Link to full graph */}
+                <div
+                  onClick={() => navigate('/trending/iran/graph')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                >
+                  <span style={{ fontSize: '13px', fontFamily: 'Arial, sans-serif', color: darkMode ? '#ffd54f' : '#b8860b', fontWeight: '500' }}>
+                    View full political graph and all markets
+                  </span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#ffd54f' : '#b8860b'} strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+              </div>
+            </div>
+
             {/* Featured Publications */}
             {substackAuthors.length > 0 && (() => {
               const categories = ['All', 'News', 'Tech', 'Culture'];
               const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter(a => a.category === pubCategory);
               return (
-              <div style={{ marginBottom: '32px' }}>
+              <div style={{ marginBottom: '44px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
                   <h2 style={{
                     fontSize: '22px',
@@ -2568,7 +2698,6 @@ export default function App() {
                         padding: isMobile ? '14px' : '16px',
                         backgroundColor: darkMode ? '#1a1a1a' : '#f5f5f5',
                         borderRadius: '8px',
-                        border: `1px solid ${darkMode ? '#333' : '#d0d0d0'}`,
                         transition: 'background-color 0.15s ease'
                       }}
                       onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
