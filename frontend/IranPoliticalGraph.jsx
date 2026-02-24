@@ -4,21 +4,21 @@ import { useNavigate } from 'react-router-dom';
 // Prediction market data - linked to entities
 const predictionMarkets = [
   {
-    id: 'khamenei-out-jan31',
-    title: 'Khamenei out as Supreme Leader by January 31?',
-    probability: 21,
-    previousProb: 18,
-    volume: '$20.5M',
+    id: 'khamenei-out-mar31',
+    title: 'Khamenei out as Supreme Leader by March 31?',
+    probability: 19,
+    previousProb: 21,
+    volume: '$49.7M',
     platform: 'polymarket',
-    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-january-31',
+    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-march-31',
     linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
-    trend: 'up',
+    trend: 'down',
   },
   {
     id: 'khamenei-out-2026',
     title: 'Khamenei out as Supreme Leader by Dec 31, 2026?',
-    probability: 61,
-    previousProb: 52,
+    probability: 64,
+    previousProb: 61,
     volume: '$283K',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxkhameneiout/ali-khamenei-out/kxkhameneiout-akha',
@@ -37,15 +37,15 @@ const predictionMarkets = [
     trend: 'up',
   },
   {
-    id: 'us-strikes-iran',
-    title: 'US strikes Iran by January 31, 2026?',
-    probability: 66,
-    previousProb: 55,
-    volume: '$18.7M',
+    id: 'us-strikes-iran-mar31',
+    title: 'US strikes Iran by March 31, 2026?',
+    probability: 63,
+    previousProb: 66,
+    volume: '$15M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/us-strikes-iran-by',
     linkedEntities: ['trump', 'israel', 'irgc', 'khamenei'],
-    trend: 'up',
+    trend: 'down',
   },
   {
     id: 'pahlavi-visit',
@@ -61,8 +61,8 @@ const predictionMarkets = [
   {
     id: 'us-recognize-pahlavi',
     title: 'Will the United States recognize Reza Pahlavi?',
-    probability: 36,
-    previousProb: 28,
+    probability: 37,
+    previousProb: 36,
     volume: '$1.2K',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxrecogpersoniran/recognize-reza-pahlavi/kxrecogpersoniran-26',
@@ -78,10 +78,10 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxnextiranleader/who-will-be-khameneis-successor/kxnextiranleader-45jan01',
     linkedEntities: ['mojtaba', 'hassan_k', 'arafi', 'khamenei'],
     candidates: [
-      { name: 'Mojtaba Khamenei', prob: 25 },
-      { name: 'Gholam-Hossein M.', prob: 23 },
+      { name: 'Mojtaba Khamenei', prob: 18 },
+      { name: 'Position abolished', prob: 56 },
     ],
-    trend: 'stable',
+    trend: 'up',
   },
   {
     id: 'iran-nuclear-deal',
@@ -160,11 +160,11 @@ const edges = [
 ];
 
 const groupColors = {
-  opposition: { bg: '#1a472a', border: '#2d5a3d', text: '#4ade80' },
-  reformist: { bg: '#2a3f5f', border: '#3d5a7f', text: '#60a5fa' },
-  regime: { bg: '#4a1a1a', border: '#6a2a2a', text: '#f87171' },
-  succession: { bg: '#4a3a1a', border: '#6a5a2a', text: '#fbbf24' },
-  external: { bg: '#3a1a4a', border: '#5a2a6a', text: '#c084fc' },
+  opposition: { bg: '#22c55e', border: '#16a34a', text: '#22c55e' },
+  reformist: { bg: '#3b82f6', border: '#2563eb', text: '#3b82f6' },
+  regime: { bg: '#ef4444', border: '#dc2626', text: '#ef4444' },
+  succession: { bg: '#eab308', border: '#ca8a04', text: '#eab308' },
+  external: { bg: '#a855f7', border: '#9333ea', text: '#a855f7' },
 };
 
 const edgeColors = {
@@ -365,11 +365,9 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
     setIsPanning(false);
   }, []);
   
-  // Handle zoom with mouse wheel
+  // Scroll zoom disabled to prevent accidental zoom
   const handleWheel = useCallback((e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoom(prev => Math.max(0.5, Math.min(2, prev + delta)));
+    // intentionally disabled
   }, []);
   
   // Zoom control functions
@@ -492,69 +490,75 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         .scrollable-panel-${darkMode ? 'dark' : 'light'}::-webkit-scrollbar-thumb { background: ${theme.cardBorder}; border-radius: 3px; }
       `}</style>
 
-      {/* Header */}
-      <header style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
+      {/* Header - matches /trending/iran style */}
+      <header style={{
+        marginBottom: '0',
+        padding: isMobile ? '0' : '0 0 20px 0',
+        borderBottom: `1px solid ${theme.cardBorder}`,
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '12px'
+        }}>
+          <div>
+            <div style={{
+              fontSize: '11px',
+              color: theme.accent,
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              marginBottom: '4px',
+              fontWeight: '600',
+              fontFamily: 'Arial, sans-serif'
+            }}>
+              Trending: Geopolitics
+            </div>
             <h1 style={{
-              fontSize: '28px',
-              fontWeight: 600,
-              letterSpacing: '0',
+              fontSize: '22px',
+              fontWeight: 'normal',
+              color: darkMode ? '#fff' : '#1a1a1a',
               margin: 0,
-              color: theme.text,
-              fontFamily: "'Georgia', serif",
+              fontFamily: 'Georgia, serif'
             }}>
-              Iran political landscape
+              Iran Political Landscape
             </h1>
-            <span style={{
-              padding: '3px 8px',
-              backgroundColor: theme.accent,
-              color: darkMode ? '#000' : '#fff',
-              fontSize: '10px',
-              fontWeight: '700',
-              letterSpacing: '0.5px',
-              borderRadius: '4px',
-              fontFamily: 'Arial, sans-serif',
+            <p style={{
+              fontSize: '14px',
+              color: theme.textMuted,
+              margin: '6px 0 0',
+              fontFamily: 'Arial, sans-serif'
             }}>
-              BETA
-            </span>
+              Social Graph + Live Prediction Markets — February 2026
+            </p>
           </div>
-          <p style={{
-            fontSize: '13px',
-            color: theme.textMuted,
-            margin: 0,
-            fontFamily: "Arial, sans-serif",
-            lineHeight: '1.5',
-          }}>
-            Social Graph + Live Prediction Markets — January 2026
-          </p>
+          
+          <button
+            onClick={() => navigate('/trending/iran')}
+            style={{
+              padding: '8px 16px',
+              background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+              border: `1px solid ${theme.cardBorder}`,
+              color: theme.text,
+              fontSize: '12px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+              fontFamily: "Arial, sans-serif",
+              borderRadius: '4px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)';
+              e.currentTarget.style.borderColor = theme.textMuted;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+              e.currentTarget.style.borderColor = theme.cardBorder;
+            }}
+          >
+            ← Back to Feed
+          </button>
         </div>
-        
-        {/* Back to Feed Button */}
-        <button
-          onClick={() => navigate('/trending/iran')}
-          style={{
-            padding: '8px 16px',
-            background: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-            border: `1px solid ${theme.cardBorder}`,
-            color: theme.text,
-            fontSize: '12px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-            fontFamily: "Arial, sans-serif",
-            borderRadius: '4px',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = darkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)';
-            e.currentTarget.style.borderColor = theme.textMuted;
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
-            e.currentTarget.style.borderColor = theme.cardBorder;
-          }}
-        >
-          ← Back to Feed
-        </button>
       </header>
 
       {/* Filters */}
@@ -567,10 +571,10 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       </div>
 
       {/* Main Layout */}
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '16px' }}>
         
         {/* Graph Area */}
-        <div style={{ flex: '1 1 600px', minWidth: '300px', position: 'relative' }}>
+        <div style={{ flex: '1 1 600px', minWidth: '300px', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
           {/* Zoom Controls */}
           <div style={{
             position: 'absolute',
@@ -654,7 +658,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               border: `1px solid ${theme.cardBorder}`,
               pointerEvents: 'none',
             }}>
-              Scroll to zoom • Drag background to pan • Drag nodes to move
+              Drag background to pan • Drag nodes to move • Use +/− to zoom
             </div>
           )}
           
@@ -663,13 +667,12 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
             viewBox="0 0 800 560"
             style={{
               width: '100%',
-              height: 'auto',
+              maxHeight: 'calc(100vh - 280px)',
               background: theme.svgBg,
               border: `1px solid ${theme.svgBorder}`,
               cursor: isPanning ? 'grabbing' : 'grab',
             }}
             onMouseDown={handleSvgMouseDown}
-            onWheel={handleWheel}
           >
             <defs>
               <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -991,7 +994,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               Note
             </div>
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 10px 0', fontFamily: 'Arial, sans-serif' }}>
-              Prediction markets currently price Khamenei leaving power at <strong style={{ color: theme.accent }}>58-61%</strong> by mid-2026. The succession process and potential political transitions remain uncertain.
+              Prediction markets currently price Khamenei leaving power at <strong style={{ color: theme.accent }}>64%</strong> by end of 2026. US strikes on Iran by March 31 at <strong style={{ color: theme.accent }}>63%</strong>. A 56% chance the Supreme Leader position is abolished entirely.
             </p>
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
               For further reading and analysis, head over to the{' '}

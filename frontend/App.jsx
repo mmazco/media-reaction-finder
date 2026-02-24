@@ -6,13 +6,14 @@ import IranPoliticalGraph from './IranPoliticalGraph';
 // Trending Topic Reactions Page Component
 function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery, onFileDownloadClick }) {
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [reddit, setReddit] = useState([]);
   const [web, setWeb] = useState([]);
   const [twitter, setTwitter] = useState([]);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [hasFetched, setHasFetched] = useState(false);
   
   // Extract topic from URL
   const topic = location.pathname.split('/trending/')[1]?.split('/')[0] || 'iran';
@@ -52,6 +53,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
         setTwitter(data.twitter || []);
         setLastUpdated(new Date());
         setError(null);
+        setHasFetched(true);
       } else {
         setError('Failed to fetch reactions');
       }
@@ -63,10 +65,6 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
       setRefreshing(false);
     }
   };
-  
-  useEffect(() => {
-    fetchReactions();
-  }, [topic]);
   
   return (
     <div style={{
@@ -227,7 +225,29 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
         margin: '0 auto',
         padding: '30px 20px'
       }}>
-        {loading ? (
+        {!hasFetched && !loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <p style={{ color: darkMode ? '#888' : '#666', marginBottom: '16px', fontFamily: 'Arial, sans-serif' }}>
+              Press refresh to fetch the latest results from X, Reddit and the web
+            </p>
+            <button
+              onClick={() => fetchReactions()}
+              style={{
+                padding: '10px 24px',
+                fontSize: '13px',
+                fontWeight: '600',
+                backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                color: darkMode ? '#000' : '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontFamily: 'Arial, sans-serif'
+              }}
+            >
+              Fetch results
+            </button>
+          </div>
+        ) : loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <div style={{
               width: '24px',
