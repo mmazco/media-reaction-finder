@@ -6,46 +6,46 @@ const predictionMarkets = [
   {
     id: 'khamenei-out-mar31',
     title: 'Khamenei out as Supreme Leader by March 31?',
-    probability: 19,
-    previousProb: 21,
-    volume: '$49.7M',
+    probability: 20,
+    previousProb: 19,
+    volume: '$16M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-march-31',
+    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
+    trend: 'up',
+  },
+  {
+    id: 'khamenei-out-2026',
+    title: 'Khamenei out as Supreme Leader in 2026?',
+    probability: 48,
+    previousProb: 64,
+    volume: '$2.8M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-december-31-2026',
     linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
     trend: 'down',
   },
   {
-    id: 'khamenei-out-2026',
-    title: 'Khamenei out as Supreme Leader by Dec 31, 2026?',
-    probability: 64,
-    previousProb: 61,
-    volume: '$283K',
-    platform: 'kalshi',
-    url: 'https://kalshi.com/markets/kxkhameneiout/ali-khamenei-out/kxkhameneiout-akha',
-    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
-    trend: 'up',
-  },
-  {
     id: 'regime-fall-2026',
     title: 'Will the Iranian regime fall before 2027?',
-    probability: 54,
-    previousProb: 48,
-    volume: '$1.74M',
+    probability: 37,
+    previousProb: 54,
+    volume: '$4.8M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-the-end-of-2026',
     linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
-    trend: 'up',
+    trend: 'down',
   },
   {
     id: 'us-strikes-iran-mar31',
     title: 'US strikes Iran by March 31, 2026?',
     probability: 63,
-    previousProb: 66,
+    previousProb: 63,
     volume: '$15M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/us-strikes-iran-by',
     linkedEntities: ['trump', 'israel', 'irgc', 'khamenei'],
-    trend: 'down',
+    trend: 'flat',
   },
   {
     id: 'pahlavi-visit',
@@ -432,7 +432,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       background: theme.bg,
       fontFamily: "'Georgia', serif",
       color: theme.text,
-      padding: isMobile ? '60px 16px 20px 16px' : '20px 20px 20px 70px',
+      padding: isMobile ? '60px 16px 80px 16px' : '20px 20px 120px 70px',
     }}>
       <style>{`
         .filter-btn-${darkMode ? 'dark' : 'light'} {
@@ -480,14 +480,8 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         .node-group:active { cursor: grabbing; }
         
         .scrollable-panel-${darkMode ? 'dark' : 'light'} {
-          max-height: calc(100vh - 200px);
-          overflow-y: auto;
-          scrollbar-width: thin;
-          scrollbar-color: ${theme.cardBorder} transparent;
+          overflow-y: visible;
         }
-        .scrollable-panel-${darkMode ? 'dark' : 'light'}::-webkit-scrollbar { width: 6px; }
-        .scrollable-panel-${darkMode ? 'dark' : 'light'}::-webkit-scrollbar-track { background: transparent; }
-        .scrollable-panel-${darkMode ? 'dark' : 'light'}::-webkit-scrollbar-thumb { background: ${theme.cardBorder}; border-radius: 3px; }
       `}</style>
 
       {/* Header - matches /trending/iran style */}
@@ -570,7 +564,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       </div>
 
       {/* Main Layout */}
-      <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '16px' }}>
+      <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', marginTop: '16px' }}>
         
         {/* Graph Area */}
         <div style={{ flex: '1 1 550px', minWidth: '300px', maxWidth: '70%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
@@ -805,6 +799,59 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               <span style={{ color: theme.textMuted }}>Has prediction markets</span>
             </div>
           </div>
+
+          {/* Prediction Market Analysis */}
+          <div style={{
+            marginTop: '12px',
+            padding: '16px',
+            background: theme.cardBg,
+            border: `1px solid ${theme.cardBorder}`,
+          }}>
+            <div style={{ fontSize: '9px', color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
+              Prediction Market Analysis
+            </div>
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 12px 0', fontFamily: 'Arial, sans-serif' }}>
+              Comparing January/early February polls to current February 2026 data, several key markets have shifted significantly on Polymarket and Kalshi.
+            </p>
+
+            <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: theme.text }}>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
+                <span><strong>Regime fall before 2027</strong> — dropped from 54% to <strong style={{ color: theme.accent }}>37%</strong> <span style={{ color: theme.textMuted }}>(−17pts)</span>. The largest move across Iran markets. Despite heightened rhetoric, traders appear less convinced of full regime collapse.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
+                <span><strong>Khamenei out by end of 2026</strong> — fell from 64% to <strong style={{ color: theme.accent }}>48%</strong> <span style={{ color: theme.textMuted }}>(−16pts)</span>. A notable pullback from highs seen in January, suggesting the timeline for a leadership change has lengthened.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: theme.textMuted, fontSize: '13px' }}>&#9644;</span>
+                <span><strong>US strikes Iran by March 31</strong> — holding steady at <strong style={{ color: theme.accent }}>63%</strong> <span style={{ color: theme.textMuted }}>(0pts)</span>. Still the highest-conviction near-term bet, with $15M in volume on this date alone and $383M across all strike dates.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
+                <span><strong>Khamenei out by March 31</strong> — ticked up from 19% to <strong style={{ color: theme.accent }}>20%</strong> <span style={{ color: theme.textMuted }}>(+1pt)</span>. Minimal movement. Markets see a near-term exit as unlikely but not impossible.</span>
+              </div>
+            </div>
+
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '12px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
+              The overall trend: markets are pricing in sustained military pressure (US strikes remain elevated) but have cooled on the prospect of internal regime change happening quickly. The gap between strike probability (63%) and regime fall (37%) implies traders expect military action without necessarily toppling the government.
+            </p>
+
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
+              For further reading and analysis, head over to the{' '}
+              <span 
+                onClick={() => navigate('/collections')}
+                style={{ 
+                  color: theme.accent, 
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
+                Collections page
+              </span>
+              {' '}to view various sources covering Iran.
+            </p>
+          </div>
         </div>
 
         {/* Right Panel */}
@@ -967,35 +1014,6 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
                 )}
               </>
             )}
-          </div>
-
-          {/* Note */}
-          <div style={{
-            marginTop: '16px',
-            padding: '14px',
-            background: theme.cardBg,
-            border: `1px solid ${theme.cardBorder}`,
-          }}>
-            <div style={{ fontSize: '9px', color: theme.textMuted, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
-              Note
-            </div>
-            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 10px 0', fontFamily: 'Arial, sans-serif' }}>
-              Prediction markets currently price Khamenei leaving power at <strong style={{ color: theme.accent }}>64%</strong> by end of 2026. US strikes on Iran by March 31 at <strong style={{ color: theme.accent }}>63%</strong>. A 56% chance the Supreme Leader position is abolished entirely.
-            </p>
-            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
-              For further reading and analysis, head over to the{' '}
-              <span 
-                onClick={() => navigate('/collections')}
-                style={{ 
-                  color: theme.accent, 
-                  cursor: 'pointer',
-                  textDecoration: 'underline'
-                }}
-              >
-                Collections page
-              </span>
-              {' '}to view various sources covering Iran.
-            </p>
           </div>
 
           {/* Sources */}
