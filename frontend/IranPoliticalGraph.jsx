@@ -808,7 +808,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         </div>
 
         {/* Right Panel */}
-        <div style={{ flex: '0 0 300px', minWidth: '280px' }}>
+        <div style={{ flex: '0 0 340px', minWidth: '300px' }}>
           
           {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${theme.cardBorder}`, marginBottom: '12px' }}>
