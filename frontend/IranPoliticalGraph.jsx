@@ -109,29 +109,29 @@ const predictionMarkets = [
 
 const nodes = [
   // Opposition / External Candidates
-  { id: 'pahlavi', label: 'Reza Pahlavi', group: 'opposition', x: 150, y: 200, description: 'Exiled son of the last Shah, in the US since 1978. Most visible diaspora opposition figure. Advocates for referendum on Iran\'s future. Has no political party or verified organizational presence inside Iran. Actual domestic support unclear.', influence: 'medium' },
-  { id: 'rajavi', label: 'Maryam Rajavi', group: 'opposition', x: 100, y: 350, description: 'NCRI President-elect, leads parliament-in-exile. Has 10-point plan backed by US Congress members. MEK/NCRI is controversial with limited verified support inside Iran.', influence: 'low' },
-  { id: 'tajzadeh', label: 'Mostafa Tajzadeh', group: 'reformist', x: 300, y: 120, description: 'Imprisoned reformist at Evin Prison, former Deputy Interior Minister. Advocates constituent assembly and peaceful transition. Publishes political analysis via Telegram. Intellectually active but operationally constrained.', influence: 'low' },
-  { id: 'mousavi', label: 'Mir-Hossein Mousavi', group: 'reformist', x: 400, y: 200, description: 'Green Movement leader (2009), under house arrest since 2011. Called for referendum to end clerical rule in 2023. Symbolic figure but severely constrained after 14 years of isolation.', influence: 'low' },
+  { id: 'pahlavi', label: 'Reza Pahlavi', group: 'opposition', x: 150, y: 140, description: 'Exiled son of the last Shah, in the US since 1978. Most visible diaspora opposition figure. Advocates for referendum on Iran\'s future. Has no political party or verified organizational presence inside Iran. Actual domestic support unclear.', influence: 'medium' },
+  { id: 'rajavi', label: 'Maryam Rajavi', group: 'opposition', x: 100, y: 280, description: 'NCRI President-elect, leads parliament-in-exile. Has 10-point plan backed by US Congress members. MEK/NCRI is controversial with limited verified support inside Iran.', influence: 'low' },
+  { id: 'tajzadeh', label: 'Mostafa Tajzadeh', group: 'reformist', x: 300, y: 70, description: 'Imprisoned reformist at Evin Prison, former Deputy Interior Minister. Advocates constituent assembly and peaceful transition. Publishes political analysis via Telegram. Intellectually active but operationally constrained.', influence: 'low' },
+  { id: 'mousavi', label: 'Mir-Hossein Mousavi', group: 'reformist', x: 400, y: 140, description: 'Green Movement leader (2009), under house arrest since 2011. Called for referendum to end clerical rule in 2023. Symbolic figure but severely constrained after 14 years of isolation.', influence: 'low' },
   
   // Current Regime
-  { id: 'khamenei', label: 'Ali Khamenei', group: 'regime', x: 550, y: 280, description: 'Supreme Leader of Iran since 1989. 86 years old. Holds ultimate authority over military, judiciary, and major state decisions under Iran\'s constitutional structure.', influence: 'critical' },
-  { id: 'pezeshkian', label: 'Masoud Pezeshkian', group: 'regime', x: 450, y: 380, description: 'President of Iran since 2024. Reformist-aligned. Executive authority is constitutionally subordinate to the Supreme Leader.', influence: 'medium' },
-  { id: 'ghalibaf', label: 'Mohammad Ghalibaf', group: 'regime', x: 650, y: 180, description: 'Speaker of the Iranian Parliament. Former mayor of Tehran and IRGC commander. Considered a conservative political figure.', influence: 'high' },
+  { id: 'khamenei', label: 'Ali Khamenei', group: 'regime', x: 550, y: 220, description: 'Supreme Leader of Iran since 1989. 86 years old. Holds ultimate authority over military, judiciary, and major state decisions under Iran\'s constitutional structure.', influence: 'critical' },
+  { id: 'pezeshkian', label: 'Masoud Pezeshkian', group: 'regime', x: 450, y: 310, description: 'President of Iran since 2024. Reformist-aligned. Executive authority is constitutionally subordinate to the Supreme Leader.', influence: 'medium' },
+  { id: 'ghalibaf', label: 'Mohammad Ghalibaf', group: 'regime', x: 650, y: 120, description: 'Speaker of the Iranian Parliament. Former mayor of Tehran and IRGC commander. Considered a conservative political figure.', influence: 'high' },
   
   // Succession Candidates
-  { id: 'mojtaba', label: 'Mojtaba Khamenei', group: 'succession', x: 700, y: 350, description: 'Son of Supreme Leader Ali Khamenei. Mid-ranking cleric. Has never held formal government position but is considered influential within the system.', influence: 'medium' },
-  { id: 'hassan_k', label: 'Hassan Khomeini', group: 'succession', x: 600, y: 450, description: 'Grandson of Ayatollah Ruhollah Khomeini, founder of the Islamic Republic. Cleric based in Qom. Generally associated with reformist positions.', influence: 'medium' },
-  { id: 'arafi', label: 'Alireza Arafi', group: 'succession', x: 750, y: 260, description: 'Deputy Chairman of the Assembly of Experts. Member of the Guardian Council. Friday prayer leader of Qom.', influence: 'medium' },
+  { id: 'mojtaba', label: 'Mojtaba Khamenei', group: 'succession', x: 700, y: 290, description: 'Son of Supreme Leader Ali Khamenei. Mid-ranking cleric. Has never held formal government position but is considered influential within the system.', influence: 'medium' },
+  { id: 'hassan_k', label: 'Hassan Khomeini', group: 'succession', x: 600, y: 380, description: 'Grandson of Ayatollah Ruhollah Khomeini, founder of the Islamic Republic. Cleric based in Qom. Generally associated with reformist positions.', influence: 'medium' },
+  { id: 'arafi', label: 'Alireza Arafi', group: 'succession', x: 750, y: 200, description: 'Deputy Chairman of the Assembly of Experts. Member of the Guardian Council. Friday prayer leader of Qom.', influence: 'medium' },
   
   // External Actors
-  { id: 'trump', label: 'Donald Trump', group: 'external', x: 200, y: 480, description: 'President of the United States. Has issued public statements regarding Iran protests and authorized military strikes on Iranian nuclear facilities in 2025.', influence: 'high' },
-  { id: 'israel', label: 'Benjamin Netanyahu', group: 'external', x: 320, y: 520, description: 'Prime Minister of Israel. Has overseen military operations against Iran and Iranian-backed groups during ongoing regional conflict.', influence: 'high' },
-  { id: 'irgc', label: 'IRGC', group: 'regime', x: 500, y: 180, description: 'Islamic Revolutionary Guard Corps. Branch of Iran\'s military reporting directly to the Supreme Leader. Also involved in economic and intelligence activities.', influence: 'critical' },
+  { id: 'trump', label: 'Donald Trump', group: 'external', x: 200, y: 400, description: 'President of the United States. Has issued public statements regarding Iran protests and authorized military strikes on Iranian nuclear facilities in 2025.', influence: 'high' },
+  { id: 'israel', label: 'Benjamin Netanyahu', group: 'external', x: 320, y: 440, description: 'Prime Minister of Israel. Has overseen military operations against Iran and Iranian-backed groups during ongoing regional conflict.', influence: 'high' },
+  { id: 'irgc', label: 'IRGC', group: 'regime', x: 500, y: 120, description: 'Islamic Revolutionary Guard Corps. Branch of Iran\'s military reporting directly to the Supreme Leader. Also involved in economic and intelligence activities.', influence: 'critical' },
   
   // Organizations
-  { id: 'ncri', label: 'NCRI / MEK', group: 'opposition', x: 80, y: 420, description: 'National Council of Resistance of Iran. Parliament-in-exile led by Rajavi. Controversial, limited internal support.', influence: 'low' },
-  { id: 'assembly', label: 'Assembly of Experts', group: 'regime', x: 750, y: 450, description: 'Body of 88 elected clerics constitutionally responsible for selecting, monitoring, and if necessary dismissing the Supreme Leader.', influence: 'medium' },
+  { id: 'ncri', label: 'NCRI / MEK', group: 'opposition', x: 80, y: 350, description: 'National Council of Resistance of Iran. Parliament-in-exile led by Rajavi. Controversial, limited internal support.', influence: 'low' },
+  { id: 'assembly', label: 'Assembly of Experts', group: 'regime', x: 750, y: 380, description: 'Body of 88 elected clerics constitutionally responsible for selecting, monitoring, and if necessary dismissing the Supreme Leader.', influence: 'medium' },
 ];
 
 const edges = [
@@ -340,14 +340,14 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       
       // Convert screen coordinates to SVG coordinates accounting for zoom and pan
       const scaleX = 800 / svgWidth / zoom;
-      const scaleY = 560 / svgHeight / zoom;
+      const scaleY = 520 / svgHeight / zoom;
       
       const x = (e.clientX - rect.left) * scaleX - pan.x / zoom;
       const y = (e.clientY - rect.top) * scaleY - pan.y / zoom;
       
       setNodePositions(prev => ({
         ...prev,
-        [dragging]: { x: Math.max(60, Math.min(740, x)), y: Math.max(40, Math.min(520, y)) }
+        [dragging]: { x: Math.max(60, Math.min(740, x)), y: Math.max(40, Math.min(480, y)) }
       }));
     }
     
@@ -574,7 +574,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '16px' }}>
         
         {/* Graph Area */}
-        <div style={{ flex: '1 1 600px', minWidth: '300px', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
+        <div style={{ flex: '1 1 500px', minWidth: '300px', maxWidth: '65%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
           {/* Zoom Controls */}
           <div style={{
             position: 'absolute',
@@ -642,29 +642,9 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
             </button>
           </div>
           
-          {/* Pan/Zoom hint - positioned over the SVG */}
-          {!isMobile && (
-            <div style={{
-              position: 'absolute',
-              bottom: '70px',
-              left: '10px',
-              zIndex: 10,
-              fontSize: '10px',
-              color: theme.textFaint,
-              fontFamily: "Arial, sans-serif",
-              background: theme.svgBg,
-              padding: '6px 10px',
-              borderRadius: '4px',
-              border: `1px solid ${theme.cardBorder}`,
-              pointerEvents: 'none',
-            }}>
-              Drag background to pan • Drag nodes to move • Use +/− to zoom
-            </div>
-          )}
-          
           <svg
             ref={svgRef}
-            viewBox="0 0 800 560"
+            viewBox="0 0 800 520"
             style={{
               width: '100%',
               maxHeight: 'calc(100vh - 280px)',
@@ -688,6 +668,13 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               <path d="M 40 0 L 0 0 0 40" fill="none" stroke={theme.gridStroke} strokeWidth="0.5"/>
             </pattern>
             <rect width="100%" height="100%" fill="url(#grid)" />
+            
+            {/* Hint text inside SVG */}
+            {!isMobile && (
+              <text x="10" y="510" fill={theme.textFaint} fontSize="9" fontFamily="Arial, sans-serif" opacity="0.7">
+                Drag background to pan • Drag nodes to move • Use +/− to zoom
+              </text>
+            )}
             
             {/* Pannable/Zoomable content group */}
             <g transform={`translate(${pan.x / zoom}, ${pan.y / zoom}) scale(${zoom})`}>
@@ -822,7 +809,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         </div>
 
         {/* Right Panel */}
-        <div style={{ flex: '0 0 340px', minWidth: '280px' }}>
+        <div style={{ flex: '1 1 380px', minWidth: '320px' }}>
           
           {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${theme.cardBorder}`, marginBottom: '12px' }}>
