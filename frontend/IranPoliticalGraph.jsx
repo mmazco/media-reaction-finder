@@ -494,7 +494,6 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       <header style={{
         marginBottom: '0',
         padding: isMobile ? '0' : '0 0 20px 0',
-        borderBottom: `1px solid ${theme.cardBorder}`,
       }}>
         <div style={{
           display: 'flex',
@@ -562,7 +561,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       </header>
 
       {/* Filters */}
-      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '6px', marginBottom: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
         {['all', 'opposition', 'reformist', 'regime', 'succession', 'external'].map(f => (
           <button key={f} className={`filter-btn-${darkMode ? 'dark' : 'light'} ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
             {f}
@@ -574,7 +573,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '16px' }}>
         
         {/* Graph Area */}
-        <div style={{ flex: '1 1 500px', minWidth: '300px', maxWidth: '65%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
+        <div style={{ flex: '1 1 550px', minWidth: '300px', maxWidth: '70%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
           {/* Zoom Controls */}
           <div style={{
             position: 'absolute',
@@ -809,7 +808,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         </div>
 
         {/* Right Panel */}
-        <div style={{ flex: '1 1 380px', minWidth: '320px' }}>
+        <div style={{ flex: '0 0 300px', minWidth: '280px' }}>
           
           {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${theme.cardBorder}`, marginBottom: '12px' }}>
