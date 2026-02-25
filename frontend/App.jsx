@@ -2307,6 +2307,7 @@ export default function App() {
               </h2>
               {[
                 { label: "What's happening in Iran?", action: () => navigate('/trending/iran'), beta: true },
+                { label: 'The 2028 Global Intelligence Crisis', action: () => { const u = 'https://www.citriniresearch.com/p/2028gic'; setQuery(u); updateURL(u); performSearch(u); } },
                 { label: 'Faith in Silicon Valley', action: () => { const u = 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion'; setQuery(u); updateURL(u); performSearch(u); } },
                 { label: 'AI & decentralized governance', action: () => { const u = 'https://blog.cosmos-institute.org/p/coasean-bargaining-at-scale'; setQuery(u); updateURL(u); performSearch(u); } },
                 { label: 'Machines of loving grace', action: () => { const u = 'https://darioamodei.com/machines-of-loving-grace'; setQuery(u); updateURL(u); performSearch(u); } }
