@@ -88,6 +88,26 @@ def add_file_download_flags(results):
         result['is_file_download'] = is_file_download_url(url)
     return results
 
+# Manually curated response articles that supplement automated search results.
+# Keyed by the searched article URL; values are lists of known reactions.
+CURATED_REACTIONS = {
+    'https://www.citriniresearch.com/p/2028gic': {
+        'substack': [
+            {
+                'title': 'BRANDS VS. AGENTS',
+                'url': 'https://substack.com/home/post/p-189128583',
+                'summary': (
+                    "Nemesis Memos responds to Citrini Research's viral piece on the 2028 Global "
+                    "Intelligence Crisis, exploring what agentic AI commerce means for brands — "
+                    "arguing that when AI agents handle purchasing decisions, habitual brand loyalty "
+                    "becomes a tax and brand value migrates upstream to the agent layer."
+                ),
+                'type': 'Substack',
+            },
+        ],
+    },
+}
+
 _CATEGORY_LABELS = ["Mainstream Coverage", "Analysis", "Opinion"]
 
 def classify_web_results(results, article_title=None):
@@ -706,16 +726,43 @@ Highlight the main points and key information. Use the author's name from the ti
             reddit_results = reddit_future.result(timeout=30)
             substack_results = substack_future.result(timeout=30)
         
-        # Filter out results from the same domain if query is a URL (backup filter)
+        # Filter out the original article from ALL result types when searching by URL
         if query.startswith('http'):
             try:
-                query_domain = urlparse(query).netloc.replace('www.', '').lower()
-                news_results = [
-                    result for result in news_results 
-                    if result.get('url', '') != query and 
-                    urlparse(result.get('url', '')).netloc.replace('www.', '').lower() != query_domain
-                ]
-                print(f"🔍 Filtered out results from domain: {query_domain}")
+                query_parsed = urlparse(query)
+                query_domain = query_parsed.netloc.replace('www.', '').lower()
+                query_path = query_parsed.path.rstrip('/').lower()
+                query_normalized = query.rstrip('/').lower()
+                
+                # Extract slug from path for cross-domain matching (e.g. "2028gic" from "/p/2028gic")
+                query_slug = query_path.rsplit('/', 1)[-1] if '/' in query_path else ''
+                
+                def is_self_reference(result_url):
+                    """Check if a result URL points to the original article being searched."""
+                    if not result_url:
+                        return False
+                    url_normalized = result_url.split('?')[0].rstrip('/').lower()
+                    if url_normalized == query_normalized.split('?')[0].rstrip('/'):
+                        return True
+                    result_parsed = urlparse(result_url.lower())
+                    result_domain = result_parsed.netloc.replace('www.', '')
+                    if result_domain == query_domain:
+                        return True
+                    # Catch Substack open.substack.com/pub/AUTHOR/p/SLUG mirrors
+                    # e.g. citriniresearch.com/p/2028gic → open.substack.com/pub/citrini/p/2028gic
+                    if query_slug and 'substack.com' in result_domain:
+                        result_path = result_parsed.path.rstrip('/')
+                        if f'/p/{query_slug}' in result_path:
+                            return True
+                    return False
+                
+                pre_web = len(news_results)
+                pre_sub = len(substack_results)
+                news_results = [r for r in news_results if not is_self_reference(r.get('url', ''))]
+                substack_results = [r for r in substack_results if not is_self_reference(r.get('url', ''))]
+                filtered = (pre_web - len(news_results)) + (pre_sub - len(substack_results))
+                if filtered:
+                    print(f"🔍 Filtered out {filtered} self-reference(s) from domain: {query_domain}")
             except Exception as e:
                 print(f"Warning: Could not parse URL for filtering: {e}")
         
@@ -749,6 +796,19 @@ Highlight the main points and key information. Use the author's name from the ti
             r for r in news_results
             if (r.get('title') or '').lower().strip() not in other_titles
         ]
+        
+        # Inject curated reaction articles that search engines may not have indexed yet
+        curated = CURATED_REACTIONS.get(query.rstrip('/'), {})
+        if curated:
+            existing_urls = {(r.get('url') or '').split('?')[0].rstrip('/').lower()
+                            for r in news_results + substack_results + reddit_results}
+            for r in curated.get('substack', []):
+                if r['url'].split('?')[0].rstrip('/').lower() not in existing_urls:
+                    substack_results.insert(0, r)
+            for r in curated.get('web', []):
+                if r['url'].split('?')[0].rstrip('/').lower() not in existing_urls:
+                    news_results.insert(0, r)
+            print(f"📌 Injected curated reactions for: {query[:50]}")
         
         # Add file download flags to web results for security warnings
         news_results = add_file_download_flags(news_results)

@@ -2333,47 +2333,26 @@ export default function App() {
               ))}
             </div>
 
-            {/* Loading state for curated feed */}
-            {curatedLoading && curatedFeed.length === 0 && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '20px',
-                backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
-                borderRadius: '5px',
-                marginBottom: '32px'
-              }}>
-                <div style={{
-                  width: '18px',
-                  height: '18px',
-                  border: `2px solid ${darkMode ? '#333' : '#ddd'}`,
-                  borderTop: `2px solid ${darkMode ? '#888' : '#666'}`,
-                  borderRadius: '50%',
-                  animation: 'spin 1s linear infinite',
-                  flexShrink: 0
-                }} />
-                <span style={{
-                  fontSize: '14px',
-                  color: darkMode ? '#888' : '#666',
-                  fontFamily: 'Arial, sans-serif',
-                  fontStyle: 'italic'
-                }}>
-                  Loading top discussions from Reddit...
-                </span>
-              </div>
-            )}
-
             {/* Curated Subreddit Feed — one at a time */}
-            {curatedFeed.length > 0 && (() => {
+            {(() => {
               const subredditDescriptions = {
                 'worldnews': 'Breaking international news and current affairs from around the globe',
                 'CriticalTheory': 'Philosophy, cultural critique, and deep analysis of society and power',
                 'AI_Agents': 'Building, deploying, and discussing autonomous AI systems',
                 'PredictionsMarkets': 'Forecasting events through prediction markets and collective intelligence'
               };
-              const channel = curatedFeed[curatedIndex % curatedFeed.length];
-              const desc = subredditDescriptions[channel.subreddit] || '';
+              const defaultSubs = [
+                { label: 'r/worldnews', subreddit: 'worldnews' },
+                { label: 'r/CriticalTheory', subreddit: 'CriticalTheory' },
+                { label: 'r/AI_Agents', subreddit: 'AI_Agents' },
+                { label: 'r/PredictionsMarkets', subreddit: 'PredictionsMarkets' },
+              ];
+              const tabs = curatedFeed.length > 0 ? curatedFeed : defaultSubs;
+              const channel = curatedFeed.length > 0 ? curatedFeed[curatedIndex % curatedFeed.length] : null;
+              const desc = channel ? (subredditDescriptions[channel.subreddit] || '') : (subredditDescriptions[tabs[curatedIndex % tabs.length]?.subreddit] || subredditDescriptions['worldnews']);
+              const isLoading = curatedLoading;
+              const hasNoPosts = !isLoading && (!channel || channel.posts.filter(p => p.num_comments > 0).length === 0);
+
               return (
                 <div style={{ marginBottom: '44px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
@@ -2387,7 +2366,7 @@ export default function App() {
                       Top discussions
                     </h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      {curatedFeed.map((ch, ci) => (
+                      {tabs.map((ch, ci) => (
                         <button
                           key={ci}
                           onClick={() => setCuratedIndex(ci)}
@@ -2395,10 +2374,10 @@ export default function App() {
                             padding: '4px 10px',
                             fontSize: '12px',
                             fontFamily: 'Arial, sans-serif',
-                            border: `1px solid ${ci === curatedIndex % curatedFeed.length ? (darkMode ? '#fff' : '#1a1a1a') : (darkMode ? '#333' : '#ddd')}`,
+                            border: `1px solid ${ci === curatedIndex % tabs.length ? (darkMode ? '#fff' : '#1a1a1a') : (darkMode ? '#333' : '#ddd')}`,
                             borderRadius: '4px',
-                            backgroundColor: ci === curatedIndex % curatedFeed.length ? (darkMode ? '#fff' : '#1a1a1a') : 'transparent',
-                            color: ci === curatedIndex % curatedFeed.length ? (darkMode ? '#1a1a1a' : '#fff') : (darkMode ? '#888' : '#666'),
+                            backgroundColor: ci === curatedIndex % tabs.length ? (darkMode ? '#fff' : '#1a1a1a') : 'transparent',
+                            color: ci === curatedIndex % tabs.length ? (darkMode ? '#1a1a1a' : '#fff') : (darkMode ? '#888' : '#666'),
                             cursor: 'pointer',
                             transition: 'all 0.2s ease'
                           }}
@@ -2420,6 +2399,54 @@ export default function App() {
                     </p>
                   )}
 
+                  {isLoading && (
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '20px',
+                      backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                      borderRadius: '5px',
+                    }}>
+                      <div style={{
+                        width: '16px',
+                        height: '16px',
+                        border: `2px solid ${darkMode ? '#333' : '#ddd'}`,
+                        borderTop: `2px solid ${darkMode ? '#888' : '#666'}`,
+                        borderRadius: '50%',
+                        animation: 'spin 1s linear infinite',
+                        flexShrink: 0
+                      }} />
+                      <span style={{
+                        fontSize: '13px',
+                        color: darkMode ? '#888' : '#666',
+                        fontFamily: 'Arial, sans-serif',
+                        fontStyle: 'italic'
+                      }}>
+                        Loading top discussions...
+                      </span>
+                    </div>
+                  )}
+
+                  {hasNoPosts && (
+                    <div style={{
+                      padding: '20px',
+                      backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
+                      borderRadius: '5px',
+                      textAlign: 'center'
+                    }}>
+                      <span style={{
+                        fontSize: '13px',
+                        color: darkMode ? '#666' : '#999',
+                        fontFamily: 'Arial, sans-serif',
+                        fontStyle: 'italic'
+                      }}>
+                        Discussions temporarily unavailable — check back shortly
+                      </span>
+                    </div>
+                  )}
+
+                  {channel && channel.posts.filter(p => p.num_comments > 0).length > 0 && (
                   <div style={{
                     backgroundColor: darkMode ? '#1e1e1e' : '#f8f8f8',
                     borderRadius: '5px',
@@ -2505,6 +2532,7 @@ export default function App() {
                       </div>
                     ))}
                   </div>
+                  )}
                 </div>
               );
             })()}
