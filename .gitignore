@@ -1,6 +1,9 @@
 # Cursor IDE
 .cursor/
 
+# Internal docs (roadmap, plans, user feedback — not public)
+docs/
+
 # Environment variables
 .env
 .env.local
