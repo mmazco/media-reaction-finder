@@ -16,6 +16,18 @@ const predictionMarkets = [
     resolved: true,
   },
   {
+    id: 'khamenei-out-feb28',
+    title: 'Khamenei out by February 28?',
+    probability: 48,
+    previousProb: 1,
+    volume: '$27.5M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-february-28',
+    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
+    trend: 'up',
+    isNew: true,
+  },
+  {
     id: 'khamenei-out-mar31',
     title: 'Khamenei out as Supreme Leader by March 31?',
     probability: 96,

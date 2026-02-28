@@ -2572,7 +2572,7 @@ export default function App() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {/* Polymarket — Khamenei out */}
+                  {/* Polymarket — Khamenei out by Feb 28 */}
                   <div style={{
                     flex: '1 1 250px',
                     padding: '16px',
@@ -2580,14 +2580,15 @@ export default function App() {
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
-                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$27.8M vol.</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$27.5M vol.</span>
+                      <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#ef4444', color: '#fff', fontWeight: '700', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>LIVE</span>
                     </div>
                     <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
-                      Khamenei out by March 31?
+                      Khamenei out by February 28?
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontSize: '28px', fontWeight: '700', color: darkMode ? '#fff' : '#1a1a1a', fontFamily: 'Arial, sans-serif' }}>96%</span>
-                      <span style={{ fontSize: '12px', fontWeight: '600', fontFamily: 'Arial, sans-serif', color: '#22c55e' }}>{'\u25B2'} 76pts</span>
+                      <span style={{ fontSize: '28px', fontWeight: '700', color: darkMode ? '#fff' : '#1a1a1a', fontFamily: 'Arial, sans-serif' }}>48%</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', fontFamily: 'Arial, sans-serif', color: '#22c55e' }}>{'\u25B2'} 47pts today</span>
                     </div>
                   </div>
                   {/* Kalshi — Trading Paused */}
@@ -2625,7 +2626,7 @@ export default function App() {
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#22c55e' }}>{'\u25B2'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei out by Mar 31</strong> surged from 20% to 96% (+76pts) — near-certain</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei out by Feb 28</strong> spiked +47pts today to 48% — coin flip on whether he's out by tonight</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#22c55e' }}>{'\u25B2'}</span>
@@ -2633,7 +2634,7 @@ export default function App() {
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    Everything has inverted since Feb 23. Confirmed US strikes have repriced all Iran markets — Khamenei's removal is now treated as near-certain (96–98%), and regime collapse has flipped to majority expectation (61%). Kalshi has paused all Iran market trading; Polymarket remains the only active venue.
+                    Confirmed US strikes have repriced all Iran markets. Khamenei's removal by March 31 is now priced at 96%, and the Feb 28 deadline market surged 47pts today. Kalshi has paused all Iran market trading; Polymarket remains the only active venue.
                   </p>
                 </div>
 
