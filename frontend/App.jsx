@@ -2572,49 +2572,40 @@ export default function App() {
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {[
-                    { title: 'Khamenei out by March 31?', prob: 96, prev: 20, volume: '$27.8M', platform: 'Polymarket', change: 76 },
-                    { title: 'Regime fall before 2027?', prob: 61, prev: 37, volume: '$5.8M', platform: 'Polymarket', change: 24 },
-                  ].map((poll, i) => (
-                    <div key={i} style={{
-                      flex: '1 1 250px',
-                      padding: '16px',
-                      borderRight: i === 0 ? `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}` : 'none',
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                        <span style={{
-                          fontSize: '10px',
-                          padding: '2px 6px',
-                          borderRadius: '3px',
-                          backgroundColor: poll.platform === 'Polymarket' ? '#1652F0' : '#00D26A',
-                          color: '#fff',
-                          fontWeight: '600',
-                          fontFamily: 'Arial, sans-serif'
-                        }}>
-                          {poll.platform}
-                        </span>
-                        <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>
-                          {poll.volume} vol.
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
-                        {poll.title}
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{ fontSize: '28px', fontWeight: '700', color: darkMode ? '#fff' : '#1a1a1a', fontFamily: 'Arial, sans-serif' }}>
-                          {poll.prob}%
-                        </span>
-                        <span style={{
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          fontFamily: 'Arial, sans-serif',
-                          color: poll.change > 0 ? '#22c55e' : poll.change < 0 ? '#ef4444' : (darkMode ? '#666' : '#999')
-                        }}>
-                          {poll.change > 0 ? '\u25B2' : poll.change < 0 ? '\u25BC' : '\u2014'} {poll.change !== 0 ? `${Math.abs(poll.change)}pts` : 'No change'}
-                        </span>
-                      </div>
+                  {/* Polymarket — Khamenei out */}
+                  <div style={{
+                    flex: '1 1 250px',
+                    padding: '16px',
+                    borderRight: `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}`,
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$27.8M vol.</span>
                     </div>
-                  ))}
+                    <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
+                      Khamenei out by March 31?
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                      <span style={{ fontSize: '28px', fontWeight: '700', color: darkMode ? '#fff' : '#1a1a1a', fontFamily: 'Arial, sans-serif' }}>96%</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', fontFamily: 'Arial, sans-serif', color: '#22c55e' }}>{'\u25B2'} 76pts</span>
+                    </div>
+                  </div>
+                  {/* Kalshi — Trading Paused */}
+                  <div style={{
+                    flex: '1 1 250px',
+                    padding: '16px',
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                      <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#00D26A', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Kalshi</span>
+                      <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#f59e0b', color: '#000', fontWeight: '700', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>PAUSED</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
+                      All Iran markets — trading halted
+                    </div>
+                    <div style={{ fontSize: '12px', color: darkMode ? '#888' : '#666', fontFamily: 'Arial, sans-serif', lineHeight: '1.5' }}>
+                      Kalshi has suspended trading on Khamenei exit, successor, Pahlavi, Strait of Hormuz, and nuclear deal markets following confirmed US strikes on Feb 28.
+                    </div>
+                  </div>
                 </div>
 
                 {/* Analysis summary - greyed out box matching Reddit AI summary style */}
