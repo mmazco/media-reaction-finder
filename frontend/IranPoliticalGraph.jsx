@@ -4,11 +4,23 @@ import { useNavigate } from 'react-router-dom';
 // Prediction market data - linked to entities
 const predictionMarkets = [
   {
+    id: 'us-strikes-iran-resolved',
+    title: 'US strikes Iran — RESOLVED YES (Feb 28)',
+    probability: 100,
+    previousProb: 63,
+    volume: '$529M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/us-strikes-iran-by',
+    linkedEntities: ['trump', 'israel', 'irgc', 'khamenei'],
+    trend: 'up',
+    resolved: true,
+  },
+  {
     id: 'khamenei-out-mar31',
     title: 'Khamenei out as Supreme Leader by March 31?',
-    probability: 20,
-    previousProb: 19,
-    volume: '$16M',
+    probability: 96,
+    previousProb: 20,
+    volume: '$27.8M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-march-31',
     linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
@@ -17,35 +29,72 @@ const predictionMarkets = [
   {
     id: 'khamenei-out-2026',
     title: 'Khamenei out as Supreme Leader in 2026?',
-    probability: 48,
-    previousProb: 64,
-    volume: '$2.8M',
+    probability: 98,
+    previousProb: 48,
+    volume: '$3.8M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-december-31-2026',
     linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
-    trend: 'down',
+    trend: 'up',
   },
   {
     id: 'regime-fall-2026',
     title: 'Will the Iranian regime fall before 2027?',
-    probability: 37,
-    previousProb: 54,
-    volume: '$4.8M',
+    probability: 61,
+    previousProb: 37,
+    volume: '$5.8M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-the-end-of-2026',
     linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
-    trend: 'down',
+    trend: 'up',
   },
   {
-    id: 'us-strikes-iran-mar31',
-    title: 'US strikes Iran by March 31, 2026?',
-    probability: 63,
-    previousProb: 63,
-    volume: '$15M',
+    id: 'regime-fall-mar31',
+    title: 'Will the Iranian regime fall by March 31?',
+    probability: 42,
+    previousProb: null,
+    volume: '$9.4M',
     platform: 'polymarket',
-    url: 'https://polymarket.com/event/us-strikes-iran-by',
-    linkedEntities: ['trump', 'israel', 'irgc', 'khamenei'],
-    trend: 'flat',
+    url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-march-31',
+    linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
+    trend: 'up',
+    isNew: true,
+  },
+  {
+    id: 'iran-coup-jun30',
+    title: 'Iran coup attempt by June 30?',
+    probability: 75,
+    previousProb: null,
+    volume: '$94K',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/iran-coup-attempt-by-june-30',
+    linkedEntities: ['irgc', 'khamenei', 'assembly'],
+    trend: 'up',
+    isNew: true,
+  },
+  {
+    id: 'regime-survive-strikes',
+    title: 'Will the Iranian regime survive US strikes?',
+    probability: 47,
+    previousProb: null,
+    volume: '$197K',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/will-the-iranian-regime-survive-us-military-strikes-741',
+    linkedEntities: ['trump', 'irgc', 'khamenei'],
+    trend: 'down',
+    isNew: true,
+  },
+  {
+    id: 'successor-named-mar6',
+    title: 'Will Iran name a successor to Khamenei by March 6?',
+    probability: 76,
+    previousProb: null,
+    volume: 'New',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/will-iran-name-a-successor-to-khamenei-by',
+    linkedEntities: ['mojtaba', 'hassan_k', 'khamenei', 'assembly'],
+    trend: 'up',
+    isNew: true,
   },
   {
     id: 'pahlavi-visit',
@@ -245,8 +294,18 @@ const MarketCard = ({ market, isHighlighted, compact = false, darkMode = true })
             lineHeight: 1.4,
             marginBottom: '6px',
             fontFamily: 'Arial, sans-serif',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            flexWrap: 'wrap',
           }}>
-            {market.title}
+            <span>{market.title}</span>
+            {market.resolved && (
+              <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '3px', backgroundColor: '#ef4444', color: '#fff', fontWeight: 700, letterSpacing: '0.3px' }}>RESOLVED</span>
+            )}
+            {market.isNew && (
+              <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '3px', backgroundColor: '#3b82f6', color: '#fff', fontWeight: 700, letterSpacing: '0.3px' }}>NEW</span>
+            )}
           </div>
           
           {market.probability !== null ? (
@@ -254,10 +313,10 @@ const MarketCard = ({ market, isHighlighted, compact = false, darkMode = true })
               <div style={{
                 fontSize: compact ? '18px' : '22px',
                 fontWeight: 600,
-                color: market.probability > 50 ? '#4caf50' : market.probability > 30 ? accent : '#e57373',
+                color: market.resolved ? '#ef4444' : market.probability > 50 ? '#4caf50' : market.probability > 30 ? accent : '#e57373',
                 fontFamily: "Arial, sans-serif",
               }}>
-                {market.probability}%
+                {market.resolved ? 'YES' : `${market.probability}%`}
               </div>
               {change !== 0 && (
                 <div style={{
@@ -265,8 +324,8 @@ const MarketCard = ({ market, isHighlighted, compact = false, darkMode = true })
                   color: change > 0 ? '#4caf50' : '#f44336',
                   fontFamily: "Arial, sans-serif",
                 }}>
-                  {change > 0 ? '+' : ''}{change}%
-                  <TrendArrow trend={market.trend} />
+                  {market.resolved ? '$529M vol' : `${change > 0 ? '+' : ''}${change}%`}
+                  {!market.resolved && <TrendArrow trend={market.trend} />}
                 </div>
               )}
             </div>
@@ -523,7 +582,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               margin: '6px 0 0',
               fontFamily: 'Arial, sans-serif'
             }}>
-              Social Graph + Live Prediction Markets — February 2026
+              Social Graph + Live Prediction Markets — Updated Feb 28, 2026
             </p>
           </div>
           
@@ -811,30 +870,30 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               Prediction Market Analysis
             </div>
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 12px 0', fontFamily: 'Arial, sans-serif' }}>
-              Comparing January/early February polls to current February 2026 data, several key markets have shifted significantly on Polymarket and Kalshi.
+              <strong style={{ color: '#ef4444' }}>Major development:</strong> US strikes on Iran resolved YES on February 28, 2026 — the largest prediction market on Iran ($529M volume) has confirmed military action. All Iran markets have shifted dramatically in the 5 days since our last update.
             </p>
 
             <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: theme.text }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
-                <span><strong>Regime fall before 2027</strong> — dropped from 54% to <strong style={{ color: theme.accent }}>37%</strong> <span style={{ color: theme.textMuted }}>(−17pts)</span>. The largest move across Iran markets. Despite heightened rhetoric, traders appear less convinced of full regime collapse.</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
-                <span><strong>Khamenei out by end of 2026</strong> — fell from 64% to <strong style={{ color: theme.accent }}>48%</strong> <span style={{ color: theme.textMuted }}>(−16pts)</span>. A notable pullback from highs seen in January, suggesting the timeline for a leadership change has lengthened.</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: theme.textMuted, fontSize: '13px' }}>&#9644;</span>
-                <span><strong>US strikes Iran by March 31</strong> — holding steady at <strong style={{ color: theme.accent }}>63%</strong> <span style={{ color: theme.textMuted }}>(0pts)</span>. Still the highest-conviction near-term bet, with $15M in volume on this date alone and $383M across all strike dates.</span>
+                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9673;</span>
+                <span><strong>US strikes Iran</strong> — <strong style={{ color: '#ef4444' }}>RESOLVED YES</strong> on Feb 28. Market closed. $529M total volume, $89.6M on the Feb 28 date alone. The strikes that markets had been pricing for months have now materialized.</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
                 <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
-                <span><strong>Khamenei out by March 31</strong> — ticked up from 19% to <strong style={{ color: theme.accent }}>20%</strong> <span style={{ color: theme.textMuted }}>(+1pt)</span>. Minimal movement. Markets see a near-term exit as unlikely but not impossible.</span>
+                <span><strong>Khamenei out by March 31</strong> — surged from 20% to <strong style={{ color: theme.accent }}>96%</strong> <span style={{ color: theme.textMuted }}>(+76pts)</span>. The most dramatic move. Markets now treat Khamenei's removal within weeks as near-certain.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
+                <span><strong>Khamenei out by end of 2026</strong> — jumped from 48% to <strong style={{ color: theme.accent }}>98%</strong> <span style={{ color: theme.textMuted }}>(+50pts)</span>. Near-total certainty. "Nothing Ever Happens: Khamenei" collapsed to just 5%.</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
+                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
+                <span><strong>Regime fall before 2027</strong> — surged from 37% to <strong style={{ color: theme.accent }}>61%</strong> <span style={{ color: theme.textMuted }}>(+24pts)</span>. Majority now expects full regime collapse, reversing the earlier decline. "Will the regime survive US strikes?" sits at just 47%.</span>
               </div>
             </div>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '12px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-              The overall trend: markets are pricing in sustained military pressure (US strikes remain elevated) but have cooled on the prospect of internal regime change happening quickly. The gap between strike probability (63%) and regime fall (37%) implies traders expect military action without necessarily toppling the government.
+              The picture has inverted completely from 5 days ago. Markets had been cooling on regime change — now, following confirmed US strikes, traders price Khamenei's removal at 96–98% and regime collapse at 61%. The successor question is live: Polymarket shows a 51% chance Iran names a successor by March 6. The speed of this repricing — from skepticism to near-certainty in under a week — reflects how dramatically the strikes have reshaped expectations.
             </p>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>

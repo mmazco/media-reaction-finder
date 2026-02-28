@@ -2568,13 +2568,13 @@ export default function App() {
                 {/* Top 2 polls */}
                 <div style={{ padding: '10px 16px 0', textAlign: 'right' }}>
                   <span style={{ fontSize: '10px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>
-                    Updated Feb 23, 2026
+                    Updated Feb 28, 2026
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                   {[
-                    { title: 'US strikes Iran by March 31?', prob: 63, prev: 63, volume: '$15M', platform: 'Polymarket', change: 0 },
-                    { title: 'Khamenei out as Supreme Leader in 2026?', prob: 48, prev: 64, volume: '$2.8M', platform: 'Polymarket', change: -16 },
+                    { title: 'Khamenei out by March 31?', prob: 96, prev: 20, volume: '$27.8M', platform: 'Polymarket', change: 76 },
+                    { title: 'Regime fall before 2027?', prob: 61, prev: 37, volume: '$5.8M', platform: 'Polymarket', change: 24 },
                   ].map((poll, i) => (
                     <div key={i} style={{
                       flex: '1 1 250px',
@@ -2629,20 +2629,20 @@ export default function App() {
                   </div>
                   <div style={{ fontSize: '12px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: darkMode ? '#aaa' : '#555' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Regime fall before 2027</strong> dropped from 54% to 37% ({'\u2212'}17pts) — largest move across Iran markets</span>
+                      <span style={{ color: '#ef4444' }}>{'\u25CF'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>US strikes Iran</strong> — resolved YES on Feb 28. $529M volume. Strikes confirmed.</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei out by 2026</strong> fell from 64% to 48% ({'\u2212'}16pts) — timeline for leadership change has lengthened</span>
+                      <span style={{ color: '#22c55e' }}>{'\u25B2'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei out by Mar 31</strong> surged from 20% to 96% (+76pts) — near-certain</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ color: darkMode ? '#666' : '#999' }}>{'\u2014'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>US strikes by Mar 31</strong> steady at 63% — highest-conviction near-term bet with $383M total volume</span>
+                      <span style={{ color: '#22c55e' }}>{'\u25B2'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Regime fall before 2027</strong> surged from 37% to 61% (+24pts) — majority expects collapse</span>
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    Markets are pricing sustained military pressure but have cooled on quick regime change. The gap between strike probability (63%) and regime fall (37%) implies traders expect military action without toppling the government.
+                    Everything has inverted since Feb 23. Confirmed US strikes have repriced all Iran markets — Khamenei's removal is now treated as near-certain (96–98%), and regime collapse has flipped to majority expectation (61%).
                   </p>
                 </div>
 
