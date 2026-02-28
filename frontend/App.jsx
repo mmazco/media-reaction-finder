@@ -2557,7 +2557,7 @@ export default function App() {
                 margin: '0 0 16px',
                 lineHeight: '1.4'
               }}>
-                Live prediction market odds from Polymarket and Kalshi on Iran-related events
+                Live prediction market odds on Iran-related events — Polymarket active, Kalshi paused
               </p>
 
               <div style={{
@@ -2642,7 +2642,7 @@ export default function App() {
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    Everything has inverted since Feb 23. Confirmed US strikes have repriced all Iran markets — Khamenei's removal is now treated as near-certain (96–98%), and regime collapse has flipped to majority expectation (61%).
+                    Everything has inverted since Feb 23. Confirmed US strikes have repriced all Iran markets — Khamenei's removal is now treated as near-certain (96–98%), and regime collapse has flipped to majority expectation (61%). Kalshi has paused all Iran market trading; Polymarket remains the only active venue.
                   </p>
                 </div>
 

@@ -106,6 +106,7 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxpahlavivisita/will-reza-pahlavi-enter-iran-before-september/kxpahlavivisita',
     linkedEntities: ['pahlavi'],
     trend: 'up',
+    paused: true,
   },
   {
     id: 'us-recognize-pahlavi',
@@ -117,6 +118,7 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxrecogpersoniran/recognize-reza-pahlavi/kxrecogpersoniran-26',
     linkedEntities: ['pahlavi', 'trump'],
     trend: 'up',
+    paused: true,
   },
   {
     id: 'next-supreme-leader',
@@ -131,6 +133,7 @@ const predictionMarkets = [
       { name: 'Position abolished', prob: 56 },
     ],
     trend: 'up',
+    paused: true,
   },
   {
     id: 'iran-nuclear-deal',
@@ -142,6 +145,7 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxusairanagreement/us-iran-nuclear-deal/kxusairanagreement-27',
     linkedEntities: ['trump', 'khamenei', 'pezeshkian'],
     trend: 'up',
+    paused: true,
   },
   {
     id: 'strait-hormuz',
@@ -153,6 +157,7 @@ const predictionMarkets = [
     url: 'https://kalshi.com/markets/kxclosehormuz/strait-of-hormuz/kxclosehormuz-27jan',
     linkedEntities: ['irgc', 'khamenei'],
     trend: 'up',
+    paused: true,
   },
 ];
 
@@ -305,6 +310,9 @@ const MarketCard = ({ market, isHighlighted, compact = false, darkMode = true })
             )}
             {market.isNew && (
               <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '3px', backgroundColor: '#3b82f6', color: '#fff', fontWeight: 700, letterSpacing: '0.3px' }}>NEW</span>
+            )}
+            {market.paused && (
+              <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '3px', backgroundColor: '#f59e0b', color: '#000', fontWeight: 700, letterSpacing: '0.3px' }}>PAUSED</span>
             )}
           </div>
           
@@ -893,7 +901,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
             </div>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '12px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-              The picture has inverted completely from 5 days ago. Markets had been cooling on regime change — now, following confirmed US strikes, traders price Khamenei's removal at 96–98% and regime collapse at 61%. The successor question is live: Polymarket shows a 51% chance Iran names a successor by March 6. The speed of this repricing — from skepticism to near-certainty in under a week — reflects how dramatically the strikes have reshaped expectations.
+              The picture has inverted completely from 5 days ago. Markets had been cooling on regime change — now, following confirmed US strikes, traders price Khamenei's removal at 96–98% and regime collapse at 61%. The successor question is live: Polymarket shows a 76% chance Iran names a successor by March 6. Kalshi has paused trading on all Iran-related markets (Khamenei exit, successor, Pahlavi, Hormuz, nuclear deal) — likely due to the rapidly evolving situation post-strikes. Polymarket remains the only active venue for Iran prediction markets.
             </p>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
