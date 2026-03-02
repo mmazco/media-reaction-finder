@@ -2,7 +2,7 @@
 
 Interactive verification map tracking US-Israeli strike locations in Tehran (Feb 28 – Mar 2, 2026). Cross-references 20+ outlets with a tiered confidence system.
 
-**Route:** `/trending/iran/strikes`
+**Route:** `/trending/iran/tehran`
 **Component:** `frontend/TehranStrikesMap.jsx`
 **Backend endpoint:** `/api/submit-strike` (in `app.py`)
 
@@ -52,7 +52,23 @@ If a previously `unverified` or `likely` strike gets confirmed by additional sou
 - Update the `counts` object
 - Update the description `t` field with new details
 
-### Airtable Table Schema For Submission 
+## Airtable Integration (Submissions)
+
+Form submissions from the "Suggest a Strike Location" button are sent to Airtable via the Flask backend.
+
+### Environment Variables
+
+| Variable | Description | Example |
+|---|---|---|
+| `AIRTABLE_PAT` | Personal Access Token | `patXXXX.XXXX` |
+| `AIRTABLE_BASE_ID` | Base ID from Airtable URL | `appXXXXXXXXXXX` |
+| `AIRTABLE_TABLE_NAME` | Table name (exact match) | `Tehran strikes feb-mar 2026` |
+
+These are set in:
+- `.env.local` (local dev)
+- Railway dashboard → Variables (production)
+
+### Airtable Table Schema
 
 | Column | Type | Notes |
 |---|---|---|
@@ -89,12 +105,22 @@ If Airtable is not configured (env vars missing), the endpoint returns 200 and t
 Strikes are tagged with a category for filtering context:
 `Leadership`, `Military`, `Government`, `Nuclear`, `Landmark`, `Civilian/Medical`, `Mixed`, `Downtown`, `Unknown`
 
+## Future Upgrades (when traffic justifies)
+
+- [ ] Replace SVG with Leaflet/Mapbox GL (lat/lng coordinates are real and ready)
+- [ ] Supabase backend for live database-driven updates (migration SQL exists in `/tmp/strikes-package/`)
+- [ ] Admin panel for reviewing submissions and adding strikes without code deploys
+- [ ] Real-time updates via Supabase Realtime subscriptions
+- [ ] Per-strike share links
+- [ ] RSS feed for new additions
+- [ ] Rate limiting on submissions endpoint
+
 ## File Dependencies
 
 | File | Role |
 |---|---|
 | `frontend/TehranStrikesMap.jsx` | Full component (data, UI, modals) |
-| `frontend/App.jsx` | Route at `/trending/iran/strikes`, navigation links |
+| `frontend/App.jsx` | Route at `/trending/iran/tehran`, navigation links |
 | `app.py` | `/api/submit-strike` endpoint |
 | `.env.local` | Airtable credentials (local) |
 

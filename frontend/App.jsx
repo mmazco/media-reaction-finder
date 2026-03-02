@@ -194,7 +194,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             {topic === 'iran' && (
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button
-                  onClick={() => navigate('/trending/iran/graph')}
+                  onClick={() => navigate('/trending/iran/markets')}
                   style={{
                     padding: '10px 16px',
                     fontSize: '11px',
@@ -210,7 +210,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                   Political map & markets
                 </button>
                 <button
-                  onClick={() => navigate('/trending/iran/strikes')}
+                  onClick={() => navigate('/trending/iran/tehran')}
                   style={{
                     padding: '10px 16px',
                     fontSize: '11px',
@@ -1950,7 +1950,7 @@ export default function App() {
       )}
 
       {/* Iran Political Graph Page */}
-      {location.pathname === '/trending/iran/graph' && (
+      {location.pathname === '/trending/iran/markets' && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1968,7 +1968,7 @@ export default function App() {
       )}
 
       {/* Tehran Strikes Map Page */}
-      {location.pathname === '/trending/iran/strikes' && (
+      {location.pathname === '/trending/iran/tehran' && (
         <div style={{
           position: 'fixed',
           top: 0,
@@ -1986,7 +1986,7 @@ export default function App() {
       )}
 
       {/* Trending Topic Reactions Page */}
-      {location.pathname.startsWith('/trending/') && !location.pathname.includes('/graph') && !location.pathname.includes('/strikes') && (
+      {location.pathname.startsWith('/trending/') && !location.pathname.includes('/markets') && !location.pathname.includes('/tehran') && (
         <TrendingTopicPage 
           darkMode={darkMode} 
           isMobile={isMobile} 
@@ -2683,7 +2683,7 @@ export default function App() {
                 {/* Link to full graph */}
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                   <div
-                    onClick={() => navigate('/trending/iran/graph')}
+                    onClick={() => navigate('/trending/iran/markets')}
                     style={{
                       flex: '1 1 200px',
                       display: 'flex',
@@ -2703,7 +2703,7 @@ export default function App() {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#ffd54f' : '#b8860b'} strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </div>
                   <div
-                    onClick={() => navigate('/trending/iran/strikes')}
+                    onClick={() => navigate('/trending/iran/tehran')}
                     style={{
                       flex: '1 1 200px',
                       display: 'flex',
