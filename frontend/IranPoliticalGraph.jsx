@@ -580,6 +580,24 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         .scrollable-panel-${darkMode ? 'dark' : 'light'} {
           overflow-y: visible;
         }
+        
+        @media (max-width: 768px) {
+          .iran-graph-layout {
+            flex-direction: column !important;
+            gap: 16px !important;
+          }
+          .iran-graph-area {
+            max-width: 100% !important;
+            min-width: 0 !important;
+            flex: 1 1 auto !important;
+            max-height: none !important;
+          }
+          .iran-right-panel {
+            flex: 1 1 auto !important;
+            min-width: 0 !important;
+            width: 100% !important;
+          }
+        }
       `}</style>
 
       {/* Header - matches /trending/iran style */}
@@ -662,10 +680,10 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
       </div>
 
       {/* Main Layout */}
-      <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', marginTop: '16px' }}>
+      <div className="iran-graph-layout" style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', marginTop: '16px' }}>
         
         {/* Graph Area */}
-        <div style={{ flex: '1 1 550px', minWidth: '300px', maxWidth: '70%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
+        <div className="iran-graph-area" style={{ flex: '1 1 550px', minWidth: '300px', maxWidth: '70%', position: 'relative', maxHeight: 'calc(100vh - 200px)' }}>
           {/* Zoom Controls */}
           <div style={{
             position: 'absolute',
@@ -953,7 +971,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
         </div>
 
         {/* Right Panel */}
-        <div style={{ flex: '0 0 340px', minWidth: '300px' }}>
+        <div className="iran-right-panel" style={{ flex: '0 0 340px', minWidth: '300px' }}>
           
           {/* Tabs */}
           <div style={{ display: 'flex', borderBottom: `1px solid ${theme.cardBorder}`, marginBottom: '12px' }}>
