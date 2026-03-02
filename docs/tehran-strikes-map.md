@@ -1,4 +1,4 @@
-# Tehran Strike Map
+# Tehran Strike Confidence Map
 
 Interactive verification map tracking US-Israeli strike locations in Tehran (Feb 28 – Mar 2, 2026). Cross-references 20+ outlets with a tiered confidence system.
 

@@ -74,39 +74,39 @@ function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.mi
 
 const T = {
   dark: {
-    bg:"#0b1120",srf:"#0f172a",srfAlt:"rgba(15,23,42,0.8)",tx:"#e0e6ed",tx2:"#94a3b8",tx3:"#64748b",tx4:"#475569",hd:"#fff",
-    bd:"rgba(255,255,255,0.06)",bd2:"rgba(255,255,255,0.1)",hvr:"rgba(255,255,255,0.06)",
-    cBg:"rgba(255,255,255,0.02)",cBd:"rgba(255,255,255,0.04)",
-    btn:"rgba(255,255,255,0.03)",btnA:"rgba(255,255,255,0.1)",
-    mBg:"#0f172a",mGr:"rgba(255,255,255,0.02)",mLb:"#1e293b",mLb2:"#334155",
-    mSt:"rgba(255,255,255,0.4)",mStS:"#fff",ttBg:"rgba(0,0,0,0.75)",ttLn:"rgba(255,255,255,0.25)",ttTx:"#fff",
+    bg:"#000000",srf:"#1a1a1a",srfAlt:"#222",tx:"#e0e0e0",tx2:"#888",tx3:"#888",tx4:"#555",hd:"#fff",
+    bd:"#333",bd2:"#444",hvr:"rgba(40,40,50,0.9)",
+    cBg:"#1a1a1a",cBd:"#333",
+    btn:"#1a1a1a",btnA:"#333",
+    mBg:"rgba(10,10,15,0.8)",mGr:"#1a1a1a",mLb:"#555",mLb2:"#888",
+    mSt:"rgba(255,255,255,0.4)",mStS:"#fff",ttBg:"rgba(0,0,0,0.85)",ttLn:"#444",ttTx:"#fff",
     gBg:"rgba(99,102,241,0.1)",gBd:"rgba(99,102,241,0.3)",gTx:"#a5b4fc",
     wBg:"rgba(245,158,11,0.08)",wBd:"rgba(245,158,11,0.2)",wTx:"#fbbf24",
-    tag:"rgba(255,255,255,0.04)",stBg:"rgba(255,255,255,0.06)",
+    tag:"#222",stBg:"#1a1a1a",
     s1:{bg:"rgba(34,197,94,0.18)",bd:"rgba(34,197,94,0.35)",tx:"#86efac"},
     s2:{bg:"rgba(59,130,246,0.15)",bd:"rgba(59,130,246,0.3)",tx:"#93c5fd"},
     s3:{bg:"rgba(245,158,11,0.12)",bd:"rgba(245,158,11,0.25)",tx:"#fcd34d"},
     s4:{bg:"rgba(239,68,68,0.12)",bd:"rgba(239,68,68,0.25)",tx:"#fca5a5"},
     sO:{bg:"rgba(168,85,247,0.15)",bd:"rgba(168,85,247,0.3)",tx:"#c4b5fd"},
-    sD:{bg:"rgba(255,255,255,0.05)",bd:"rgba(255,255,255,0.1)",tx:"#94a3b8"},
+    sD:{bg:"#222",bd:"#333",tx:"#888"},
     tC:["#86efac","#93c5fd","#fcd34d","#fca5a5","#c4b5fd"],
   },
   light: {
-    bg:"#f8fafc",srf:"#ffffff",srfAlt:"#f1f5f9",tx:"#1e293b",tx2:"#475569",tx3:"#64748b",tx4:"#94a3b8",hd:"#0f172a",
-    bd:"#e2e8f0",bd2:"#cbd5e1",hvr:"#f1f5f9",
-    cBg:"#ffffff",cBd:"#e2e8f0",
-    btn:"#f1f5f9",btnA:"#e2e8f0",
-    mBg:"#f1f5f9",mGr:"rgba(0,0,0,0.04)",mLb:"#94a3b8",mLb2:"#64748b",
-    mSt:"rgba(0,0,0,0.2)",mStS:"#0f172a",ttBg:"rgba(255,255,255,0.95)",ttLn:"rgba(0,0,0,0.15)",ttTx:"#0f172a",
+    bg:"rgb(240,238,231)",srf:"#f5f5f5",srfAlt:"#eeeeee",tx:"#333",tx2:"#666",tx3:"#888",tx4:"#999",hd:"#333",
+    bd:"#d0d0d0",bd2:"#ccc",hvr:"#ebebeb",
+    cBg:"#f5f5f5",cBd:"#d0d0d0",
+    btn:"#f5f5f5",btnA:"#e8e8e8",
+    mBg:"rgba(255,255,255,0.9)",mGr:"rgba(0,0,0,0.04)",mLb:"#999",mLb2:"#666",
+    mSt:"rgba(0,0,0,0.2)",mStS:"#333",ttBg:"rgba(255,255,255,0.95)",ttLn:"rgba(0,0,0,0.15)",ttTx:"#333",
     gBg:"#eef2ff",gBd:"#a5b4fc",gTx:"#4f46e5",
     wBg:"#fffbeb",wBd:"#fcd34d",wTx:"#b45309",
-    tag:"#f1f5f9",stBg:"#f1f5f9",
+    tag:"#ebebeb",stBg:"#f5f5f5",
     s1:{bg:"#dcfce7",bd:"#86efac",tx:"#166534"},
     s2:{bg:"#dbeafe",bd:"#93c5fd",tx:"#1e40af"},
     s3:{bg:"#fef3c7",bd:"#fcd34d",tx:"#92400e"},
     s4:{bg:"#fee2e2",bd:"#fca5a5",tx:"#991b1b"},
     sO:{bg:"#f3e8ff",bd:"#c4b5fd",tx:"#6b21a8"},
-    sD:{bg:"#f1f5f9",bd:"#e2e8f0",tx:"#475569"},
+    sD:{bg:"#eeeeee",bd:"#d0d0d0",tx:"#666"},
     tC:["#166534","#1e40af","#92400e","#991b1b","#6b21a8"],
   }
 };
@@ -155,11 +155,11 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
   ];
 
   return (
-    <div style={{background:dk ? '#000' : 'rgb(240,238,231)',minHeight:"100vh",fontFamily:"Arial, sans-serif",color:t.tx,display:"flex",flexDirection:"column"}}>
+    <div style={{background:t.bg,minHeight:"100vh",fontFamily:"Arial, sans-serif",color:t.tx,display:"flex",flexDirection:"column"}}>
 
       {/* Header */}
-      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 28px 24px 70px'}}>
-        <div style={{fontSize:11,color:dk?'#b8860b':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
+      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 20px 24px 70px'}}>
+        <div style={{fontSize:11,color:dk?'#ffd54f':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
         <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
           Tehran Strike Map
         </h1>
@@ -168,25 +168,25 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
         </p>
 
         <div style={{display:"flex",alignItems:"center",gap:14,marginTop:20,flexWrap:"wrap"}}>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:8,padding:"10px 18px",display:"flex",alignItems:"center",gap:10}}>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd}`,padding:"10px 18px",display:"flex",alignItems:"center",gap:10}}>
             <div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 10px rgba(34,197,94,0.6)"}}/>
             <div>
               <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>LAST UPDATED</div>
               <div style={{fontSize:15,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
             </div>
           </div>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:8,padding:"10px 18px"}}>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd}`,padding:"10px 18px"}}>
             <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>SITUATION</div>
             <div style={{fontSize:13,color:"#ef4444",fontWeight:700}}>ACTIVE — Strikes ongoing, new waves expected</div>
           </div>
-          <span style={{background:"#dc2626",color:"#fff",fontSize:11,fontWeight:700,padding:"5px 12px",borderRadius:4,letterSpacing:1}}>DAY 3</span>
+          <span style={{background:"#dc2626",color:"#fff",fontSize:11,fontWeight:700,padding:"5px 12px",letterSpacing:1}}>DAY 3</span>
         </div>
 
         <div style={{display:"flex",gap:12,marginTop:20,flexWrap:"wrap"}}>
-          <button onClick={()=>setConfModal(true)} style={{background:dk?"rgba(99,102,241,0.12)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.3)":"#a5b4fc"}`,color:dk?"#a5b4fc":"#4f46e5",borderRadius:6,padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+          <button onClick={()=>setConfModal(true)} style={{background:dk?"rgba(99,102,241,0.12)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.3)":"#a5b4fc"}`,color:dk?"#a5b4fc":"#4f46e5",padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
             Confidence Statement
           </button>
-          <button onClick={()=>{setSuggestModal(true);setSubmitSuccess(false)}} style={{background:dk?"rgba(16,185,129,0.12)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:6,padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+          <button onClick={()=>{setSuggestModal(true);setSubmitSuccess(false)}} style={{background:dk?"rgba(16,185,129,0.12)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
             + Suggest a Strike Location
           </button>
           {submissions.length > 0 && (
@@ -200,13 +200,15 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
       </div>
 
       {/* Main — Map + Right Panel */}
-      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row', padding: isMobile ? '0' : '16px 20px 0 70px', gap: isMobile ? 0 : 32, flexWrap:'wrap'}}>
+      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row', padding: isMobile ? '0' : '0 20px 60px 70px', gap: isMobile ? 0 : 20, flexWrap:'wrap'}}>
+        {/* Left Column — Map + Verification Guide */}
+        <div style={{flex: isMobile ? '1' : '1 1 550px', minWidth: isMobile ? '100%' : 300, maxWidth: isMobile ? '100%' : '65%'}}>
         {/* Map */}
-        <div style={{flex: isMobile ? '1' : '1 1 550px', minWidth: isMobile ? '100%' : 300, maxWidth: isMobile ? '100%' : '70%', padding: isMobile ? "10px 12px 16px" : "8px", position: 'relative', background:t.mBg, borderRadius:10, border:`1px solid ${t.bd}`, overflow:'hidden', maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)'}}>
+        <div style={{padding: isMobile ? "10px 12px 16px" : "8px", position: 'relative', background: dk ? t.mBg : 'rgba(255,255,255,0.9)', border:`1px solid ${t.bd}`, overflow:'hidden', maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)'}}>
           <div style={{position:'absolute',top:12,right:12,zIndex:10,display:'flex',flexDirection:'column',gap:4}}>
-            <button onClick={()=>setZoom(z=>Math.min(3,z+0.3))} title="Zoom in" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:dk?'#e0e6ed':'#374151',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
-            <button onClick={()=>setZoom(z=>Math.max(0.5,z-0.3))} title="Zoom out" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:dk?'#e0e6ed':'#374151',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
-            <button onClick={()=>{setZoom(1);setPan({x:0,y:0})}} title="Reset view" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:t.tx3,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>↺</button>
+            <button onClick={()=>setZoom(z=>Math.min(3,z+0.3))} title="Zoom in" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+            <button onClick={()=>setZoom(z=>Math.max(0.5,z-0.3))} title="Zoom out" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
+            <button onClick={()=>{setZoom(1);setPan({x:0,y:0})}} title="Reset view" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>↺</button>
           </div>
           <svg viewBox="0 0 100 75" style={{width:"100%",maxHeight:'calc(100vh - 280px)',cursor:isPanning?'grabbing':'grab'}}
             onMouseDown={e=>{if(e.target.closest('g[style*="pointer"]'))return;setIsPanning(true);setPanStart({x:e.clientX-pan.x,y:e.clientY-pan.y})}}
@@ -241,60 +243,98 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
           </svg>
         </div>
 
+        {/* Verification Guide & Source Methodology — under map like analysis section */}
+        <div style={{marginTop:12,padding:16,background:t.cBg,border:`1px solid ${t.bd}`}}>
+          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:'1px',marginBottom:10,fontFamily:'Arial, sans-serif',fontWeight:600}}>
+            Verification Guide &amp; Source Methodology
+          </div>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:16}}>
+            {Object.entries(CONF).map(([k,c])=>(
+              <div key={k} style={{flex:"1 1 140px",background:dk?`${c.color}11`:`${c.color}08`,border:`1px solid ${c.color}44`,padding:"10px 12px"}}>
+                <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:4}}>
+                  <div style={{width:8,height:8,borderRadius:"50%",background:c.color}}/>
+                  <span style={{fontSize:11,fontWeight:700,color:c.color,textTransform:'uppercase'}}>{c.label}</span>
+                  <span style={{fontSize:18,fontWeight:800,color:c.color,marginLeft:"auto"}}>{counts[k]}</span>
+                </div>
+                <p style={{fontSize:11,color:t.tx2,lineHeight:1.4,margin:0}}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:'1px',marginBottom:8,fontFamily:'Arial, sans-serif',fontWeight:600}}>
+            Source Reliability Ranking
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:0,marginBottom:12}}>
+            {tiers.map((tr,i)=>(
+              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderBottom:`1px solid ${t.bd}`}}>
+                <div style={{width:7,height:7,borderRadius:"50%",background:t.tC[i],marginTop:5,flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <span style={{fontSize:12,fontWeight:700,color:t.tC[i]}}>{tr.n}</span>
+                  <span style={{fontSize:12,color:t.tx2}}> — {tr.v}</span>
+                  <p style={{fontSize:11,color:t.tx3,margin:"2px 0 0",lineHeight:1.4}}>{tr.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,padding:"10px 14px",fontSize:12,color:t.wTx,lineHeight:1.5}}>
+            <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
+          </div>
+        </div>
+        </div>
+
         {/* Right Panel — Tabs */}
-        <div style={{flex: '0 0 340px', minWidth: isMobile ? '100%' : 300}}>
+        <div style={{flex: '1 1 380px', minWidth: isMobile ? '100%' : 320}}>
           {/* Tabs like Markets/Map Info */}
           <div style={{display:'flex',borderBottom:`1px solid ${t.bd}`,marginBottom:12}}>
             {[{k:"all",l:`All (${STRIKES.length})`},{k:"confirmed",l:`Confirmed (${counts.confirmed})`},{k:"likely",l:`Likely (${counts.likely})`},{k:"unverified",l:`Unverified (${counts.unverified})`}].map(tab=>(
-              <button key={tab.k} onClick={()=>{setFlt(tab.k);setSel(null)}} style={{padding:'8px 16px',border:'none',background:'transparent',color:flt===tab.k?t.hd:t.tx3,fontSize:12,fontFamily:'Arial, sans-serif',cursor:'pointer',borderBottom:flt===tab.k?`2px solid ${dk?'#b8860b':'#8b6914'}`:'2px solid transparent',transition:'all 0.2s ease',fontWeight:flt===tab.k?600:400}}>
+              <button key={tab.k} onClick={()=>{setFlt(tab.k);setSel(null)}} style={{padding:'10px 16px',border:'none',background:'transparent',color:flt===tab.k?t.hd:t.tx3,fontSize:12,fontFamily:'Arial, sans-serif',cursor:'pointer',borderBottom:flt===tab.k?`2px solid ${dk?'#ffd54f':'#8b6914'}`:'2px solid transparent',transition:'all 0.2s ease',fontWeight:flt===tab.k?700:400,textTransform:'uppercase',letterSpacing:'0.5px'}}>
                 {tab.l}
               </button>
             ))}
           </div>
 
-          <div style={{overflowY:'auto',maxHeight: isMobile ? 'none' : 'calc(100vh - 260px)',padding: isMobile ? "0 16px 80px" : "0"}}>
+          <div style={{overflowY:'visible',padding: isMobile ? "0 16px 80px" : "0"}}>
           {s?(
-            <div style={{padding:"16px",background:t.cBg,border:`1px solid ${t.cBd}`}}>
+            <div style={{padding:"16px",background:t.cBg,border:`1px solid ${t.bd}`,marginBottom:8}}>
               <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:2,color:CONF[s.c].color,fontWeight:700,marginBottom:6}}>{CONF[s.c].label}</div>
-              <h2 style={{fontSize:18,fontWeight:600,color:t.hd,margin:"0 0 10px",fontFamily:"'Georgia', serif"}}>{s.n}</h2>
-              <div style={{display:"flex",gap:8,fontSize:11,color:t.tx3,marginBottom:14}}>
+              <h2 style={{fontSize:17,fontWeight:600,color:t.hd,margin:"0 0 10px",fontFamily:"'Georgia', serif"}}>{s.n}</h2>
+              <div style={{display:"flex",gap:8,fontSize:11,color:t.tx3,marginBottom:14,alignItems:'center'}}>
                 <span>{s.d}</span>
-                <span style={{display:'inline-block',padding:"3px 8px",background:t.tag,borderRadius:3,border:`1px solid ${t.cBd}`,fontSize:9,textTransform:'uppercase',letterSpacing:1}}>{s.cat}</span>
+                <span style={{display:'inline-block',padding:"3px 8px",background:t.tag,border:`1px solid ${t.bd}`,fontSize:9,textTransform:'uppercase',letterSpacing:1}}>{s.cat}</span>
               </div>
-              <p style={{fontSize:12,color:t.tx2,lineHeight:1.6,marginBottom:16,fontFamily:'Arial, sans-serif'}}>{s.t}</p>
+              <p style={{fontSize:13,color:t.tx2,lineHeight:1.6,marginBottom:16,fontFamily:'Arial, sans-serif'}}>{s.t}</p>
               <div style={{marginBottom:14,paddingTop:12,borderTop:`1px solid ${t.bd}`}}>
                 <div style={{fontSize:9,color:t.tx3,marginBottom:8,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>Sources ({s.s.length}) — {s.s.length>=3?"strong corroboration":s.s.length===2?"moderate corroboration":"single source"}</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
-                  {s.s.map((src,i)=>{const sc=sC(src,t);return <span key={i} style={{fontSize:10,padding:"3px 10px",borderRadius:4,background:sc.bg,color:sc.tx,border:`1px solid ${sc.bd}`}}>{src}</span>})}
+                  {s.s.map((src,i)=>{const sc=sC(src,t);return <span key={i} style={{fontSize:10,padding:"3px 10px",background:sc.bg,color:sc.tx,border:`1px solid ${sc.bd}`}}>{src}</span>})}
                 </div>
               </div>
               {s.c==="unverified"&&(
-                <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:"10px 12px",fontSize:11,color:t.wTx,marginBottom:14,lineHeight:1.4}}>
+                <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,padding:"10px 12px",fontSize:11,color:t.wTx,marginBottom:14,lineHeight:1.4}}>
                   Single-source report. Iran's internet blackout (~1% connectivity) makes independent verification near-impossible.
                 </div>
               )}
               <div style={{fontSize:11,color:t.tx4,padding:"8px 0",borderTop:`1px solid ${t.bd}`,fontFamily:'Arial, sans-serif'}}>
                 {s.c==="confirmed"?"High confidence — independently verified by multiple major outlets":s.c==="likely"?"Medium confidence — credible but fewer independent verifications":"Low confidence — needs further corroboration"}
               </div>
-              <button onClick={()=>setSel(null)} style={{marginTop:12,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:0,padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>Back to list</button>
+              <button onClick={()=>setSel(null)} style={{marginTop:12,background:dk?'rgba(255,213,79,0.1)':'rgba(184,134,11,0.1)',border:`1px solid ${dk?'#6a5a2a':'#c9a227'}`,color:dk?'#ffd54f':'#b8860b',padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>← Back to list</button>
             </div>
           ):(
             <>
-              <div style={{padding:12,background:t.cBg,border:`1px solid ${t.cBd}`,marginBottom:12,fontSize:11,lineHeight:1.5,color:t.tx3,fontFamily:'Arial, sans-serif'}}>
-                <span style={{color:t.tx}}>Strike locations</span> cross-referenced from multiple outlets. Click any location to view details and sources. Click map markers for the same.
+              <div style={{padding:12,background:t.cBg,border:`1px solid ${t.bd}`,marginBottom:12,fontSize:11,lineHeight:1.5,color:t.tx3,fontFamily:'Arial, sans-serif'}}>
+                <span style={{color:t.tx}}>Strike locations</span> cross-referenced from multiple outlets. Click any location for details and sources.
               </div>
               {(flt==="all"?["confirmed","likely","unverified"]:[flt]).map(lv=>{
                 const items=STRIKES.filter(x=>x.c===lv);if(!items.length)return null;
                 return items.map(st=>(
-                  <div key={st.id} onClick={()=>setSel(st.id)} style={{padding:"12px",marginBottom:1,cursor:"pointer",background:t.cBg,border:`1px solid ${t.cBd}`,transition:"background .15s",fontFamily:'Arial, sans-serif'}}
-                    onMouseEnter={e=>{e.currentTarget.style.background=t.hvr}} onMouseLeave={e=>{e.currentTarget.style.background=t.cBg}}>
-                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <div key={st.id} onClick={()=>setSel(st.id)} style={{padding:"10px 12px",cursor:"pointer",background:t.cBg,border:`1px solid ${t.bd}`,marginBottom:8,transition:"all .2s ease",fontFamily:'Arial, sans-serif'}}
+                    onMouseEnter={e=>{e.currentTarget.style.borderColor=dk?'#666':'#999';e.currentTarget.style.background=dk?'rgba(40,40,50,0.9)':'#eee'}} onMouseLeave={e=>{e.currentTarget.style.borderColor=t.bd;e.currentTarget.style.background=t.cBg}}>
+                    <div style={{display:'flex',alignItems:'center',gap:10}}>
                       <div style={{width:8,height:8,borderRadius:"50%",background:CONF[st.c].color,flexShrink:0}}/>
                       <div style={{flex:1}}>
-                        <div style={{fontSize:12,color:t.tx,fontWeight:600}}>{st.n}</div>
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:2}}>
+                        <div style={{fontSize:12,color:t.hd,fontWeight:600,lineHeight:1.4}}>{st.n}</div>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:3}}>
                           <span style={{fontSize:11,color:t.tx3}}>{st.d}</span>
-                          <span style={{fontSize:10,color:t.tx3,background:t.tag,padding:"2px 7px",borderRadius:3}}>{st.s.length} source{st.s.length!==1?"s":""}</span>
+                          <span style={{fontSize:10,color:t.tx3,background:t.tag,padding:"2px 7px",border:`1px solid ${t.bd}`}}>{st.s.length} source{st.s.length!==1?"s":""}</span>
                         </div>
                       </div>
                     </div>
@@ -307,64 +347,25 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
         </div>
       </div>
 
-      {/* Verification Guide & Source Methodology — below map like analysis section */}
-      <div style={{padding: isMobile ? '16px' : '12px 20px 40px 70px', marginTop:12}}>
-        <div style={{background:t.cBg,border:`1px solid ${t.cBd}`,padding:16}}>
-          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:1,marginBottom:10,fontFamily:'Arial, sans-serif',fontWeight:600}}>
-            Verification Guide & Source Methodology
-          </div>
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:16}}>
-            {Object.entries(CONF).map(([k,c])=>(
-              <div key={k} style={{flex:"1 1 200px",background:dk?`${c.color}11`:`${c.color}15`,border:`1px solid ${c.color}44`,borderRadius:8,padding:14}}>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-                  <div style={{width:12,height:12,borderRadius:"50%",background:c.color,boxShadow:`0 0 6px ${c.color}66`}}/>
-                  <span style={{fontSize:13,fontWeight:700,color:c.color}}>{c.label}</span>
-                  <span style={{fontSize:20,fontWeight:800,color:c.color,marginLeft:"auto"}}>{counts[k]}</span>
-                </div>
-                <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,margin:0}}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
-          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:1,marginBottom:8,fontFamily:'Arial, sans-serif',fontWeight:600}}>
-            Source Reliability Ranking
-          </div>
-          <div style={{display:"flex",flexDirection:"column",gap:4,marginBottom:14}}>
-            {tiers.map((tr,i)=>(
-              <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",background:t.srfAlt,border:`1px solid ${t.cBd}`,borderRadius:4}}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:t.tC[i],marginTop:5,flexShrink:0}}/>
-                <div style={{flex:1}}>
-                  <span style={{fontSize:12,fontWeight:700,color:t.tC[i]}}>{tr.n}</span>
-                  <span style={{fontSize:12,color:t.tx2}}> — {tr.v}</span>
-                  <p style={{fontSize:11,color:t.tx3,margin:"2px 0 0",lineHeight:1.4}}>{tr.d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:12,fontSize:12,color:t.wTx,lineHeight:1.5}}>
-            <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
-          </div>
-        </div>
-      </div>
-
       {/* CONFIDENCE STATEMENT MODAL */}
       {confModal && (
-        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}} onClick={()=>setConfModal(false)}>
-          <div style={{background:t.srf,border:`1px solid ${t.bd2}`,borderRadius:12,padding:24,maxWidth:620,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(4px)"}} onClick={()=>setConfModal(false)}>
+          <div style={{background:dk?'#111':'#f5f5f5',border:`1px solid ${dk?'#333':'#ccc'}`,borderRadius:12,padding:24,maxWidth:620,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
               <div>
-                <h2 style={{fontSize:18,fontWeight:700,color:t.hd,margin:0,fontFamily:"'Georgia', serif"}}>Confidence Statement</h2>
-                <p style={{fontSize:11,color:t.tx3,marginTop:2}}>Last updated: Mar 2, 2026 — 15:15 UTC</p>
+                <h2 style={{fontSize:18,fontWeight:700,color:dk?'#fff':'#333',margin:0,fontFamily:"'Georgia', serif"}}>Confidence Statement</h2>
+                <p style={{fontSize:11,color:dk?'#888':'#666',marginTop:2}}>Last updated: Mar 2, 2026 — 15:15 UTC</p>
               </div>
-              <button onClick={()=>setConfModal(false)} style={{background:"none",border:"none",color:t.tx3,fontSize:20,cursor:"pointer",padding:4}}>✕</button>
+              <button onClick={()=>setConfModal(false)} style={{background:"none",border:"none",color:dk?'#888':'#666',fontSize:20,cursor:"pointer",padding:4}}>✕</button>
             </div>
 
-            <div style={{background:dk?"rgba(99,102,241,0.08)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.2)":"#c7d2fe"}`,borderRadius:8,padding:14,marginBottom:16}}>
-              <p style={{fontSize:13,color:t.tx,lineHeight:1.6,margin:0}}>
-                This map compiles <strong style={{color:t.hd}}>21 reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:t.hd}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
+            <div style={{background:dk?'rgba(99,102,241,0.08)':'#eef2ff',border:`1px solid ${dk?'rgba(99,102,241,0.2)':'#c7d2fe'}`,borderRadius:8,padding:14,marginBottom:16}}>
+              <p style={{fontSize:13,color:dk?'#e0e0e0':'#333',lineHeight:1.6,margin:0}}>
+                This map compiles <strong style={{color:dk?'#fff':'#333'}}>21 reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:dk?'#fff':'#333'}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
               </p>
             </div>
 
-            <h3 style={{fontSize:13,fontWeight:700,color:t.hd,marginBottom:8,fontFamily:"'Georgia', serif"}}>Confidence by tier</h3>
+            <h3 style={{fontSize:13,fontWeight:700,color:dk?'#fff':'#333',marginBottom:8,fontFamily:"'Georgia', serif"}}>Confidence by tier</h3>
 
             {[
               {label:"CONFIRMED",count:11,pct:"90%+",color:"#ef4444",
@@ -380,11 +381,11 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
                   <span style={{fontSize:12,fontWeight:700,color:tier.color}}>{tier.label} ({tier.count} sites)</span>
                   <span style={{marginLeft:"auto",fontSize:12,fontWeight:700,color:tier.color}}>~{tier.pct} confidence</span>
                 </div>
-                <p style={{fontSize:11,color:t.tx2,lineHeight:1.55,margin:0}}>{tier.text}</p>
+                <p style={{fontSize:11,color:dk?'#888':'#666',lineHeight:1.55,margin:0}}>{tier.text}</p>
               </div>
             ))}
 
-            <h3 style={{fontSize:13,fontWeight:700,color:t.hd,marginTop:16,marginBottom:8,fontFamily:"'Georgia', serif"}}>Key limitations</h3>
+            <h3 style={{fontSize:13,fontWeight:700,color:dk?'#fff':'#333',marginTop:16,marginBottom:8,fontFamily:"'Georgia', serif"}}>Key limitations</h3>
             <div style={{display:"flex",flexDirection:"column",gap:6}}>
               {[
                 {title:"Location accuracy",text:"Markers placed by neighbourhood/street name, not GPS from geolocated footage. Some could be off by several hundred metres."},
@@ -393,10 +394,10 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
                 {title:"Source bias",text:"Iranian state media may overstate civilian impact for political purposes. IDF/CENTCOM confirm targets but won't acknowledge civilian harm. Truth likely lies in between."},
                 {title:"Internet blackout",text:"Iran's internet at ~1% since strikes began. Severely limits real-time verification, especially for Mar 2 morning reports."},
               ].map((item,i)=>(
-                <div key={i} style={{display:"flex",gap:10,padding:"8px 10px",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6}}>
+                <div key={i} style={{display:"flex",gap:10,padding:"8px 10px",background:dk?'#1a1a1a':'#f5f5f5',border:`1px solid ${dk?'#333':'#d0d0d0'}`,borderRadius:6}}>
                   <div>
-                    <div style={{fontSize:11,fontWeight:700,color:t.hd}}>{item.title}</div>
-                    <p style={{fontSize:10,color:t.tx2,margin:"2px 0 0",lineHeight:1.45}}>{item.text}</p>
+                    <div style={{fontSize:11,fontWeight:700,color:dk?'#fff':'#333'}}>{item.title}</div>
+                    <p style={{fontSize:10,color:dk?'#888':'#666',margin:"2px 0 0",lineHeight:1.45}}>{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -413,20 +414,20 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
       {/* SUGGEST A STRIKE MODAL */}
       {suggestModal && (
-        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}} onClick={()=>setSuggestModal(false)}>
-          <div style={{background:t.srf,border:`1px solid ${t.bd2}`,borderRadius:12,padding:24,maxWidth:520,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.7)",backdropFilter:"blur(4px)"}} onClick={()=>setSuggestModal(false)}>
+          <div style={{background:dk?'#111':'#f5f5f5',border:`1px solid ${dk?'#333':'#ccc'}`,borderRadius:12,padding:24,maxWidth:520,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.5)"}} onClick={e=>e.stopPropagation()}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
               <div>
-                <h2 style={{fontSize:18,fontWeight:700,color:t.hd,margin:0,fontFamily:"'Georgia', serif"}}>Suggest a Strike Location</h2>
-                <p style={{fontSize:11,color:t.tx3,marginTop:2}}>Submissions are reviewed before being added to the map</p>
+                <h2 style={{fontSize:18,fontWeight:700,color:dk?'#fff':'#333',margin:0,fontFamily:"'Georgia', serif"}}>Suggest a Strike Location</h2>
+                <p style={{fontSize:11,color:dk?'#888':'#666',marginTop:2}}>Submissions are reviewed before being added to the map</p>
               </div>
-              <button onClick={()=>setSuggestModal(false)} style={{background:"none",border:"none",color:t.tx3,fontSize:20,cursor:"pointer",padding:4}}>✕</button>
+              <button onClick={()=>setSuggestModal(false)} style={{background:"none",border:"none",color:dk?'#888':'#666',fontSize:20,cursor:"pointer",padding:4}}>✕</button>
             </div>
 
             {submitSuccess ? (
               <div style={{textAlign:"center",padding:"30px 20px"}}>
-                <h3 style={{fontSize:16,fontWeight:700,color:t.hd,marginBottom:6}}>Submission Received</h3>
-                <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,marginBottom:16}}>
+                <h3 style={{fontSize:16,fontWeight:700,color:dk?'#fff':'#333',marginBottom:6}}>Submission Received</h3>
+                <p style={{fontSize:12,color:dk?'#888':'#666',lineHeight:1.5,marginBottom:16}}>
                   Thank you. Your suggestion has been logged and will be reviewed against available sources before being added to the map. Submissions with verifiable source links are prioritised.
                 </p>
                 <button onClick={()=>setSuggestModal(false)} style={{background:dk?"rgba(16,185,129,0.15)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:6,padding:"8px 20px",fontSize:12,fontWeight:600,cursor:"pointer"}}>
@@ -447,15 +448,15 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
                   {key:"contact",label:"Your contact (optional, for follow-up)",placeholder:"Email or social handle — completely optional",type:"text"},
                 ].map(field=>(
                   <div key={field.key} style={{marginBottom:12}}>
-                    <label style={{display:"block",fontSize:11,fontWeight:600,color:t.tx2,marginBottom:4}}>{field.label}</label>
+                    <label style={{display:"block",fontSize:11,fontWeight:600,color:dk?'#e0e0e0':'#666',marginBottom:4}}>{field.label}</label>
                     {field.type === "textarea" ? (
                       <textarea value={suggestForm[field.key]} onChange={e=>setSuggestForm(p=>({...p,[field.key]:e.target.value}))}
                         placeholder={field.placeholder} rows={3}
-                        style={{width:"100%",boxSizing:"border-box",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:t.tx,resize:"vertical",fontFamily:"inherit",outline:"none"}}/>
+                        style={{width:"100%",boxSizing:"border-box",background:dk?'#1a1a1a':'#fff',border:`1px solid ${dk?'#333':'#d0d0d0'}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:dk?'#e0e0e0':'#333',resize:"vertical",fontFamily:"inherit",outline:"none"}}/>
                     ) : (
                       <input value={suggestForm[field.key]} onChange={e=>setSuggestForm(p=>({...p,[field.key]:e.target.value}))}
                         placeholder={field.placeholder} type="text"
-                        style={{width:"100%",boxSizing:"border-box",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:t.tx,fontFamily:"inherit",outline:"none"}}/>
+                        style={{width:"100%",boxSizing:"border-box",background:dk?'#1a1a1a':'#fff',border:`1px solid ${dk?'#333':'#d0d0d0'}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:dk?'#e0e0e0':'#333',fontFamily:"inherit",outline:"none"}}/>
                     )}
                   </div>
                 ))}
@@ -472,24 +473,24 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
                       setSubmitting(false);
                     }}
                     disabled={!suggestForm.location||!suggestForm.date||!suggestForm.description||submitting}
-                    style={{flex:1,background:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?(dk?"rgba(255,255,255,0.03)":"#f1f5f9"):(dk?"rgba(16,185,129,0.2)":"#ecfdf5"),border:`1px solid ${(!suggestForm.location||!suggestForm.date||!suggestForm.description)?t.bd2:(dk?"rgba(16,185,129,0.4)":"#6ee7b7")}`,color:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?t.tx4:(dk?"#6ee7b7":"#065f46"),borderRadius:6,padding:"10px 16px",fontSize:12,fontWeight:700,cursor:(!suggestForm.location||!suggestForm.date||!suggestForm.description||submitting)?"not-allowed":"pointer"}}>
+                    style={{flex:1,background:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?(dk?'#1a1a1a':'#f1f5f9'):(dk?"rgba(16,185,129,0.2)":"#ecfdf5"),border:`1px solid ${(!suggestForm.location||!suggestForm.date||!suggestForm.description)?(dk?'#333':'#ccc'):(dk?"rgba(16,185,129,0.4)":"#6ee7b7")}`,color:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?(dk?'#555':'#999'):(dk?"#6ee7b7":"#065f46"),borderRadius:6,padding:"10px 16px",fontSize:12,fontWeight:700,cursor:(!suggestForm.location||!suggestForm.date||!suggestForm.description||submitting)?"not-allowed":"pointer"}}>
                     {submitting ? "Submitting..." : "Submit for Review"}
                   </button>
-                  <button onClick={()=>setSuggestModal(false)} style={{background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx3,borderRadius:6,padding:"10px 16px",fontSize:12,cursor:"pointer"}}>
+                  <button onClick={()=>setSuggestModal(false)} style={{background:dk?'#1a1a1a':'#f5f5f5',border:`1px solid ${dk?'#333':'#ccc'}`,color:dk?'#888':'#666',borderRadius:6,padding:"10px 16px",fontSize:12,cursor:"pointer"}}>
                     Cancel
                   </button>
                 </div>
 
                 {submissions.length > 0 && (
-                  <div style={{marginTop:16,borderTop:`1px solid ${t.bd}`,paddingTop:12}}>
-                    <h4 style={{fontSize:11,fontWeight:700,color:t.tx3,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Your submissions ({submissions.length})</h4>
+                  <div style={{marginTop:16,borderTop:`1px solid ${dk?'#333':'#d0d0d0'}`,paddingTop:12}}>
+                    <h4 style={{fontSize:11,fontWeight:700,color:dk?'#888':'#888',textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Your submissions ({submissions.length})</h4>
                     {submissions.map(sub=>(
-                      <div key={sub.id} style={{padding:"8px 10px",marginBottom:4,background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6}}>
+                      <div key={sub.id} style={{padding:"8px 10px",marginBottom:4,background:dk?'#1a1a1a':'#f5f5f5',border:`1px solid ${dk?'#333':'#d0d0d0'}`,borderRadius:6}}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                          <span style={{fontSize:12,fontWeight:600,color:t.tx}}>{sub.location}</span>
+                          <span style={{fontSize:12,fontWeight:600,color:dk?'#e0e0e0':'#333'}}>{sub.location}</span>
                           <span style={{fontSize:9,fontWeight:700,padding:"2px 6px",borderRadius:3,background:dk?"rgba(245,158,11,0.12)":"#fef3c7",color:dk?"#fcd34d":"#92400e",border:`1px solid ${dk?"rgba(245,158,11,0.25)":"#fcd34d"}`}}>PENDING REVIEW</span>
                         </div>
-                        <p style={{fontSize:10,color:t.tx3,margin:"2px 0 0"}}>{sub.date} — {sub.description.slice(0,80)}{sub.description.length>80?"…":""}</p>
+                        <p style={{fontSize:10,color:dk?'#888':'#888',margin:"2px 0 0"}}>{sub.date} — {sub.description.slice(0,80)}{sub.description.length>80?"…":""}</p>
                       </div>
                     ))}
                   </div>
