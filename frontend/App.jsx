@@ -218,7 +218,7 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
                     fontFamily: 'Arial, sans-serif'
                   }}
                 >
-                  Tehran strikes map
+                  Tehran strike map
                 </button>
               </div>
             )}
@@ -2712,7 +2712,7 @@ export default function App() {
                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
                   >
                     <span style={{ fontSize: '13px', fontFamily: 'Arial, sans-serif', color: '#dc2626', fontWeight: '500' }}>
-                      Tehran strikes map
+                      Tehran strike map
                     </span>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
                   </div>

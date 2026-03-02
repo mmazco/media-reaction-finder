@@ -158,7 +158,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
       <div style={{padding: isMobile ? '60px 16px 20px' : '20px 20px 24px 70px'}}>
         <div style={{fontSize:11,color:dk?'#b8860b':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
         <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
-          Tehran Strike Confidence Map
+          Tehran Strike Map
         </h1>
         <p style={{fontSize:14,color:t.tx3,margin:'6px 0 0',fontFamily:'Arial, sans-serif'}}>
           Strike Verification Map — Updated Mar 2, 2026
