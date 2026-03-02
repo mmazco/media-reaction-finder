@@ -246,7 +246,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
       {/* Main */}
       <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden",minHeight: isMobile ? 'auto' : 420, padding: isMobile ? '0' : '0 0 0 54px', gap: isMobile ? 0 : 24}}>
         {/* Map */}
-        <div style={{flex: isMobile ? 1 : '1 1 500px', maxWidth: isMobile ? '100%' : '60%', padding: isMobile ? "10px 12px 16px" : "14px 0 16px 16px"}}>
+        <div style={{flex: isMobile ? 1 : '1 1 400px', maxWidth: isMobile ? '100%' : '50%', padding: isMobile ? "10px 12px 16px" : "14px 0 16px 16px"}}>
           <svg viewBox="0 0 100 75" style={{width:"100%",height:"100%",background:t.mBg,borderRadius:10,border:`1px solid ${t.bd}`}}>
             {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12}/>)}
             {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12}/>)}
