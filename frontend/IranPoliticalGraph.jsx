@@ -17,96 +17,107 @@ const predictionMarkets = [
   },
   {
     id: 'khamenei-out-feb28',
-    title: 'Khamenei out by February 28?',
-    probability: 48,
-    previousProb: 1,
-    volume: '$27.5M',
+    title: 'Khamenei out by February 28? — Resolving YES (disputed)',
+    probability: 99,
+    previousProb: 48,
+    volume: '$104M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-february-28',
-    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
+    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly', 'ali_larijani', 'sadegh_larijani'],
+    trend: 'up',
+    resolved: true,
+  },
+  {
+    id: 'khamenei-out-mar31',
+    title: 'Khamenei out by March 31? — Resolving YES (disputed)',
+    probability: 99,
+    previousProb: 96,
+    volume: '$58.5M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-march-31',
+    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly', 'ali_larijani', 'sadegh_larijani'],
+    trend: 'up',
+    resolved: true,
+  },
+  {
+    id: 'next-supreme-leader-pm',
+    title: 'Next Supreme Leader of Iran?',
+    probability: null,
+    volume: '$4.8M',
+    platform: 'polymarket',
+    url: 'https://polymarket.com/event/who-will-be-next-supreme-leader-of-iran-515',
+    linkedEntities: ['hassan_k', 'arafi', 'mojtaba', 'ali_larijani', 'sadegh_larijani', 'assembly'],
+    candidates: [
+      { name: 'Hassan Khomeini', prob: 21 },
+      { name: 'Alireza Arafi', prob: 19 },
+      { name: 'Mohseni-Eje\'i', prob: 13 },
+      { name: 'Position abolished', prob: 10 },
+      { name: 'Sadegh Larijani', prob: 8 },
+      { name: 'Mojtaba Khamenei', prob: 7 },
+      { name: 'Ali Larijani', prob: 7 },
+    ],
     trend: 'up',
     isNew: true,
   },
   {
-    id: 'khamenei-out-mar31',
-    title: 'Khamenei out as Supreme Leader by March 31?',
-    probability: 96,
-    previousProb: 20,
-    volume: '$27.8M',
+    id: 'new-leader-timeline',
+    title: 'New Supreme Leader named by...?',
+    probability: null,
+    volume: '$1.5M',
     platform: 'polymarket',
-    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-march-31',
-    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
+    url: 'https://polymarket.com/event/will-iran-name-a-successor-to-khamenei-by',
+    linkedEntities: ['hassan_k', 'arafi', 'mojtaba', 'ali_larijani', 'sadegh_larijani', 'assembly'],
+    candidates: [
+      { name: 'By March 6', prob: 39 },
+      { name: 'By March 15', prob: 69 },
+      { name: 'By March 31', prob: 80 },
+    ],
     trend: 'up',
-  },
-  {
-    id: 'khamenei-out-2026',
-    title: 'Khamenei out as Supreme Leader in 2026?',
-    probability: 98,
-    previousProb: 48,
-    volume: '$3.8M',
-    platform: 'polymarket',
-    url: 'https://polymarket.com/event/khamenei-out-as-supreme-leader-of-iran-by-december-31-2026',
-    linkedEntities: ['khamenei', 'mojtaba', 'hassan_k', 'assembly'],
-    trend: 'up',
+    isNew: true,
   },
   {
     id: 'regime-fall-2026',
     title: 'Will the Iranian regime fall before 2027?',
-    probability: 61,
-    previousProb: 37,
-    volume: '$5.8M',
+    probability: 50,
+    previousProb: 61,
+    volume: '$7.2M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-the-end-of-2026',
     linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
-    trend: 'up',
+    trend: 'down',
   },
   {
     id: 'regime-fall-mar31',
     title: 'Will the Iranian regime fall by March 31?',
-    probability: 42,
-    previousProb: null,
-    volume: '$9.4M',
+    probability: 17,
+    previousProb: 42,
+    volume: '$15M',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/will-the-iranian-regime-fall-by-march-31',
     linkedEntities: ['khamenei', 'irgc', 'pezeshkian', 'ghalibaf'],
-    trend: 'up',
-    isNew: true,
-  },
-  {
-    id: 'iran-coup-jun30',
-    title: 'Iran coup attempt by June 30?',
-    probability: 75,
-    previousProb: null,
-    volume: '$94K',
-    platform: 'polymarket',
-    url: 'https://polymarket.com/event/iran-coup-attempt-by-june-30',
-    linkedEntities: ['irgc', 'khamenei', 'assembly'],
-    trend: 'up',
-    isNew: true,
+    trend: 'down',
   },
   {
     id: 'regime-survive-strikes',
     title: 'Will the Iranian regime survive US strikes?',
-    probability: 47,
-    previousProb: null,
+    probability: 65,
+    previousProb: 47,
     volume: '$197K',
     platform: 'polymarket',
     url: 'https://polymarket.com/event/will-the-iranian-regime-survive-us-military-strikes-741',
     linkedEntities: ['trump', 'irgc', 'khamenei'],
-    trend: 'down',
-    isNew: true,
+    trend: 'up',
   },
   {
-    id: 'successor-named-mar6',
-    title: 'Will Iran name a successor to Khamenei by March 6?',
-    probability: 76,
-    previousProb: null,
-    volume: 'New',
+    id: 'iran-coup-jun30',
+    title: 'Iran coup attempt by June 30?',
+    probability: 40,
+    previousProb: 75,
+    volume: '$94K',
     platform: 'polymarket',
-    url: 'https://polymarket.com/event/will-iran-name-a-successor-to-khamenei-by',
-    linkedEntities: ['mojtaba', 'hassan_k', 'khamenei', 'assembly'],
-    trend: 'up',
-    isNew: true,
+    url: 'https://polymarket.com/event/iran-coup-attempt-by-june-30',
+    linkedEntities: ['irgc', 'khamenei', 'assembly'],
+    trend: 'down',
   },
   {
     id: 'pahlavi-visit',
@@ -186,9 +197,11 @@ const nodes = [
   { id: 'ghalibaf', label: 'Mohammad Ghalibaf', group: 'regime', x: 650, y: 120, description: 'Speaker of the Iranian Parliament. Former mayor of Tehran and IRGC commander. Considered a conservative political figure.', influence: 'high' },
   
   // Succession Candidates
-  { id: 'mojtaba', label: 'Mojtaba Khamenei', group: 'succession', x: 700, y: 290, description: 'Son of Supreme Leader Ali Khamenei. Mid-ranking cleric. Has never held formal government position but is considered influential within the system.', influence: 'medium' },
-  { id: 'hassan_k', label: 'Hassan Khomeini', group: 'succession', x: 600, y: 380, description: 'Grandson of Ayatollah Ruhollah Khomeini, founder of the Islamic Republic. Cleric based in Qom. Generally associated with reformist positions.', influence: 'medium' },
-  { id: 'arafi', label: 'Alireza Arafi', group: 'succession', x: 750, y: 200, description: 'Deputy Chairman of the Assembly of Experts. Member of the Guardian Council. Friday prayer leader of Qom.', influence: 'medium' },
+  { id: 'mojtaba', label: 'Mojtaba Khamenei', group: 'succession', x: 700, y: 290, description: 'Son of Supreme Leader Ali Khamenei. Mid-ranking cleric. Has never held formal government position but is considered influential within the system. Polymarket successor odds: 7%.', influence: 'medium' },
+  { id: 'hassan_k', label: 'Hassan Khomeini', group: 'succession', x: 600, y: 380, description: 'Grandson of Ayatollah Ruhollah Khomeini, founder of the Islamic Republic. Cleric based in Qom. Generally associated with reformist positions. Current frontrunner in successor market at 21%.', influence: 'medium' },
+  { id: 'arafi', label: 'Alireza Arafi', group: 'succession', x: 750, y: 200, description: 'Deputy Chairman of the Assembly of Experts. Member of the Guardian Council. Friday prayer leader of Qom. Second in successor market at 19%.', influence: 'medium' },
+  { id: 'ali_larijani', label: 'Ali Larijani', group: 'succession', x: 350, y: 350, description: 'Former Speaker of Parliament (2008–2020) and former Secretary of the Supreme National Security Council. Pragmatic conservative, close to Khamenei but seen as a moderate establishment figure. Currently circulating as a transitional leadership candidate. Polymarket successor odds: 7%.', influence: 'medium' },
+  { id: 'sadegh_larijani', label: 'Sadegh Larijani', group: 'succession', x: 430, y: 420, description: 'Former Head of the Judiciary (2009–2019) and current member of the Guardian Council and Expediency Discernment Council. Brother of Ali Larijani. Hardline conservative cleric. Polymarket successor odds: 8%.', influence: 'medium' },
   
   // External Actors
   { id: 'trump', label: 'Donald Trump', group: 'external', x: 200, y: 400, description: 'President of the United States. Has issued public statements regarding Iran protests and authorized military strikes on Iranian nuclear facilities in 2025.', influence: 'high' },
@@ -220,6 +233,12 @@ const edges = [
   { source: 'hassan_k', target: 'assembly', label: 'Candidate', type: 'succession' },
   { source: 'arafi', target: 'assembly', label: 'Member', type: 'succession' },
   { source: 'arafi', target: 'khamenei', label: 'Confidant', type: 'alliance' },
+  { source: 'ali_larijani', target: 'assembly', label: 'Candidate', type: 'succession' },
+  { source: 'ali_larijani', target: 'khamenei', label: 'Close ally', type: 'alliance' },
+  { source: 'ali_larijani', target: 'ghalibaf', label: 'Rival', type: 'conflict' },
+  { source: 'ali_larijani', target: 'sadegh_larijani', label: 'Brothers', type: 'family' },
+  { source: 'sadegh_larijani', target: 'assembly', label: 'Candidate', type: 'succession' },
+  { source: 'sadegh_larijani', target: 'khamenei', label: 'Ally', type: 'alliance' },
   { source: 'trump', target: 'khamenei', label: 'Threatens', type: 'conflict' },
   { source: 'israel', target: 'irgc', label: 'War', type: 'conflict' },
   { source: 'israel', target: 'khamenei', label: 'Assassination threat', type: 'conflict' },
@@ -602,7 +621,7 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               margin: '6px 0 0',
               fontFamily: 'Arial, sans-serif'
             }}>
-              Social Graph + Live Prediction Markets — Updated Feb 28, 2026
+              Social Graph + Live Prediction Markets — Updated Mar 2, 2026
             </p>
           </div>
           
@@ -890,30 +909,30 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               Prediction Market Analysis
             </div>
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: '0 0 12px 0', fontFamily: 'Arial, sans-serif' }}>
-              <strong style={{ color: '#ef4444' }}>Major development:</strong> US strikes on Iran resolved YES on February 28, 2026 — the largest prediction market on Iran ($529M volume) has confirmed military action. All Iran markets have shifted dramatically in the 5 days since our last update.
+              <strong style={{ color: '#ef4444' }}>March 2 update:</strong> Khamenei is out. Both the Feb 28 ($104M vol) and Mar 31 ($58.5M vol) Khamenei exit markets are at 99% and resolving YES (currently disputed in final review). The focus has now shifted entirely to succession and regime survival.
             </p>
 
             <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: theme.text }}>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
                 <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9673;</span>
-                <span><strong>US strikes Iran</strong> — <strong style={{ color: '#ef4444' }}>RESOLVED YES</strong> on Feb 28. Market closed. $529M total volume, $89.6M on the Feb 28 date alone. The strikes that markets had been pricing for months have now materialized.</span>
+                <span><strong>Khamenei out by Feb 28</strong> — <strong style={{ color: '#ef4444' }}>99% — RESOLVING YES</strong> (disputed, final review). $104M volume. Was 48% just 2 days ago.</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
-                <span><strong>Khamenei out by March 31</strong> — surged from 20% to <strong style={{ color: theme.accent }}>96%</strong> <span style={{ color: theme.textMuted }}>(+76pts)</span>. The most dramatic move. Markets now treat Khamenei's removal within weeks as near-certain.</span>
+                <span style={{ color: '#eab308', fontSize: '13px' }}>&#9733;</span>
+                <span><strong>Next Supreme Leader</strong> — New $4.8M market. Top candidates: Hassan Khomeini <strong style={{ color: theme.accent }}>21%</strong>, Alireza Arafi <strong style={{ color: theme.accent }}>19%</strong>, Mohseni-Eje'i <strong style={{ color: theme.accent }}>13%</strong>, position abolished <strong style={{ color: theme.accent }}>10%</strong>, Sadegh Larijani <strong style={{ color: theme.accent }}>8%</strong>, Ali Larijani <strong style={{ color: theme.accent }}>7%</strong>.</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
-                <span><strong>Khamenei out by end of 2026</strong> — jumped from 48% to <strong style={{ color: theme.accent }}>98%</strong> <span style={{ color: theme.textMuted }}>(+50pts)</span>. Near-total certainty. "Nothing Ever Happens: Khamenei" collapsed to just 5%.</span>
+                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
+                <span><strong>Regime fall by Mar 31</strong> — dropped from 42% to <strong style={{ color: theme.accent }}>17%</strong> <span style={{ color: theme.textMuted }}>(−25pts)</span>. Despite Khamenei's exit, markets now see the regime surviving. "Regime survive US strikes" climbed to 65%.</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '6px' }}>
-                <span style={{ color: '#22c55e', fontSize: '13px' }}>&#9650;</span>
-                <span><strong>Regime fall before 2027</strong> — surged from 37% to <strong style={{ color: theme.accent }}>61%</strong> <span style={{ color: theme.textMuted }}>(+24pts)</span>. Majority now expects full regime collapse, reversing the earlier decline. "Will the regime survive US strikes?" sits at just 47%.</span>
+                <span style={{ color: '#ef4444', fontSize: '13px' }}>&#9660;</span>
+                <span><strong>Regime fall before 2027</strong> — eased from 61% to <strong style={{ color: theme.accent }}>50%</strong> <span style={{ color: theme.textMuted }}>(−11pts)</span>. Now a coin flip. Coup attempt by June 30 also dropped sharply from 75% to 40%.</span>
               </div>
             </div>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '12px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-              The picture has inverted completely from 5 days ago. Markets had been cooling on regime change — now, following confirmed US strikes, traders price Khamenei's removal at 96–98% and regime collapse at 61%. The successor question is live: Polymarket shows a 76% chance Iran names a successor by March 6. Kalshi has paused trading on all Iran-related markets (Khamenei exit, successor, Pahlavi, Hormuz, nuclear deal) — likely due to the rapidly evolving situation post-strikes. Polymarket remains the only active venue for Iran prediction markets.
+              The story has shifted from "will Khamenei fall?" to "what comes next?" Markets are pricing an orderly succession within the Islamic Republic — not regime collapse. The successor race is wide open, with no candidate above 21%. The Larijani brothers (Ali at 7%, Sadegh at 8%) are emerging as establishment candidates alongside Khomeini and Arafi. 80% chance a new leader is named by March 31. Kalshi remains paused on all Iran markets.
             </p>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>
