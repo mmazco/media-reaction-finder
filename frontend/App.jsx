@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import IranPoliticalGraph from './IranPoliticalGraph';
+import TehranStrikesMap from './TehranStrikesMap';
 // v2.1.0 - Simplified error message styling
 
 // Trending Topic Reactions Page Component
@@ -186,22 +187,40 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
             </button>
             
             {topic === 'iran' && (
-              <button
-                onClick={() => navigate('/trending/iran/graph')}
-                style={{
-                  padding: '10px 20px',
-                  fontSize: '12px',
-                  fontWeight: '600',
-                  backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
-                  color: darkMode ? '#000' : '#fff',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontFamily: 'Arial, sans-serif'
-                }}
-              >
-                View political map (beta)
-              </button>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => navigate('/trending/iran/graph')}
+                  style={{
+                    padding: '10px 16px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: darkMode ? '#ffd54f' : '#b8860b',
+                    color: darkMode ? '#000' : '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                >
+                  Political map & markets
+                </button>
+                <button
+                  onClick={() => navigate('/trending/iran/strikes')}
+                  style={{
+                    padding: '10px 16px',
+                    fontSize: '11px',
+                    fontWeight: '600',
+                    backgroundColor: '#dc2626',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontFamily: 'Arial, sans-serif'
+                  }}
+                >
+                  Tehran strikes map
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -1943,8 +1962,26 @@ export default function App() {
         </div>
       )}
 
+      {/* Tehran Strikes Map Page */}
+      {location.pathname === '/trending/iran/strikes' && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: darkMode ? '#000000' : 'rgb(240, 238, 231)',
+          zIndex: 1000,
+          overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch'
+        }}>
+          <TehranStrikesMap darkMode={darkMode} isMobile={isMobile} />
+        </div>
+      )}
+
       {/* Trending Topic Reactions Page */}
-      {location.pathname.startsWith('/trending/') && !location.pathname.includes('/graph') && (
+      {location.pathname.startsWith('/trending/') && !location.pathname.includes('/graph') && !location.pathname.includes('/strikes') && (
         <TrendingTopicPage 
           darkMode={darkMode} 
           isMobile={isMobile} 
@@ -2639,23 +2676,46 @@ export default function App() {
                 </div>
 
                 {/* Link to full graph */}
-                <div
-                  onClick={() => navigate('/trending/iran/graph')}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '12px 16px',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.15s ease'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
-                >
-                  <span style={{ fontSize: '13px', fontFamily: 'Arial, sans-serif', color: darkMode ? '#ffd54f' : '#b8860b', fontWeight: '500' }}>
-                    View full political graph and all markets
-                  </span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#ffd54f' : '#b8860b'} strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+                  <div
+                    onClick={() => navigate('/trending/iran/graph')}
+                    style={{
+                      flex: '1 1 200px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s ease',
+                      borderRight: `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}`,
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <span style={{ fontSize: '13px', fontFamily: 'Arial, sans-serif', color: darkMode ? '#ffd54f' : '#b8860b', fontWeight: '500' }}>
+                      Political graph & markets
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#ffd54f' : '#b8860b'} strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </div>
+                  <div
+                    onClick={() => navigate('/trending/iran/strikes')}
+                    style={{
+                      flex: '1 1 200px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '12px 16px',
+                      cursor: 'pointer',
+                      transition: 'background-color 0.15s ease'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
+                    <span style={{ fontSize: '13px', fontFamily: 'Arial, sans-serif', color: '#dc2626', fontWeight: '500' }}>
+                      Tehran strikes map
+                    </span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth="2" style={{ flexShrink: 0 }}><polyline points="9 18 15 12 9 6"></polyline></svg>
+                  </div>
                 </div>
               </div>
             </div>
