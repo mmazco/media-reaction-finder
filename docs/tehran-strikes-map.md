@@ -89,16 +89,6 @@ If Airtable is not configured (env vars missing), the endpoint returns 200 and t
 Strikes are tagged with a category for filtering context:
 `Leadership`, `Military`, `Government`, `Nuclear`, `Landmark`, `Civilian/Medical`, `Mixed`, `Downtown`, `Unknown`
 
-## Future Upgrades (when traffic justifies)
-
-- [ ] Replace SVG with Leaflet/Mapbox GL (lat/lng coordinates are real and ready)
-- [ ] Supabase backend for live database-driven updates (migration SQL exists in `/tmp/strikes-package/`)
-- [ ] Admin panel for reviewing submissions and adding strikes without code deploys
-- [ ] Real-time updates via Supabase Realtime subscriptions
-- [ ] Per-strike share links
-- [ ] RSS feed for new additions
-- [ ] Rate limiting on submissions endpoint
-
 ## File Dependencies
 
 | File | Role |
