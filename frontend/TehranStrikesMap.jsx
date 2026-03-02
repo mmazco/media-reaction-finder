@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const STRIKES = [
   {id:1,n:"Supreme Leader's Compound (Pasteur District)",lat:35.700,lng:51.423,c:"confirmed",d:"Feb 28",
@@ -141,6 +142,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
   const [pan, setPan] = useState({x:0,y:0});
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({x:0,y:0});
+  const navigate = useNavigate();
   const mode = darkMode ? "dark" : "light";
   const t = T[mode]; const dk = darkMode;
   const list = flt==="all" ? STRIKES : STRIKES.filter(s=>s.c===flt);
@@ -159,13 +161,25 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
       {/* Header */}
       <div style={{padding: isMobile ? '60px 16px 20px' : '20px 20px 24px 70px'}}>
-        <div style={{fontSize:11,color:dk?'#ffd54f':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
-        <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
-          Tehran Strike Map
-        </h1>
-        <p style={{fontSize:14,color:t.tx3,margin:'6px 0 0',fontFamily:'Arial, sans-serif'}}>
-          Strike Verification Map — Updated Mar 2, 2026
-        </p>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:12}}>
+          <div>
+            <div style={{fontSize:11,color:dk?'#ffd54f':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
+            <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
+              Tehran Strike Map
+            </h1>
+            <p style={{fontSize:14,color:t.tx3,margin:'6px 0 0',fontFamily:'Arial, sans-serif'}}>
+              Strike Verification Map — Updated Mar 2, 2026
+            </p>
+          </div>
+          <button
+            onClick={()=>navigate('/trending/iran')}
+            style={{padding:'8px 16px',background:dk?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)',border:`1px solid ${t.bd}`,color:t.tx,fontSize:12,cursor:'pointer',transition:'all 0.2s ease',fontFamily:'Arial, sans-serif',borderRadius:4}}
+            onMouseEnter={e=>{e.currentTarget.style.background=dk?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.1)';e.currentTarget.style.borderColor=t.tx3}}
+            onMouseLeave={e=>{e.currentTarget.style.background=dk?'rgba(255,255,255,0.1)':'rgba(0,0,0,0.05)';e.currentTarget.style.borderColor=t.bd}}
+          >
+            ← Back to Feed
+          </button>
+        </div>
 
         <div style={{display:"flex",alignItems:"center",gap:14,marginTop:20,flexWrap:"wrap"}}>
           <div style={{background:t.stBg,border:`1px solid ${t.bd}`,padding:"10px 18px",display:"flex",alignItems:"center",gap:10}}>
