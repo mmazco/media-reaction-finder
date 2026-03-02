@@ -7,17 +7,20 @@ import TehranStrikesMap from './TehranStrikesMap';
 // Trending Topic Reactions Page Component
 function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQuery, onFileDownloadClick }) {
   const location = useLocation();
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const [reddit, setReddit] = useState([]);
-  const [web, setWeb] = useState([]);
-  const [twitter, setTwitter] = useState([]);
-  const [error, setError] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [hasFetched, setHasFetched] = useState(false);
-  
   // Extract topic from URL
   const topic = location.pathname.split('/trending/')[1]?.split('/')[0] || 'iran';
+
+  const cacheKey = `trending_${topic}`;
+  const cached = (() => { try { const raw = sessionStorage.getItem(cacheKey); if (!raw) return null; const c = JSON.parse(raw); if (Date.now() - c.ts > 10 * 60 * 1000) return null; return c; } catch { return null; } })();
+
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [reddit, setReddit] = useState(cached?.reddit || []);
+  const [web, setWeb] = useState(cached?.web || []);
+  const [twitter, setTwitter] = useState(cached?.twitter || []);
+  const [error, setError] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(cached ? new Date(cached.ts) : null);
+  const [hasFetched, setHasFetched] = useState(!!cached);
   
   const topicInfo = {
     'iran': {
@@ -46,15 +49,17 @@ function TrendingTopicPage({ darkMode, isMobile, navigate, performSearch, setQue
       setLoading(true);
     }
     try {
-      const response = await fetch(`/api/trending/${topic}`);
+      const response = await fetch(`/api/trending/${topic}${isRefresh ? '?refresh=1' : ''}`);
       if (response.ok) {
         const data = await response.json();
-        setReddit(data.reddit || []);
-        setWeb(data.web || []);
-        setTwitter(data.twitter || []);
+        const r = data.reddit || [], w = data.web || [], tw = data.twitter || [];
+        setReddit(r);
+        setWeb(w);
+        setTwitter(tw);
         setLastUpdated(new Date());
         setError(null);
         setHasFetched(true);
+        try { sessionStorage.setItem(cacheKey, JSON.stringify({ reddit: r, web: w, twitter: tw, ts: Date.now() })); } catch {}
       } else {
         setError('Failed to fetch reactions');
       }

@@ -9,6 +9,7 @@ from api.substack_authors import get_curated_authors
 import json as json_module
 from api.meta_commentary import generate_audio_commentary
 import os
+import time
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
 import requests
@@ -1072,23 +1073,27 @@ def get_twitter_reactions():
         print(f"Error in Twitter endpoint: {e}")
         return jsonify({'error': str(e), 'tweets': []}), 500
 
+_trending_cache = {}
+TRENDING_CACHE_TTL = 600  # 10 minutes
+
 @app.route('/api/trending/<topic>', methods=['GET'])
 def get_trending_reactions(topic):
     """
     Get combined reactions (Reddit, Web, Twitter) for a trending topic.
-    
-    Args:
-        topic: Topic name (e.g., 'iran', 'ai-governance')
-    
-    Returns:
-    - reddit: Reddit posts
-    - web: Web search results
-    - twitter: Twitter posts
+    Uses a 10-minute in-memory cache to avoid redundant API calls.
+    Pass ?refresh=1 to bypass the cache.
     """
+    force = request.args.get('refresh') == '1'
+
+    if not force and topic in _trending_cache:
+        entry = _trending_cache[topic]
+        if time.time() - entry['ts'] < TRENDING_CACHE_TTL:
+            print(f"📈 Returning cached trending results for: {topic} (age {int(time.time()-entry['ts'])}s)")
+            return jsonify(entry['data'])
+
     try:
-        print(f"📈 Fetching trending reactions for: {topic}")
+        print(f"📈 Fetching fresh trending reactions for: {topic}")
         
-        # Topic-specific search queries
         topic_queries = {
             'iran': 'Iran attack strike military US nuclear 2026',
             'ai-governance': 'AI governance regulation policy',
@@ -1107,13 +1112,16 @@ def get_trending_reactions(topic):
             web_results = web_future.result(timeout=30)[:5]
             twitter_results = twitter_future.result(timeout=30)
         
-        return jsonify({
+        result = {
             'topic': topic,
             'query': query,
             'reddit': reddit_results,
             'web': web_results,
             'twitter': twitter_results
-        })
+        }
+
+        _trending_cache[topic] = {'data': result, 'ts': time.time()}
+        return jsonify(result)
         
     except Exception as e:
         print(f"Error fetching trending reactions: {e}")
