@@ -138,6 +138,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
   const [submissions, setSubmissions] = useState([]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [mapExpanded, setMapExpanded] = useState(true);
   const mode = darkMode ? "dark" : "light";
   const t = T[mode]; const dk = darkMode;
   const list = flt==="all" ? STRIKES : STRIKES.filter(s=>s.c===flt);
@@ -155,7 +156,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
     <div style={{background:dk ? '#000' : 'rgb(240,238,231)',minHeight:"100vh",fontFamily:"Arial, sans-serif",color:t.tx,display:"flex",flexDirection:"column"}}>
 
       {/* Header */}
-      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 20px 24px 70px'}}>
+      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 32px 24px 32px', maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
         <div style={{fontSize:11,color:dk?'#b8860b':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
         <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
           Tehran Strike Map
@@ -197,13 +198,13 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
       </div>
 
       {/* Guide */}
-      <div style={{padding: isMobile ? "10px 16px 0" : "10px 70px 0"}}>
+      <div style={{padding: isMobile ? "10px 16px 0" : "10px 32px 0", maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
         <button onClick={()=>setGuide(!guide)} style={{background:t.gBg,border:`1px solid ${t.gBd}`,color:t.gTx,borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
           {guide?"▾":"▸"} Verification Guide & Source Methodology
         </button>
       </div>
       {guide&&(
-        <div style={{margin: isMobile ? "10px 16px 0" : "10px 70px 0",background:t.srfAlt,border:`1px solid ${t.bd}`,borderRadius:10,padding:18}}>
+        <div style={{margin: isMobile ? "10px 16px 0" : "10px 32px 0", maxWidth: 1100 - 64, background:t.srfAlt,border:`1px solid ${t.bd}`,borderRadius:10,padding:18}}>
           <h3 style={{fontSize:11,fontWeight:700,color:t.hd,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Confidence tiers</h3>
           <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:14}}>
             {Object.entries(CONF).map(([k,c])=>(
@@ -237,17 +238,22 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
       )}
 
       {/* Filters */}
-      <div style={{padding: isMobile ? "14px 16px" : "14px 70px",display:"flex",gap:8,flexWrap:"wrap"}}>
+      <div style={{padding: isMobile ? "14px 16px" : "14px 32px",display:"flex",gap:8,flexWrap:"wrap", maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
         {[{k:"all",l:`All (${STRIKES.length})`,c:dk?"#fff":"#0f172a"},{k:"confirmed",l:`Confirmed (${counts.confirmed})`,c:"#ef4444"},{k:"likely",l:`Likely (${counts.likely})`,c:"#f59e0b"},{k:"unverified",l:`Unverified (${counts.unverified})`,c:"#10b981"}].map(f=>(
           <button key={f.k} onClick={()=>{setFlt(f.k);setSel(null)}} style={{background:flt===f.k?t.btnA:t.btn,border:`1px solid ${flt===f.k?f.c:t.bd2}`,color:flt===f.k?f.c:t.tx2,borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}}>{f.l}</button>
         ))}
       </div>
 
       {/* Main */}
-      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden",minHeight: isMobile ? 'auto' : 420, padding: isMobile ? '0' : '0 0 0 54px', gap: isMobile ? 0 : 24}}>
+      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden", padding: isMobile ? '0' : '0 32px', maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box', gap: isMobile ? 0 : 20}}>
         {/* Map */}
-        <div style={{flex: isMobile ? 1 : '1 1 400px', maxWidth: isMobile ? '100%' : '50%', padding: isMobile ? "10px 12px 16px" : "14px 0 16px 16px"}}>
-          <svg viewBox="0 0 100 75" style={{width:"100%",height:"100%",background:t.mBg,borderRadius:10,border:`1px solid ${t.bd}`}}>
+        <div style={{flex: 'none', width: isMobile ? '100%' : mapExpanded ? 420 : 0, transition: 'width 0.3s ease', overflow: 'hidden', padding: isMobile ? "10px 12px 16px" : "8px 0 16px 0", position: 'relative'}}>
+          {!isMobile && (
+            <button onClick={()=>setMapExpanded(!mapExpanded)} style={{position:'absolute',top:12,right:4,zIndex:2,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:4,padding:"3px 8px",fontSize:10,cursor:"pointer",fontWeight:600}}>
+              {mapExpanded ? "Hide map" : "Show map"}
+            </button>
+          )}
+          <svg viewBox="0 0 100 75" style={{width:"100%",height:"auto",aspectRatio:"1/1",background:t.mBg,borderRadius:10,border:`1px solid ${t.bd}`}}>
             {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12}/>)}
             {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12}/>)}
             <text x={3} y={4.5} fontSize={1.8} fill={t.mLb2} fontWeight={700}>N</text>
@@ -271,7 +277,12 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
         </div>
 
         {/* Panel */}
-        <div style={{flex: isMobile ? 'none' : '0 0 340px', minWidth: isMobile ? '100%' : 300, borderLeft: isMobile ? 'none' : `1px solid ${t.bd}`, borderTop: isMobile ? `1px solid ${t.bd}` : 'none', overflowY:"auto",padding: isMobile ? "16px 16px 80px" : "14px 18px",background:t.srf}}>
+        <div style={{flex: 1, minWidth: isMobile ? '100%' : 300, borderLeft: isMobile ? 'none' : (mapExpanded ? `1px solid ${t.bd}` : 'none'), borderTop: isMobile ? `1px solid ${t.bd}` : 'none', overflowY:"auto",padding: isMobile ? "16px 16px 80px" : "8px 0 16px 18px",background:'transparent'}}>
+          {!mapExpanded && !isMobile && (
+            <button onClick={()=>setMapExpanded(true)} style={{marginBottom:10,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:4,padding:"5px 12px",fontSize:11,cursor:"pointer",fontWeight:600}}>
+              Show map
+            </button>
+          )}
           {s?(
             <div>
               <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:CONF[s.c].color,fontWeight:700,marginBottom:2}}>{CONF[s.c].label}</div>
