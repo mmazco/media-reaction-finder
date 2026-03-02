@@ -52,23 +52,7 @@ If a previously `unverified` or `likely` strike gets confirmed by additional sou
 - Update the `counts` object
 - Update the description `t` field with new details
 
-## Airtable Integration (Submissions)
-
-Form submissions from the "Suggest a Strike Location" button are sent to Airtable via the Flask backend.
-
-### Environment Variables
-
-| Variable | Description | Example |
-|---|---|---|
-| `AIRTABLE_PAT` | Personal Access Token | `patXXXX.XXXX` |
-| `AIRTABLE_BASE_ID` | Base ID from Airtable URL | `appXXXXXXXXXXX` |
-| `AIRTABLE_TABLE_NAME` | Table name (exact match) | `Tehran strikes feb-mar 2026` |
-
-These are set in:
-- `.env.local` (local dev)
-- Railway dashboard → Variables (production)
-
-### Airtable Table Schema
+### Airtable Table Schema For Submission 
 
 | Column | Type | Notes |
 |---|---|---|
