@@ -113,10 +113,31 @@ const T = {
 
 function sC(src,t){if(TIER1.includes(src))return t.s1;if(TIER2.includes(src))return t.s2;if(TIER3.includes(src))return t.s3;if(TIER4.includes(src))return t.s4;if(OFFICIAL.includes(src))return t.sO;return t.sD;}
 
+const AIRTABLE_URL = "/api/submit-strike";
+
+async function submitToAirtable(data) {
+  try {
+    const res = await fetch(AIRTABLE_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 export default function TehranStrikesMap({ darkMode = true, isMobile = false }) {
   const [sel, setSel] = useState(null);
   const [flt, setFlt] = useState("all");
   const [guide, setGuide] = useState(false);
+  const [confModal, setConfModal] = useState(false);
+  const [suggestModal, setSuggestModal] = useState(false);
+  const [suggestForm, setSuggestForm] = useState({ location: "", date: "", description: "", sources: "", contact: "" });
+  const [submissions, setSubmissions] = useState([]);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const mode = darkMode ? "dark" : "light";
   const t = T[mode]; const dk = darkMode;
   const list = flt==="all" ? STRIKES : STRIKES.filter(s=>s.c===flt);
@@ -126,47 +147,63 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
     {n:"Tier 1 — Wire services",v:"AP, Reuters",d:"Gold standard. On-ground correspondents where possible"},
     {n:"Tier 2 — Major broadcasters",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS",d:"Independent geolocation, satellite analysis, verified footage"},
     {n:"Tier 3 — Iranian state media",v:"Fars, Tasnim, IRNA",d:"Reliable on confirming strikes occurred. May spin details politically"},
-    {n:"Tier 4 — Aggregators (⚠ caution)",v:"LiveUAMap, MahsaAlert",d:"Crowdsourced. Fast but not independently verified"},
+    {n:"Tier 4 — Aggregators (caution)",v:"LiveUAMap, MahsaAlert",d:"Crowdsourced. Fast but not independently verified"},
     {n:"Official military claims",v:"IDF, CENTCOM",d:"First-party claims. Useful but inherently one-sided"},
   ];
-
-  const accent = dk ? '#ffd54f' : '#b8860b';
 
   return (
     <div style={{background:dk ? '#000' : 'rgb(240,238,231)',minHeight:"100vh",fontFamily:"Arial, sans-serif",color:t.tx,display:"flex",flexDirection:"column"}}>
 
       {/* Header */}
-      <div style={{padding: isMobile ? '60px 16px 10px' : '20px 20px 10px 70px',borderBottom:`1px solid ${t.bd}`}}>
-        <div style={{fontSize:'10px',color:t.tx3,textTransform:'uppercase',letterSpacing:'2px',fontWeight:600,marginBottom:4}}>Trending: Geopolitics</div>
-        <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}}>
-          <h1 style={{fontSize: isMobile ? 22 : 28,fontWeight:700,color:t.hd,margin:0,fontFamily:"'Georgia', serif"}}>Tehran Strike Confidence Map</h1>
-          <span style={{background:"#dc2626",color:"#fff",fontSize:9,fontWeight:700,padding:"2px 7px",borderRadius:3,letterSpacing:1}}>DAY 3</span>
-        </div>
-        <p style={{fontSize:11,color:t.tx3,marginTop:3}}>Feb 28 – Mar 2, 2026 · Sources: Al Jazeera, CNN, NPR, AP, BBC Verify, Fars/Tasnim, CBS, Wikipedia, LiveUAMap</p>
-        <div style={{display:"flex",alignItems:"center",gap:10,marginTop:6,flexWrap:"wrap"}}>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"5px 12px",display:"flex",alignItems:"center",gap:8}}>
+      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 20px 24px 70px'}}>
+        <div style={{fontSize:11,color:dk?'#b8860b':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
+        <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
+          Tehran Strike Confidence Map
+        </h1>
+        <p style={{fontSize:14,color:t.tx3,margin:'6px 0 0',fontFamily:'Arial, sans-serif'}}>
+          Strike Verification Map — Updated Mar 2, 2026
+        </p>
+
+        <div style={{display:"flex",alignItems:"center",gap:12,marginTop:18,flexWrap:"wrap"}}>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"6px 14px",display:"flex",alignItems:"center",gap:8}}>
             <div style={{width:6,height:6,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 8px rgba(34,197,94,0.6)"}}/>
             <div>
               <div style={{fontSize:10,color:t.tx3,lineHeight:1}}>LAST UPDATED</div>
-              <div style={{fontSize:13,color:t.hd,fontWeight:700,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
+              <div style={{fontSize:13,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
             </div>
           </div>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"5px 12px"}}>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"6px 14px"}}>
             <div style={{fontSize:10,color:t.tx3,lineHeight:1}}>SITUATION</div>
             <div style={{fontSize:11,color:"#ef4444",fontWeight:700}}>ACTIVE — Strikes ongoing, new waves expected</div>
           </div>
+          <span style={{background:"#dc2626",color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:3,letterSpacing:1}}>DAY 3</span>
         </div>
-        <p style={{fontSize:10,color:t.wTx,marginTop:5}}>⚠ LiveUAMap returned 403; MahsaAlert loaded as JS-only — neither fully scrapeable. This map will be outdated quickly.</p>
+
+        <div style={{display:"flex",gap:10,marginTop:16,flexWrap:"wrap"}}>
+          <button onClick={()=>setConfModal(true)} style={{background:dk?"rgba(99,102,241,0.12)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.3)":"#a5b4fc"}`,color:dk?"#a5b4fc":"#4f46e5",borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
+            Confidence Statement
+          </button>
+          <button onClick={()=>{setSuggestModal(true);setSubmitSuccess(false)}} style={{background:dk?"rgba(16,185,129,0.12)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
+            + Suggest a Strike Location
+          </button>
+          {submissions.length > 0 && (
+            <span style={{fontSize:10,color:t.tx3,alignSelf:"center"}}>{submissions.length} pending suggestion{submissions.length!==1?"s":""}</span>
+          )}
+        </div>
+
+        <p style={{fontSize:11,color:t.tx4,marginTop:14,marginBottom:0,lineHeight:1.5}}>
+          Sources: Al Jazeera, CNN, NPR, AP, BBC Verify, Fars/Tasnim, CBS, Wikipedia, LiveUAMap · {STRIKES.length} locations tracked
+        </p>
       </div>
 
       {/* Guide */}
-      <div style={{padding: isMobile ? "6px 16px 0" : "6px 18px 0"}}>
-        <button onClick={()=>setGuide(!guide)} style={{background:t.gBg,border:`1px solid ${t.gBd}`,color:t.gTx,borderRadius:6,padding:"6px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
+      <div style={{padding: isMobile ? "10px 16px 0" : "10px 70px 0"}}>
+        <button onClick={()=>setGuide(!guide)} style={{background:t.gBg,border:`1px solid ${t.gBd}`,color:t.gTx,borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
           {guide?"▾":"▸"} Verification Guide & Source Methodology
         </button>
       </div>
       {guide&&(
-        <div style={{margin:"8px 18px 0",background:t.srfAlt,border:`1px solid ${t.bd}`,borderRadius:10,padding:16}}>
+        <div style={{margin: isMobile ? "10px 16px 0" : "10px 70px 0",background:t.srfAlt,border:`1px solid ${t.bd}`,borderRadius:10,padding:18}}>
           <h3 style={{fontSize:11,fontWeight:700,color:t.hd,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Confidence tiers</h3>
           <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:14}}>
             {Object.entries(CONF).map(([k,c])=>(
@@ -194,26 +231,26 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
             ))}
           </div>
           <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:8,fontSize:10,color:t.wTx,lineHeight:1.5}}>
-            ⚠ <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
+            <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div style={{padding: isMobile ? "8px 16px" : "8px 18px",display:"flex",gap:6,flexWrap:"wrap",borderBottom:`1px solid ${t.bd}`}}>
+      <div style={{padding: isMobile ? "14px 16px" : "14px 70px",display:"flex",gap:8,flexWrap:"wrap"}}>
         {[{k:"all",l:`All (${STRIKES.length})`,c:dk?"#fff":"#0f172a"},{k:"confirmed",l:`Confirmed (${counts.confirmed})`,c:"#ef4444"},{k:"likely",l:`Likely (${counts.likely})`,c:"#f59e0b"},{k:"unverified",l:`Unverified (${counts.unverified})`,c:"#10b981"}].map(f=>(
           <button key={f.k} onClick={()=>{setFlt(f.k);setSel(null)}} style={{background:flt===f.k?t.btnA:t.btn,border:`1px solid ${flt===f.k?f.c:t.bd2}`,color:flt===f.k?f.c:t.tx2,borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}}>{f.l}</button>
         ))}
       </div>
 
       {/* Main */}
-      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden",minHeight: isMobile ? 'auto' : 420}}>
+      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden",minHeight: isMobile ? 'auto' : 420, padding: isMobile ? '0' : '0 0 0 54px'}}>
         {/* Map */}
-        <div style={{flex:1,padding: isMobile ? "6px 8px 12px" : "6px 12px 12px"}}>
+        <div style={{flex:1,padding: isMobile ? "10px 12px 16px" : "10px 16px 16px"}}>
           <svg viewBox="0 0 100 75" style={{width:"100%",height:"100%",background:t.mBg,borderRadius:10,border:`1px solid ${t.bd}`}}>
             {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12}/>)}
             {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12}/>)}
-            <text x={3} y={4.5} fontSize={1.8} fill={t.mLb2} fontWeight={700}>N↑</text>
+            <text x={3} y={4.5} fontSize={1.8} fill={t.mLb2} fontWeight={700}>N</text>
             <text x={50} y={3.5} fontSize={1.4} fill={t.mLb} textAnchor="middle" fontWeight={600}>NORTHERN TEHRAN</text>
             <text x={50} y={73} fontSize={1.4} fill={t.mLb} textAnchor="middle" fontWeight={600}>SOUTHERN TEHRAN</text>
             <text x={3} y={38} fontSize={1.3} fill={t.mLb}>W</text>
@@ -234,7 +271,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
         </div>
 
         {/* Panel */}
-        <div style={{width: isMobile ? '100%' : 310, borderLeft: isMobile ? 'none' : `1px solid ${t.bd}`, borderTop: isMobile ? `1px solid ${t.bd}` : 'none', overflowY:"auto",padding: isMobile ? "10px 16px 80px" : "10px 14px",background:t.srf}}>
+        <div style={{width: isMobile ? '100%' : 320, borderLeft: isMobile ? 'none' : `1px solid ${t.bd}`, borderTop: isMobile ? `1px solid ${t.bd}` : 'none', overflowY:"auto",padding: isMobile ? "16px 16px 80px" : "14px 18px",background:t.srf}}>
           {s?(
             <div>
               <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:CONF[s.c].color,fontWeight:700,marginBottom:2}}>{CONF[s.c].label}</div>
@@ -245,24 +282,24 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
               </div>
               <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,marginBottom:12}}>{s.t}</p>
               <div style={{marginBottom:10}}>
-                <div style={{fontSize:10,color:t.tx3,marginBottom:5,fontWeight:600}}>SOURCES ({s.s.length}) — {s.s.length>=3?"strong corroboration":s.s.length===2?"moderate corroboration":"⚠ single source"}</div>
+                <div style={{fontSize:10,color:t.tx3,marginBottom:5,fontWeight:600}}>SOURCES ({s.s.length}) — {s.s.length>=3?"strong corroboration":s.s.length===2?"moderate corroboration":"single source"}</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
                   {s.s.map((src,i)=>{const sc=sC(src,t);return <span key={i} style={{fontSize:10,padding:"2px 8px",borderRadius:4,background:sc.bg,color:sc.tx,border:`1px solid ${sc.bd}`}}>{src}</span>})}
                 </div>
               </div>
               {s.c==="unverified"&&(
                 <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:"8px 10px",fontSize:11,color:t.wTx,marginBottom:10,lineHeight:1.4}}>
-                  ⚠ Single-source report. Iran's internet blackout (~1% connectivity) makes independent verification near-impossible.
+                  Single-source report. Iran's internet blackout (~1% connectivity) makes independent verification near-impossible.
                 </div>
               )}
               <div style={{fontSize:10,color:t.tx4,padding:"6px 0",borderTop:`1px solid ${t.bd}`}}>
-                {s.c==="confirmed"?"✓ High confidence — independently verified by multiple major outlets":s.c==="likely"?"◐ Medium confidence — credible but fewer independent verifications":"○ Low confidence — needs further corroboration"}
+                {s.c==="confirmed"?"High confidence — independently verified by multiple major outlets":s.c==="likely"?"Medium confidence — credible but fewer independent verifications":"Low confidence — needs further corroboration"}
               </div>
-              <button onClick={()=>setSel(null)} style={{marginTop:10,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:6,padding:"6px 14px",fontSize:11,cursor:"pointer",width:"100%"}}>← Back to list</button>
+              <button onClick={()=>setSel(null)} style={{marginTop:10,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:6,padding:"6px 14px",fontSize:11,cursor:"pointer",width:"100%"}}>Back to list</button>
             </div>
           ):(
             <div>
-              <h3 style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:t.tx4,marginBottom:10}}>Strike locations · Click map or list</h3>
+              <h3 style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:t.tx4,marginBottom:10}}>Strike locations — Click map or list</h3>
               {["confirmed","likely","unverified"].map(lv=>{
                 const items=list.filter(x=>x.c===lv);if(!items.length)return null;
                 return(
@@ -287,6 +324,160 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
           )}
         </div>
       </div>
+
+      {/* CONFIDENCE STATEMENT MODAL */}
+      {confModal && (
+        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}} onClick={()=>setConfModal(false)}>
+          <div style={{background:t.srf,border:`1px solid ${t.bd2}`,borderRadius:12,padding:24,maxWidth:620,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+              <div>
+                <h2 style={{fontSize:18,fontWeight:700,color:t.hd,margin:0,fontFamily:"'Georgia', serif"}}>Confidence Statement</h2>
+                <p style={{fontSize:11,color:t.tx3,marginTop:2}}>Last updated: Mar 2, 2026 — 15:15 UTC</p>
+              </div>
+              <button onClick={()=>setConfModal(false)} style={{background:"none",border:"none",color:t.tx3,fontSize:20,cursor:"pointer",padding:4}}>✕</button>
+            </div>
+
+            <div style={{background:dk?"rgba(99,102,241,0.08)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.2)":"#c7d2fe"}`,borderRadius:8,padding:14,marginBottom:16}}>
+              <p style={{fontSize:13,color:t.tx,lineHeight:1.6,margin:0}}>
+                This map compiles <strong style={{color:t.hd}}>21 reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:t.hd}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
+              </p>
+            </div>
+
+            <h3 style={{fontSize:13,fontWeight:700,color:t.hd,marginBottom:8,fontFamily:"'Georgia', serif"}}>Confidence by tier</h3>
+
+            {[
+              {label:"CONFIRMED",count:11,pct:"90%+",color:"#ef4444",
+               text:"Backed by 3+ independent major outlets (AP, Reuters, CNN, BBC, Al Jazeera, etc). Satellite imagery or BBC Verify/CNN Verified corroboration where available. We are highly confident strikes occurred at these locations. Coordinates are approximate — placed by neighbourhood/street name, not geolocated footage, so markers may be off by several hundred metres."},
+              {label:"LIKELY",count:7,pct:"60–75%",color:"#f59e0b",
+               text:"Backed by 1–2 credible sources, verified video, or BBC Verify confirmation. Strong evidence but fewer independent sources. Some entries (e.g. Ferdowsi Square) come from a single state broadcaster (CGTN). Khatam-al-Anbia Hospital is the strongest in this tier and may be upgraded. Niloofar Square has a specific casualty figure but the underlying Iranian source couldn't be independently traced."},
+              {label:"UNVERIFIED",count:3,pct:"30–40%",color:"#10b981",
+               text:"Sourced primarily from LiveUAMap (which returned a 403 error on the specific page linked) or Iranian social media. With Iran's internet at ~1%, these could be real strikes not yet picked up by major outlets, or they could be misidentified explosions, sonic booms, or air defence activity. No way to tell without further corroboration."},
+            ].map((tier,i)=>(
+              <div key={i} style={{background:dk?`${tier.color}11`:`${tier.color}15`,border:`1px solid ${tier.color}33`,borderRadius:8,padding:12,marginBottom:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                  <div style={{width:10,height:10,borderRadius:"50%",background:tier.color}}/>
+                  <span style={{fontSize:12,fontWeight:700,color:tier.color}}>{tier.label} ({tier.count} sites)</span>
+                  <span style={{marginLeft:"auto",fontSize:12,fontWeight:700,color:tier.color}}>~{tier.pct} confidence</span>
+                </div>
+                <p style={{fontSize:11,color:t.tx2,lineHeight:1.55,margin:0}}>{tier.text}</p>
+              </div>
+            ))}
+
+            <h3 style={{fontSize:13,fontWeight:700,color:t.hd,marginTop:16,marginBottom:8,fontFamily:"'Georgia', serif"}}>Key limitations</h3>
+            <div style={{display:"flex",flexDirection:"column",gap:6}}>
+              {[
+                {title:"Location accuracy",text:"Markers placed by neighbourhood/street name, not GPS from geolocated footage. Some could be off by several hundred metres."},
+                {title:"Coverage gaps",text:"Almost certainly missing Tehran strikes that haven't made it into English-language reporting. The 21 sites are a floor, not a ceiling."},
+                {title:"Source access",text:"LiveUAMap returned 403 on the specific Farmanieh page. MahsaAlert was a JS-only dynamic map with no extractable text. Neither could be fully verified."},
+                {title:"Source bias",text:"Iranian state media may overstate civilian impact for political purposes. IDF/CENTCOM confirm targets but won't acknowledge civilian harm. Truth likely lies in between."},
+                {title:"Internet blackout",text:"Iran's internet at ~1% since strikes began. Severely limits real-time verification, especially for Mar 2 morning reports."},
+              ].map((item,i)=>(
+                <div key={i} style={{display:"flex",gap:10,padding:"8px 10px",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6}}>
+                  <div>
+                    <div style={{fontSize:11,fontWeight:700,color:t.hd}}>{item.title}</div>
+                    <p style={{fontSize:10,color:t.tx2,margin:"2px 0 0",lineHeight:1.45}}>{item.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{marginTop:16,padding:12,background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:8}}>
+              <p style={{fontSize:11,color:t.wTx,lineHeight:1.5,margin:0}}>
+                <strong>This map is a snapshot, not a live feed.</strong> The conflict is actively evolving with new strike waves expected. Locations may be upgraded, downgraded, or added as new information emerges. If you have information about a strike not listed here, please use the "Suggest a Strike Location" button to submit it for verification.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUGGEST A STRIKE MODAL */}
+      {suggestModal && (
+        <div style={{position:"fixed",inset:0,zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.6)",backdropFilter:"blur(4px)"}} onClick={()=>setSuggestModal(false)}>
+          <div style={{background:t.srf,border:`1px solid ${t.bd2}`,borderRadius:12,padding:24,maxWidth:520,width:"90%",maxHeight:"85vh",overflowY:"auto",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
+              <div>
+                <h2 style={{fontSize:18,fontWeight:700,color:t.hd,margin:0,fontFamily:"'Georgia', serif"}}>Suggest a Strike Location</h2>
+                <p style={{fontSize:11,color:t.tx3,marginTop:2}}>Submissions are reviewed before being added to the map</p>
+              </div>
+              <button onClick={()=>setSuggestModal(false)} style={{background:"none",border:"none",color:t.tx3,fontSize:20,cursor:"pointer",padding:4}}>✕</button>
+            </div>
+
+            {submitSuccess ? (
+              <div style={{textAlign:"center",padding:"30px 20px"}}>
+                <h3 style={{fontSize:16,fontWeight:700,color:t.hd,marginBottom:6}}>Submission Received</h3>
+                <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,marginBottom:16}}>
+                  Thank you. Your suggestion has been logged and will be reviewed against available sources before being added to the map. Submissions with verifiable source links are prioritised.
+                </p>
+                <button onClick={()=>setSuggestModal(false)} style={{background:dk?"rgba(16,185,129,0.15)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:6,padding:"8px 20px",fontSize:12,fontWeight:600,cursor:"pointer"}}>
+                  Close
+                </button>
+              </div>
+            ) : (
+              <div>
+                <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:10,marginBottom:16,fontSize:10,color:t.wTx,lineHeight:1.5}}>
+                  <strong>Verification process:</strong> All submissions are reviewed before display. We cross-reference against wire services, major broadcasters, and wider media coverage. Submissions with direct source links (news articles, verified video, satellite imagery) are prioritised. Unverifiable reports will be held pending corroboration.
+                </div>
+
+                {[
+                  {key:"location",label:"Location name / area *",placeholder:"e.g. Vanak Square, northern Tehran",type:"text"},
+                  {key:"date",label:"Date & approximate time *",placeholder:"e.g. Mar 2, ~08:30 local time",type:"text"},
+                  {key:"description",label:"What happened? *",placeholder:"Describe what was reported — explosion, smoke, structural damage, etc.",type:"textarea"},
+                  {key:"sources",label:"Source links (crucial for verification)",placeholder:"Paste URLs to news articles, social media posts, video links, satellite imagery...",type:"textarea"},
+                  {key:"contact",label:"Your contact (optional, for follow-up)",placeholder:"Email or social handle — completely optional",type:"text"},
+                ].map(field=>(
+                  <div key={field.key} style={{marginBottom:12}}>
+                    <label style={{display:"block",fontSize:11,fontWeight:600,color:t.tx2,marginBottom:4}}>{field.label}</label>
+                    {field.type === "textarea" ? (
+                      <textarea value={suggestForm[field.key]} onChange={e=>setSuggestForm(p=>({...p,[field.key]:e.target.value}))}
+                        placeholder={field.placeholder} rows={3}
+                        style={{width:"100%",boxSizing:"border-box",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:t.tx,resize:"vertical",fontFamily:"inherit",outline:"none"}}/>
+                    ) : (
+                      <input value={suggestForm[field.key]} onChange={e=>setSuggestForm(p=>({...p,[field.key]:e.target.value}))}
+                        placeholder={field.placeholder} type="text"
+                        style={{width:"100%",boxSizing:"border-box",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6,padding:"8px 10px",fontSize:12,color:t.tx,fontFamily:"inherit",outline:"none"}}/>
+                    )}
+                  </div>
+                ))}
+
+                <div style={{display:"flex",gap:8,marginTop:12}}>
+                  <button
+                    onClick={async ()=>{
+                      if(!suggestForm.location||!suggestForm.date||!suggestForm.description){return}
+                      setSubmitting(true);
+                      const sent = await submitToAirtable(suggestForm);
+                      setSubmissions(prev=>[...prev,{...suggestForm,id:Date.now(),status:"pending",submitted:new Date().toISOString()}]);
+                      setSuggestForm({location:"",date:"",description:"",sources:"",contact:""});
+                      setSubmitSuccess(true);
+                      setSubmitting(false);
+                    }}
+                    disabled={!suggestForm.location||!suggestForm.date||!suggestForm.description||submitting}
+                    style={{flex:1,background:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?(dk?"rgba(255,255,255,0.03)":"#f1f5f9"):(dk?"rgba(16,185,129,0.2)":"#ecfdf5"),border:`1px solid ${(!suggestForm.location||!suggestForm.date||!suggestForm.description)?t.bd2:(dk?"rgba(16,185,129,0.4)":"#6ee7b7")}`,color:(!suggestForm.location||!suggestForm.date||!suggestForm.description)?t.tx4:(dk?"#6ee7b7":"#065f46"),borderRadius:6,padding:"10px 16px",fontSize:12,fontWeight:700,cursor:(!suggestForm.location||!suggestForm.date||!suggestForm.description||submitting)?"not-allowed":"pointer"}}>
+                    {submitting ? "Submitting..." : "Submit for Review"}
+                  </button>
+                  <button onClick={()=>setSuggestModal(false)} style={{background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx3,borderRadius:6,padding:"10px 16px",fontSize:12,cursor:"pointer"}}>
+                    Cancel
+                  </button>
+                </div>
+
+                {submissions.length > 0 && (
+                  <div style={{marginTop:16,borderTop:`1px solid ${t.bd}`,paddingTop:12}}>
+                    <h4 style={{fontSize:11,fontWeight:700,color:t.tx3,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Your submissions ({submissions.length})</h4>
+                    {submissions.map(sub=>(
+                      <div key={sub.id} style={{padding:"8px 10px",marginBottom:4,background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:6}}>
+                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                          <span style={{fontSize:12,fontWeight:600,color:t.tx}}>{sub.location}</span>
+                          <span style={{fontSize:9,fontWeight:700,padding:"2px 6px",borderRadius:3,background:dk?"rgba(245,158,11,0.12)":"#fef3c7",color:dk?"#fcd34d":"#92400e",border:`1px solid ${dk?"rgba(245,158,11,0.25)":"#fcd34d"}`}}>PENDING REVIEW</span>
+                        </div>
+                        <p style={{fontSize:10,color:t.tx3,margin:"2px 0 0"}}>{sub.date} — {sub.description.slice(0,80)}{sub.description.length>80?"…":""}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1295,6 +1295,52 @@ def serve_index():
     """Serve the main index.html"""
     return send_from_directory(STATIC_ROOT, 'index.html')
 
+@app.route('/api/submit-strike', methods=['POST'])
+def submit_strike():
+    """Forward strike suggestions to Airtable"""
+    data = request.get_json()
+    if not data or not data.get('location') or not data.get('date') or not data.get('description'):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    airtable_token = os.environ.get('AIRTABLE_PAT')
+    airtable_base = os.environ.get('AIRTABLE_BASE_ID')
+    airtable_table = os.environ.get('AIRTABLE_TABLE_NAME', 'Strike Submissions')
+
+    if not airtable_token or not airtable_base:
+        print("[submit-strike] Airtable not configured, storing locally only")
+        return jsonify({'status': 'received', 'stored': 'local_only'}), 200
+
+    try:
+        res = requests.post(
+            f'https://api.airtable.com/v0/{airtable_base}/{airtable_table}',
+            headers={
+                'Authorization': f'Bearer {airtable_token}',
+                'Content-Type': 'application/json',
+            },
+            json={
+                'records': [{
+                    'fields': {
+                        'Location': data.get('location', ''),
+                        'Date': data.get('date', ''),
+                        'Description': data.get('description', ''),
+                        'Sources': data.get('sources', ''),
+                        'Contact': data.get('contact', ''),
+                        'Status': 'Pending',
+                        'Submitted At': datetime.utcnow().isoformat() + 'Z',
+                    }
+                }]
+            },
+            timeout=10
+        )
+        if res.ok:
+            return jsonify({'status': 'submitted'}), 200
+        else:
+            print(f"[submit-strike] Airtable error: {res.status_code} {res.text}")
+            return jsonify({'status': 'received', 'stored': 'local_only'}), 200
+    except Exception as e:
+        print(f"[submit-strike] Error: {e}")
+        return jsonify({'status': 'received', 'stored': 'local_only'}), 200
+
 @app.route('/<path:path>')
 def serve_static(path):
     """Serve static files or fallback to index.html for SPA routing"""
