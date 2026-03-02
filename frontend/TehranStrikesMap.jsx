@@ -131,14 +131,16 @@ async function submitToAirtable(data) {
 export default function TehranStrikesMap({ darkMode = true, isMobile = false }) {
   const [sel, setSel] = useState(null);
   const [flt, setFlt] = useState("all");
-  const [guide, setGuide] = useState(false);
   const [confModal, setConfModal] = useState(false);
   const [suggestModal, setSuggestModal] = useState(false);
   const [suggestForm, setSuggestForm] = useState({ location: "", date: "", description: "", sources: "", contact: "" });
   const [submissions, setSubmissions] = useState([]);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [mapExpanded, setMapExpanded] = useState(true);
+  const [zoom, setZoom] = useState(1);
+  const [pan, setPan] = useState({x:0,y:0});
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({x:0,y:0});
   const mode = darkMode ? "dark" : "light";
   const t = T[mode]; const dk = darkMode;
   const list = flt==="all" ? STRIKES : STRIKES.filter(s=>s.c===flt);
@@ -156,7 +158,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
     <div style={{background:dk ? '#000' : 'rgb(240,238,231)',minHeight:"100vh",fontFamily:"Arial, sans-serif",color:t.tx,display:"flex",flexDirection:"column"}}>
 
       {/* Header */}
-      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 32px 24px 32px', maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
+      <div style={{padding: isMobile ? '60px 16px 20px' : '20px 28px 24px 70px'}}>
         <div style={{fontSize:11,color:dk?'#b8860b':'#8b6914',textTransform:'uppercase',letterSpacing:'1px',fontWeight:600,marginBottom:6,fontFamily:'Arial, sans-serif'}}>Trending: Geopolitics</div>
         <h1 style={{fontSize:22,fontWeight:'normal',color:dk?'#fff':'#1a1a1a',margin:0,fontFamily:'Georgia, serif'}}>
           Tehran Strike Map
@@ -165,95 +167,54 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
           Strike Verification Map — Updated Mar 2, 2026
         </p>
 
-        <div style={{display:"flex",alignItems:"center",gap:12,marginTop:18,flexWrap:"wrap"}}>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"6px 14px",display:"flex",alignItems:"center",gap:8}}>
-            <div style={{width:6,height:6,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 8px rgba(34,197,94,0.6)"}}/>
+        <div style={{display:"flex",alignItems:"center",gap:14,marginTop:20,flexWrap:"wrap"}}>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:8,padding:"10px 18px",display:"flex",alignItems:"center",gap:10}}>
+            <div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 10px rgba(34,197,94,0.6)"}}/>
             <div>
-              <div style={{fontSize:10,color:t.tx3,lineHeight:1}}>LAST UPDATED</div>
-              <div style={{fontSize:13,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
+              <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>LAST UPDATED</div>
+              <div style={{fontSize:15,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
             </div>
           </div>
-          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:6,padding:"6px 14px"}}>
-            <div style={{fontSize:10,color:t.tx3,lineHeight:1}}>SITUATION</div>
-            <div style={{fontSize:11,color:"#ef4444",fontWeight:700}}>ACTIVE — Strikes ongoing, new waves expected</div>
+          <div style={{background:t.stBg,border:`1px solid ${t.bd2}`,borderRadius:8,padding:"10px 18px"}}>
+            <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>SITUATION</div>
+            <div style={{fontSize:13,color:"#ef4444",fontWeight:700}}>ACTIVE — Strikes ongoing, new waves expected</div>
           </div>
-          <span style={{background:"#dc2626",color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:3,letterSpacing:1}}>DAY 3</span>
+          <span style={{background:"#dc2626",color:"#fff",fontSize:11,fontWeight:700,padding:"5px 12px",borderRadius:4,letterSpacing:1}}>DAY 3</span>
         </div>
 
-        <div style={{display:"flex",gap:10,marginTop:16,flexWrap:"wrap"}}>
-          <button onClick={()=>setConfModal(true)} style={{background:dk?"rgba(99,102,241,0.12)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.3)":"#a5b4fc"}`,color:dk?"#a5b4fc":"#4f46e5",borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
+        <div style={{display:"flex",gap:12,marginTop:20,flexWrap:"wrap"}}>
+          <button onClick={()=>setConfModal(true)} style={{background:dk?"rgba(99,102,241,0.12)":"#eef2ff",border:`1px solid ${dk?"rgba(99,102,241,0.3)":"#a5b4fc"}`,color:dk?"#a5b4fc":"#4f46e5",borderRadius:6,padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
             Confidence Statement
           </button>
-          <button onClick={()=>{setSuggestModal(true);setSubmitSuccess(false)}} style={{background:dk?"rgba(16,185,129,0.12)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:5}}>
+          <button onClick={()=>{setSuggestModal(true);setSubmitSuccess(false)}} style={{background:dk?"rgba(16,185,129,0.12)":"#ecfdf5",border:`1px solid ${dk?"rgba(16,185,129,0.3)":"#6ee7b7"}`,color:dk?"#6ee7b7":"#065f46",borderRadius:6,padding:"10px 18px",fontSize:13,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
             + Suggest a Strike Location
           </button>
           {submissions.length > 0 && (
-            <span style={{fontSize:10,color:t.tx3,alignSelf:"center"}}>{submissions.length} pending suggestion{submissions.length!==1?"s":""}</span>
+            <span style={{fontSize:12,color:t.tx3,alignSelf:"center"}}>{submissions.length} pending suggestion{submissions.length!==1?"s":""}</span>
           )}
         </div>
 
-        <p style={{fontSize:11,color:t.tx4,marginTop:14,marginBottom:0,lineHeight:1.5}}>
+        <p style={{fontSize:13,color:t.tx4,marginTop:16,marginBottom:0,lineHeight:1.5}}>
           Sources: Al Jazeera, CNN, NPR, AP, BBC Verify, Fars/Tasnim, CBS, Wikipedia, LiveUAMap · {STRIKES.length} locations tracked
         </p>
       </div>
 
-      {/* Guide */}
-      <div style={{padding: isMobile ? "10px 16px 0" : "10px 32px 0", maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
-        <button onClick={()=>setGuide(!guide)} style={{background:t.gBg,border:`1px solid ${t.gBd}`,color:t.gTx,borderRadius:4,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>
-          {guide?"▾":"▸"} Verification Guide & Source Methodology
-        </button>
-      </div>
-      {guide&&(
-        <div style={{margin: isMobile ? "10px 16px 0" : "10px 32px 0", maxWidth: 1100 - 64, background:t.srfAlt,border:`1px solid ${t.bd}`,borderRadius:10,padding:18}}>
-          <h3 style={{fontSize:11,fontWeight:700,color:t.hd,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Confidence tiers</h3>
-          <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:14}}>
-            {Object.entries(CONF).map(([k,c])=>(
-              <div key={k} style={{flex:"1 1 180px",background:dk?`${c.color}11`:`${c.color}15`,border:`1px solid ${c.color}44`,borderRadius:8,padding:10}}>
-                <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:4}}>
-                  <div style={{width:10,height:10,borderRadius:"50%",background:c.color,boxShadow:`0 0 6px ${c.color}66`}}/>
-                  <span style={{fontSize:11,fontWeight:700,color:c.color}}>{c.label}</span>
-                  <span style={{fontSize:16,fontWeight:800,color:c.color,marginLeft:"auto"}}>{counts[k]}</span>
-                </div>
-                <p style={{fontSize:10,color:t.tx2,lineHeight:1.4,margin:0}}>{c.desc}</p>
-              </div>
-            ))}
-          </div>
-          <h3 style={{fontSize:11,fontWeight:700,color:t.hd,marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>Source reliability ranking</h3>
-          <div style={{display:"flex",flexDirection:"column",gap:4,marginBottom:12}}>
-            {tiers.map((tr,i)=>(
-              <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"5px 8px",background:t.cBg,border:`1px solid ${t.cBd}`,borderRadius:4}}>
-                <div style={{width:6,height:6,borderRadius:"50%",background:t.tC[i],marginTop:4,flexShrink:0}}/>
-                <div style={{flex:1}}>
-                  <span style={{fontSize:10,fontWeight:700,color:t.tC[i]}}>{tr.n}</span>
-                  <span style={{fontSize:10,color:t.tx2}}> — {tr.v}</span>
-                  <p style={{fontSize:9,color:t.tx3,margin:"1px 0 0"}}>{tr.d}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:8,fontSize:10,color:t.wTx,lineHeight:1.5}}>
-            <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
-          </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      <div style={{padding: isMobile ? "14px 16px" : "14px 32px",display:"flex",gap:8,flexWrap:"wrap", maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box'}}>
-        {[{k:"all",l:`All (${STRIKES.length})`,c:dk?"#fff":"#0f172a"},{k:"confirmed",l:`Confirmed (${counts.confirmed})`,c:"#ef4444"},{k:"likely",l:`Likely (${counts.likely})`,c:"#f59e0b"},{k:"unverified",l:`Unverified (${counts.unverified})`,c:"#10b981"}].map(f=>(
-          <button key={f.k} onClick={()=>{setFlt(f.k);setSel(null)}} style={{background:flt===f.k?t.btnA:t.btn,border:`1px solid ${flt===f.k?f.c:t.bd2}`,color:flt===f.k?f.c:t.tx2,borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}}>{f.l}</button>
-        ))}
-      </div>
-
-      {/* Main */}
-      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row',flex:1,overflow: isMobile ? 'visible' : "hidden", padding: isMobile ? '0' : '0 32px', maxWidth: 1100, margin: '0 auto', width: '100%', boxSizing: 'border-box', gap: isMobile ? 0 : 20}}>
+      {/* Main — Map + Right Panel */}
+      <div style={{display:"flex",flexDirection: isMobile ? 'column' : 'row', padding: isMobile ? '0' : '16px 20px 0 70px', gap: isMobile ? 0 : 32, flexWrap:'wrap'}}>
         {/* Map */}
-        <div style={{flex: 'none', width: isMobile ? '100%' : mapExpanded ? 420 : 0, transition: 'width 0.3s ease', overflow: 'hidden', padding: isMobile ? "10px 12px 16px" : "8px 0 16px 0", position: 'relative'}}>
-          {!isMobile && (
-            <button onClick={()=>setMapExpanded(!mapExpanded)} style={{position:'absolute',top:12,right:4,zIndex:2,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:4,padding:"3px 8px",fontSize:10,cursor:"pointer",fontWeight:600}}>
-              {mapExpanded ? "Hide map" : "Show map"}
-            </button>
-          )}
-          <svg viewBox="0 0 100 75" style={{width:"100%",height:"auto",aspectRatio:"1/1",background:t.mBg,borderRadius:10,border:`1px solid ${t.bd}`}}>
+        <div style={{flex: isMobile ? '1' : '1 1 550px', minWidth: isMobile ? '100%' : 300, maxWidth: isMobile ? '100%' : '70%', padding: isMobile ? "10px 12px 16px" : "8px", position: 'relative', background:t.mBg, borderRadius:10, border:`1px solid ${t.bd}`, overflow:'hidden', maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)'}}>
+          <div style={{position:'absolute',top:12,right:12,zIndex:10,display:'flex',flexDirection:'column',gap:4}}>
+            <button onClick={()=>setZoom(z=>Math.min(3,z+0.3))} title="Zoom in" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:dk?'#e0e6ed':'#374151',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+            <button onClick={()=>setZoom(z=>Math.max(0.5,z-0.3))} title="Zoom out" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:dk?'#e0e6ed':'#374151',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
+            <button onClick={()=>{setZoom(1);setPan({x:0,y:0})}} title="Reset view" style={{width:32,height:32,background:dk?'rgba(255,255,255,0.08)':'#fff',border:`1px solid ${dk?'rgba(255,255,255,0.15)':'#d1d5db'}`,color:t.tx3,fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>↺</button>
+          </div>
+          <svg viewBox="0 0 100 75" style={{width:"100%",maxHeight:'calc(100vh - 280px)',cursor:isPanning?'grabbing':'grab'}}
+            onMouseDown={e=>{if(e.target.closest('g[style*="pointer"]'))return;setIsPanning(true);setPanStart({x:e.clientX-pan.x,y:e.clientY-pan.y})}}
+            onMouseMove={e=>{if(isPanning){setPan({x:e.clientX-panStart.x,y:e.clientY-panStart.y})}}}
+            onMouseUp={()=>setIsPanning(false)}
+            onMouseLeave={()=>setIsPanning(false)}
+          >
+            <g transform={`translate(${pan.x/(zoom*14)}, ${pan.y/(zoom*14)}) scale(${zoom})`} style={{transformOrigin:'50px 37.5px'}}>
             {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12}/>)}
             {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12}/>)}
             <text x={3} y={4.5} fontSize={1.8} fill={t.mLb2} fontWeight={700}>N</text>
@@ -273,66 +234,115 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
                 </g>
               );
             })}
+            </g>
+            {zoom===1&&pan.x===0&&pan.y===0&&(
+              <text x={50} y={74} fontSize={0.9} fill={t.tx4} textAnchor="middle">Drag to pan · Use +/− to zoom</text>
+            )}
           </svg>
         </div>
 
-        {/* Panel */}
-        <div style={{flex: 1, minWidth: isMobile ? '100%' : 300, borderLeft: isMobile ? 'none' : (mapExpanded ? `1px solid ${t.bd}` : 'none'), borderTop: isMobile ? `1px solid ${t.bd}` : 'none', overflowY:"auto",padding: isMobile ? "16px 16px 80px" : "8px 0 16px 18px",background:'transparent'}}>
-          {!mapExpanded && !isMobile && (
-            <button onClick={()=>setMapExpanded(true)} style={{marginBottom:10,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:4,padding:"5px 12px",fontSize:11,cursor:"pointer",fontWeight:600}}>
-              Show map
-            </button>
-          )}
+        {/* Right Panel — Tabs */}
+        <div style={{flex: '0 0 340px', minWidth: isMobile ? '100%' : 300}}>
+          {/* Tabs like Markets/Map Info */}
+          <div style={{display:'flex',borderBottom:`1px solid ${t.bd}`,marginBottom:12}}>
+            {[{k:"all",l:`All (${STRIKES.length})`},{k:"confirmed",l:`Confirmed (${counts.confirmed})`},{k:"likely",l:`Likely (${counts.likely})`},{k:"unverified",l:`Unverified (${counts.unverified})`}].map(tab=>(
+              <button key={tab.k} onClick={()=>{setFlt(tab.k);setSel(null)}} style={{padding:'8px 16px',border:'none',background:'transparent',color:flt===tab.k?t.hd:t.tx3,fontSize:12,fontFamily:'Arial, sans-serif',cursor:'pointer',borderBottom:flt===tab.k?`2px solid ${dk?'#b8860b':'#8b6914'}`:'2px solid transparent',transition:'all 0.2s ease',fontWeight:flt===tab.k?600:400}}>
+                {tab.l}
+              </button>
+            ))}
+          </div>
+
+          <div style={{overflowY:'auto',maxHeight: isMobile ? 'none' : 'calc(100vh - 260px)',padding: isMobile ? "0 16px 80px" : "0"}}>
           {s?(
-            <div>
-              <div style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:CONF[s.c].color,fontWeight:700,marginBottom:2}}>{CONF[s.c].label}</div>
-              <h2 style={{fontSize:15,fontWeight:700,color:t.hd,margin:"0 0 2px"}}>{s.n}</h2>
-              <div style={{display:"flex",gap:8,fontSize:10,color:t.tx3,marginBottom:10}}>
+            <div style={{padding:"16px",background:t.cBg,border:`1px solid ${t.cBd}`}}>
+              <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:2,color:CONF[s.c].color,fontWeight:700,marginBottom:6}}>{CONF[s.c].label}</div>
+              <h2 style={{fontSize:18,fontWeight:600,color:t.hd,margin:"0 0 10px",fontFamily:"'Georgia', serif"}}>{s.n}</h2>
+              <div style={{display:"flex",gap:8,fontSize:11,color:t.tx3,marginBottom:14}}>
                 <span>{s.d}</span>
-                <span style={{background:t.tag,padding:"1px 6px",borderRadius:3,border:`1px solid ${t.cBd}`}}>{s.cat}</span>
+                <span style={{display:'inline-block',padding:"3px 8px",background:t.tag,borderRadius:3,border:`1px solid ${t.cBd}`,fontSize:9,textTransform:'uppercase',letterSpacing:1}}>{s.cat}</span>
               </div>
-              <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,marginBottom:12}}>{s.t}</p>
-              <div style={{marginBottom:10}}>
-                <div style={{fontSize:10,color:t.tx3,marginBottom:5,fontWeight:600}}>SOURCES ({s.s.length}) — {s.s.length>=3?"strong corroboration":s.s.length===2?"moderate corroboration":"single source"}</div>
-                <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                  {s.s.map((src,i)=>{const sc=sC(src,t);return <span key={i} style={{fontSize:10,padding:"2px 8px",borderRadius:4,background:sc.bg,color:sc.tx,border:`1px solid ${sc.bd}`}}>{src}</span>})}
+              <p style={{fontSize:12,color:t.tx2,lineHeight:1.6,marginBottom:16,fontFamily:'Arial, sans-serif'}}>{s.t}</p>
+              <div style={{marginBottom:14,paddingTop:12,borderTop:`1px solid ${t.bd}`}}>
+                <div style={{fontSize:9,color:t.tx3,marginBottom:8,fontWeight:600,textTransform:'uppercase',letterSpacing:1}}>Sources ({s.s.length}) — {s.s.length>=3?"strong corroboration":s.s.length===2?"moderate corroboration":"single source"}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+                  {s.s.map((src,i)=>{const sc=sC(src,t);return <span key={i} style={{fontSize:10,padding:"3px 10px",borderRadius:4,background:sc.bg,color:sc.tx,border:`1px solid ${sc.bd}`}}>{src}</span>})}
                 </div>
               </div>
               {s.c==="unverified"&&(
-                <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:"8px 10px",fontSize:11,color:t.wTx,marginBottom:10,lineHeight:1.4}}>
+                <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:"10px 12px",fontSize:11,color:t.wTx,marginBottom:14,lineHeight:1.4}}>
                   Single-source report. Iran's internet blackout (~1% connectivity) makes independent verification near-impossible.
                 </div>
               )}
-              <div style={{fontSize:10,color:t.tx4,padding:"6px 0",borderTop:`1px solid ${t.bd}`}}>
+              <div style={{fontSize:11,color:t.tx4,padding:"8px 0",borderTop:`1px solid ${t.bd}`,fontFamily:'Arial, sans-serif'}}>
                 {s.c==="confirmed"?"High confidence — independently verified by multiple major outlets":s.c==="likely"?"Medium confidence — credible but fewer independent verifications":"Low confidence — needs further corroboration"}
               </div>
-              <button onClick={()=>setSel(null)} style={{marginTop:10,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:6,padding:"6px 14px",fontSize:11,cursor:"pointer",width:"100%"}}>Back to list</button>
+              <button onClick={()=>setSel(null)} style={{marginTop:12,background:t.btn,border:`1px solid ${t.bd2}`,color:t.tx2,borderRadius:0,padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>Back to list</button>
             </div>
           ):(
-            <div>
-              <h3 style={{fontSize:10,textTransform:"uppercase",letterSpacing:1.5,color:t.tx4,marginBottom:10}}>Strike locations — Click map or list</h3>
-              {["confirmed","likely","unverified"].map(lv=>{
-                const items=list.filter(x=>x.c===lv);if(!items.length)return null;
-                return(
-                  <div key={lv} style={{marginBottom:14}}>
-                    <div style={{fontSize:10,fontWeight:700,color:CONF[lv].color,textTransform:"uppercase",letterSpacing:1,marginBottom:5,display:"flex",alignItems:"center",gap:6}}>
-                      <div style={{width:8,height:8,borderRadius:"50%",background:CONF[lv].color,boxShadow:`0 0 6px ${CONF[lv].color}66`}}/>{CONF[lv].label} ({items.length})
-                    </div>
-                    {items.map(st=>(
-                      <div key={st.id} onClick={()=>setSel(st.id)} style={{padding:"7px 10px",marginBottom:3,borderRadius:6,cursor:"pointer",background:t.cBg,border:`1px solid ${t.cBd}`,transition:"background .15s"}}
-                        onMouseEnter={e=>{e.currentTarget.style.background=t.hvr}} onMouseLeave={e=>{e.currentTarget.style.background=t.cBg}}>
+            <>
+              <div style={{padding:12,background:t.cBg,border:`1px solid ${t.cBd}`,marginBottom:12,fontSize:11,lineHeight:1.5,color:t.tx3,fontFamily:'Arial, sans-serif'}}>
+                <span style={{color:t.tx}}>Strike locations</span> cross-referenced from multiple outlets. Click any location to view details and sources. Click map markers for the same.
+              </div>
+              {(flt==="all"?["confirmed","likely","unverified"]:[flt]).map(lv=>{
+                const items=STRIKES.filter(x=>x.c===lv);if(!items.length)return null;
+                return items.map(st=>(
+                  <div key={st.id} onClick={()=>setSel(st.id)} style={{padding:"12px",marginBottom:1,cursor:"pointer",background:t.cBg,border:`1px solid ${t.cBd}`,transition:"background .15s",fontFamily:'Arial, sans-serif'}}
+                    onMouseEnter={e=>{e.currentTarget.style.background=t.hvr}} onMouseLeave={e=>{e.currentTarget.style.background=t.cBg}}>
+                    <div style={{display:'flex',alignItems:'center',gap:8}}>
+                      <div style={{width:8,height:8,borderRadius:"50%",background:CONF[st.c].color,flexShrink:0}}/>
+                      <div style={{flex:1}}>
                         <div style={{fontSize:12,color:t.tx,fontWeight:600}}>{st.n}</div>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:2}}>
-                          <span style={{fontSize:10,color:t.tx3}}>{st.d}</span>
-                          <span style={{fontSize:9,color:t.tx3,background:t.tag,padding:"1px 5px",borderRadius:3}}>{st.s.length} source{st.s.length!==1?"s":""}</span>
+                          <span style={{fontSize:11,color:t.tx3}}>{st.d}</span>
+                          <span style={{fontSize:10,color:t.tx3,background:t.tag,padding:"2px 7px",borderRadius:3}}>{st.s.length} source{st.s.length!==1?"s":""}</span>
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                );
+                ));
               })}
-            </div>
+            </>
           )}
+          </div>
+        </div>
+      </div>
+
+      {/* Verification Guide & Source Methodology — below map like analysis section */}
+      <div style={{padding: isMobile ? '16px' : '12px 20px 40px 70px', marginTop:12}}>
+        <div style={{background:t.cBg,border:`1px solid ${t.cBd}`,padding:16}}>
+          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:1,marginBottom:10,fontFamily:'Arial, sans-serif',fontWeight:600}}>
+            Verification Guide & Source Methodology
+          </div>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",marginBottom:16}}>
+            {Object.entries(CONF).map(([k,c])=>(
+              <div key={k} style={{flex:"1 1 200px",background:dk?`${c.color}11`:`${c.color}15`,border:`1px solid ${c.color}44`,borderRadius:8,padding:14}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                  <div style={{width:12,height:12,borderRadius:"50%",background:c.color,boxShadow:`0 0 6px ${c.color}66`}}/>
+                  <span style={{fontSize:13,fontWeight:700,color:c.color}}>{c.label}</span>
+                  <span style={{fontSize:20,fontWeight:800,color:c.color,marginLeft:"auto"}}>{counts[k]}</span>
+                </div>
+                <p style={{fontSize:12,color:t.tx2,lineHeight:1.5,margin:0}}>{c.desc}</p>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize:9,color:t.tx3,textTransform:'uppercase',letterSpacing:1,marginBottom:8,fontFamily:'Arial, sans-serif',fontWeight:600}}>
+            Source Reliability Ranking
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:4,marginBottom:14}}>
+            {tiers.map((tr,i)=>(
+              <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start",padding:"8px 12px",background:t.srfAlt,border:`1px solid ${t.cBd}`,borderRadius:4}}>
+                <div style={{width:8,height:8,borderRadius:"50%",background:t.tC[i],marginTop:5,flexShrink:0}}/>
+                <div style={{flex:1}}>
+                  <span style={{fontSize:12,fontWeight:700,color:t.tC[i]}}>{tr.n}</span>
+                  <span style={{fontSize:12,color:t.tx2}}> — {tr.v}</span>
+                  <p style={{fontSize:11,color:t.tx3,margin:"2px 0 0",lineHeight:1.4}}>{tr.d}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{background:t.wBg,border:`1px solid ${t.wBd}`,borderRadius:6,padding:12,fontSize:12,color:t.wTx,lineHeight:1.5}}>
+            <strong>Iran's internet is at ~1% connectivity</strong> since strikes began. This severely limits real-time verification, especially the Mar 2 morning reports.
+          </div>
         </div>
       </div>
 
