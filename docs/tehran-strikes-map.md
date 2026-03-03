@@ -10,8 +10,8 @@ Interactive verification map tracking US-Israeli strike locations in Tehran (Feb
 
 ## Current State
 
-- **22 strike locations** tracked across 3 confidence tiers
-- **Data last re-checked:** Mar 2, 2026 (add new strikes: Quds Basij Base District 5; ISW Mar 2 AM)
+- **28 strike locations** tracked across 3 confidence tiers
+- **Data last re-checked:** Mar 3, 2026 — cross-referenced with `tehran_strikes_export.xlsx`; added Malek-Ashtar, Central Prison, Majlis, Assembly of Experts, Evin (IDF warning); IRIB noted as hit again Mar 3
 - Confidence Statement modal with methodology and limitations
 - Suggest a Strike Location form → Airtable
 - Styled to match MRF design system (Georgia serif headers, consistent spacing)
@@ -34,7 +34,7 @@ When new strikes are reported or existing ones need upgrading:
    ```
 4. **Update counts** — The `counts` object near the top of the file:
    ```js
-   const counts = {confirmed: 11, likely: 8, unverified: 3};
+   const counts = {confirmed: 13, likely: 11, unverified: 4};
    ```
 5. **Update header** — Change the "LAST UPDATED" timestamp and DAY counter
 6. **Build and deploy:**

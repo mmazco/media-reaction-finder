@@ -23,8 +23,8 @@ const STRIKES = [
   {id:7,n:"Atomic Energy Org. of Iran (District 6, Amirabad)",lat:35.720,lng:51.395,c:"confirmed",d:"Feb 28",
    t:"AEOI HQ targeted. Confirmed in Al Jazeera's verified mapping report alongside other government ministry strikes.",
    s:["Al Jazeera","Iranian media"],cat:"Nuclear"},
-  {id:8,n:"State Radio & TV HQ (IRIB) (District 6, Central Tehran)",lat:35.715,lng:51.406,c:"confirmed",d:"Feb 28–Mar 1",
-   t:"State broadcasting HQ struck. IDF confirmed targeting regime communications infrastructure.",
+  {id:8,n:"State Radio & TV HQ (IRIB) (District 6, Central Tehran)",lat:35.715,lng:51.406,c:"confirmed",d:"Feb 28–Mar 1; again Mar 3",
+   t:"State broadcasting HQ struck. IDF confirmed targeting regime communications infrastructure. Hit again early Mar 3 in a separate IAF operation.",
    s:["Iranian media","Wikipedia","IDF"],cat:"Government"},
   {id:9,n:"Azadi Tower / Azadi Square (District 9, West Tehran)",lat:35.700,lng:51.338,c:"confirmed",d:"Mar 1",
    t:"Video confirmed massive explosions around iconic Azadi Tower during Israel's second wave on Sunday. CNN verified footage.",
@@ -68,11 +68,29 @@ const STRIKES = [
   {id:22,n:"Quds Basij Base (District 5, NW Tehran)",lat:35.76,lng:51.37,c:"likely",d:"Mar 1",
    t:"Fifth Tehran Municipality Quds Basij Resistance Regional Base. Commercially available satellite imagery shows building damage in airstrikes on Mar 1. One of 23 Basij regional bases in Tehran (IRGC Ground Forces).",
    s:["ISW"],cat:"Military"},
+  {id:23,n:"Leadership complex (Presidential bureau, SNSC HQ, officer training) (District 6, Central Tehran)",lat:35.698,lng:51.412,c:"confirmed",d:"Mar 2–3",
+   t:"IAF struck Iran's 'leadership complex' in central Tehran overnight with ~100 fighter jets and 250+ bombs. Targets: presidential bureau, Supreme National Security Council HQ, senior leadership meeting compound, and army officer training institution. IDF described it as one of the most secured assets and the regime's most important headquarters. Reuters, Times of Israel.",
+   s:["IDF","Times of Israel","Reuters"],cat:"Leadership"},
+  {id:24,n:"IRGC Malek-Ashtar Building (District 4, Lavizan)",lat:35.77,lng:51.505,c:"likely",d:"Mar 2",
+   t:"Video shows building completely destroyed. Defence/nuclear research linked. Lavizan / Babaei Hwy area, NE Tehran.",
+   s:["Iran International","Wikipedia"],cat:"Military"},
+  {id:25,n:"Central Prison Complex (District 3, near IRIB)",lat:35.72,lng:51.412,c:"likely",d:"Mar 2",
+   t:"Al Jazeera reported strikes near IRIB and central prison complex. Separate from Evin. N. Tehran.",
+   s:["Al Jazeera"],cat:"Government"},
+  {id:26,n:"Majlis / Parliament (District 12, Baharestan Sq)",lat:35.6919,lng:51.4278,c:"likely",d:"Mar 1–2",
+   t:"Fars reported explosions at parliament; initial reports indicate building targeted. Not independently confirmed by wire services.",
+   s:["Fars News","Iranian state media"],cat:"Government"},
+  {id:27,n:"Assembly of Experts Building (District 12, Baharestan Sq)",lat:35.6922,lng:51.428,c:"confirmed",d:"Mar 2–3",
+   t:"Old parliament building, now used by Assembly of Experts. Struck during session to select new Supreme Leader. Members reportedly killed. Fars, Tasnim, state TV, Iran International.",
+   s:["Fars News","Tasnim News","Iranian state media","Iran International"],cat:"Government"},
+  {id:28,n:"Evin District (IDF evacuation warning) (District 1)",lat:35.805,lng:51.394,c:"unverified",d:"Mar 3",
+   t:"IDF issued evacuation warning for Evin district. Prison admin collapsed, staff abandoned posts. Strike incoming — not yet confirmed hit.",
+   s:["IDF","NCRI"],cat:"Government"},
 ];
 
-const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","Anadolu Agency","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","ISW"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)"],OFFICIAL=["IDF","CENTCOM"];
+const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","Anadolu Agency","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","ISW","Iran International"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)"],OFFICIAL=["IDF","CENTCOM"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED — MAR 2",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:11,likely:8,unverified:3};
+const counts={confirmed:13,likely:11,unverified:4};
 const BOUNDS={minLat:35.59,maxLat:35.81,minLng:51.29,maxLng:51.53};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
@@ -153,8 +171,8 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
   const tiers=[
     {n:"Tier 1 — Wire services",v:"AP, Reuters",d:"Gold standard. On-ground correspondents where possible"},
-    {n:"Tier 2 — Major broadcasters / analysis",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, Anadolu, TRT World, Times of Israel, Globe and Mail, Middle East Eye, NDTV, ISW",d:"Independent geolocation, satellite analysis, verified footage"},
-    {n:"Tier 3 — State/regional",v:"Fars, Tasnim, IRNA, ISNA, CGTN, Iranian sources",d:"Reliable on confirming strikes occurred. May spin details politically"},
+    {n:"Tier 2 — Major broadcasters / analysis",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, Anadolu, TRT World, Times of Israel, Globe and Mail, Middle East Eye, NDTV, ISW, Iran International",d:"Independent geolocation, satellite analysis, verified footage"},
+    {n:"Tier 3 — State/regional",v:"Fars, Tasnim, IRNA, ISNA, CGTN, Iranian sources, NCRI",d:"Reliable on confirming strikes occurred. May spin details politically"},
     {n:"Tier 4 — Aggregators (caution)",v:"LiveUAMap, MahsaAlert, Pravda (images)",d:"Crowdsourced or republished. Fast but not independently verified"},
     {n:"Official military claims",v:"IDF, CENTCOM",d:"First-party claims. Useful but inherently one-sided"},
   ];
@@ -378,18 +396,18 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
             <div style={{background:dk?'rgba(99,102,241,0.08)':'#eef2ff',border:`1px solid ${dk?'rgba(99,102,241,0.2)':'#c7d2fe'}`,borderRadius:8,padding:14,marginBottom:16}}>
               <p style={{fontSize:13,color:dk?'#e0e0e0':'#333',lineHeight:1.6,margin:0}}>
-                This map compiles <strong style={{color:dk?'#fff':'#333'}}>21 reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:dk?'#fff':'#333'}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
+                This map compiles <strong style={{color:dk?'#fff':'#333'}}>{STRIKES.length} reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:dk?'#fff':'#333'}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
               </p>
             </div>
 
             <h3 style={{fontSize:13,fontWeight:700,color:dk?'#fff':'#333',marginBottom:8,fontFamily:"'Georgia', serif"}}>Confidence by tier</h3>
 
             {[
-              {label:"CONFIRMED",count:11,pct:"90%+",color:"#ef4444",
+              {label:"CONFIRMED",count:counts.confirmed,pct:"90%+",color:"#ef4444",
                text:"Backed by 3+ independent major outlets (AP, Reuters, CNN, BBC, Al Jazeera, etc). Satellite imagery or BBC Verify/CNN Verified corroboration where available. We are highly confident strikes occurred at these locations. Coordinates are approximate — placed by neighbourhood/street name, not geolocated footage, so markers may be off by several hundred metres."},
-              {label:"LIKELY",count:7,pct:"60–75%",color:"#f59e0b",
+              {label:"LIKELY",count:counts.likely,pct:"60–75%",color:"#f59e0b",
                text:"Backed by 1–2 credible sources, verified video, or BBC Verify confirmation. Strong evidence but fewer independent sources. Some entries (e.g. Ferdowsi Square) come from a single state broadcaster (CGTN). Khatam-al-Anbia Hospital is the strongest in this tier and may be upgraded. Niloofar Square has a specific casualty figure but the underlying Iranian source couldn't be independently traced."},
-              {label:"UNVERIFIED",count:3,pct:"30–40%",color:"#10b981",
+              {label:"UNVERIFIED",count:counts.unverified,pct:"30–40%",color:"#10b981",
                text:"Sourced primarily from LiveUAMap (which returned a 403 error on the specific page linked) or Iranian social media. With Iran's internet at ~1%, these could be real strikes not yet picked up by major outlets, or they could be misidentified explosions, sonic booms, or air defence activity. No way to tell without further corroboration."},
             ].map((tier,i)=>(
               <div key={i} style={{background:dk?`${tier.color}11`:`${tier.color}15`,border:`1px solid ${tier.color}33`,borderRadius:8,padding:12,marginBottom:10}}>
@@ -406,7 +424,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
             <div style={{display:"flex",flexDirection:"column",gap:6}}>
               {[
                 {title:"Location accuracy",text:"Markers placed by neighbourhood/street name, not GPS from geolocated footage. Some could be off by several hundred metres."},
-                {title:"Coverage gaps",text:"Almost certainly missing Tehran strikes that haven't made it into English-language reporting. The 21 sites are a floor, not a ceiling."},
+                {title:"Coverage gaps",text:`Almost certainly missing Tehran strikes that haven't made it into English-language reporting. The ${STRIKES.length} sites are a floor, not a ceiling.`},
                 {title:"Source access",text:"LiveUAMap returned 403 on the specific Farmanieh page. MahsaAlert was a JS-only dynamic map with no extractable text. Neither could be fully verified."},
                 {title:"Source bias",text:"Iranian state media may overstate civilian impact for political purposes. IDF/CENTCOM confirm targets but won't acknowledge civilian harm. Truth likely lies in between."},
                 {title:"Internet blackout",text:"Iran's internet at ~1% since strikes began. Severely limits real-time verification, especially for Mar 2 morning reports."},
