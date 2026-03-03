@@ -2,7 +2,7 @@
 
 Interactive verification map tracking US-Israeli strike locations in Tehran (Feb 28 – Mar 2, 2026). Cross-references 20+ outlets with a tiered confidence system.
 
-**Route:** `/trending/iran/tehran`
+**Route:** `/trending/iran/strikes`
 **Component:** `frontend/TehranStrikesMap.jsx`
 **Backend endpoint:** `/api/submit-strike` (in `app.py`)
 
@@ -10,7 +10,8 @@ Interactive verification map tracking US-Israeli strike locations in Tehran (Feb
 
 ## Current State
 
-- **21 strike locations** tracked across 3 confidence tiers
+- **22 strike locations** tracked across 3 confidence tiers
+- **Data last re-checked:** Mar 2, 2026 (add new strikes: Quds Basij Base District 5; ISW Mar 2 AM)
 - Confidence Statement modal with methodology and limitations
 - Suggest a Strike Location form → Airtable
 - Styled to match MRF design system (Georgia serif headers, consistent spacing)
@@ -33,7 +34,7 @@ When new strikes are reported or existing ones need upgrading:
    ```
 4. **Update counts** — The `counts` object near the top of the file:
    ```js
-   const counts = {confirmed: 11, likely: 7, unverified: 3};
+   const counts = {confirmed: 11, likely: 8, unverified: 3};
    ```
 5. **Update header** — Change the "LAST UPDATED" timestamp and DAY counter
 6. **Build and deploy:**
@@ -43,6 +44,21 @@ When new strikes are reported or existing ones need upgrading:
    cp frontend/dist/assets/*.js assets/
    git add -A && git commit -m "Add new strike locations" && git push
    ```
+
+### Re-check every few hours (updates & new strikes)
+
+When you do a refresh pass to see if anything has changed:
+
+1. **Data last verified** — Note the date/time at the top of this section (update it after each pass).
+2. **Check these sources** (in order):
+   - **ISW** — [Morning](https://isw.pub/IranUpdate030226AM) and [Evening](https://isw.pub/IranUpdate030226PM) Iran updates for satellite-confirmed locations and new named targets.
+   - **Wire / broadcast** — AP, Reuters, CNN, BBC, Al Jazeera for new strikes or upgrades to existing ones.
+   - **Aggregators** — [Iran Strike Map](https://iranstrikemap.com/), LiveUAMap for new reports (treat as unverified until corroborated).
+   - **Iranian outlets** — Fars, Tasnim for confirmations or new locations.
+3. **Update the data** — For each change: edit `STRIKES` (add/amend entries), update `counts`, and update the "LAST UPDATED" / day in the UI.
+4. **Build and deploy** — Same as in "How to Update the Map" above.
+
+No changes needed if nothing new or upgraded is found.
 
 ### Upgrading a strike's confidence
 
@@ -95,7 +111,7 @@ If Airtable is not configured (env vars missing), the endpoint returns 200 and t
 | Tier | Outlets | Reliability |
 |---|---|---|
 | Tier 1 — Wire services | AP, Reuters | Gold standard |
-| Tier 2 — Major broadcasters | CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS | Independent verification |
+| Tier 2 — Major broadcasters / analysis | CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, ISW | Independent verification; ISW uses satellite/OSINT |
 | Tier 3 — Regional media | Fars, Tasnim, IRNA | Confirms strikes occurred, may spin details |
 | Tier 4 — Aggregators | LiveUAMap, MahsaAlert | Crowdsourced, not independently verified |
 | Official claims | IDF, CENTCOM | First-party, inherently one-sided |
@@ -120,7 +136,7 @@ Strikes are tagged with a category for filtering context:
 | File | Role |
 |---|---|
 | `frontend/TehranStrikesMap.jsx` | Full component (data, UI, modals) |
-| `frontend/App.jsx` | Route at `/trending/iran/tehran`, navigation links |
+| `frontend/App.jsx` | Route at `/trending/iran/strikes`, navigation links |
 | `app.py` | `/api/submit-strike` endpoint |
 | `.env.local` | Airtable credentials (local) |
 

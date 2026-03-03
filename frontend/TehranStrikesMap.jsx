@@ -53,23 +53,26 @@ const STRIKES = [
   {id:17,n:"Khazaneh / Basij Bokharaei Base (S. Tehran)",lat:35.620,lng:51.440,c:"unverified",d:"Mar 2",
    t:"Airstrike near Khazaneh area, presumably IRGC Basij Bokharaei base. Not mentioned by any major wire service yet.",
    s:["LiveUAMap"],cat:"Military"},
-  {id:18,n:"Gandhi Hospital (Gandhi St, N. Tehran)",lat:35.759,lng:51.410,c:"confirmed",d:"Mar 1",
+  {id:18,n:"Gandhi Hospital (Gandhi St, N. Tehran)",lat:35.759,lng:51.410,c:"confirmed",d:"Mar 2",
    t:"Major private hospital on South Gandhi Street struck during Sunday wave. State TV showed structural damage, shattered windows. Nurses evacuated newborns from incubators. Iran Health Ministry confirmed. Located near IRIB transmitter that was also hit. WHO Director-General condemned the strike.",
-   s:["Al Jazeera","Anadolu Agency","ISNA","Tasnim News","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","Reuters"],cat:"Civilian/Medical"},
+   s:["CNN","Al Jazeera","Anadolu Agency","ISNA","Tasnim News","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","Reuters"],cat:"Civilian/Medical"},
   {id:19,n:"Ferdowsi Square (Downtown Tehran)",lat:35.6965,lng:51.4185,c:"likely",d:"Mar 2",
    t:"Explosions reported at Ferdowsi Square in central Tehran during IAF's latest large-scale wave. CGTN named it alongside Tajrish and the Foreign Police Station area as targets.",
-   s:["CGTN","Pravda (images)","IDF (confirmed new Tehran wave)"],cat:"Downtown"},
+   s:["CGTN","Pravda (images)","IDF"],cat:"Downtown"},
   {id:20,n:"Tajrish (N. Tehran)",lat:35.800,lng:51.434,c:"likely",d:"Mar 2",
    t:"Explosions reported in the Tajrish area of far northern Tehran, named alongside Ferdowsi Square in CGTN reporting of IAF's latest wave.",
    s:["CGTN"],cat:"Mixed"},
   {id:21,n:"Niloofar Square",lat:35.705,lng:51.435,c:"likely",d:"Mar 2",
    t:"20 civilians killed at Niloofar Square on March 2, per Wikipedia citing Iranian sources. One of the deadliest single incidents in Tehran.",
    s:["Wikipedia","Iranian sources"],cat:"Civilian"},
+  {id:22,n:"Quds Basij Base (District 5, NW Tehran)",lat:35.76,lng:51.37,c:"likely",d:"Mar 1",
+   t:"Fifth Tehran Municipality Quds Basij Resistance Regional Base. Commercially available satellite imagery shows building damage in airstrikes on Mar 1. One of 23 Basij regional bases in Tehran (IRGC Ground Forces).",
+   s:["ISW"],cat:"Military"},
 ];
 
-const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA"],TIER4=["LiveUAMap","Iranian media via LiveUAMap"],OFFICIAL=["IDF"];
+const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","Anadolu Agency","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","ISW"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)"],OFFICIAL=["IDF","CENTCOM"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED — MAR 2",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:11,likely:7,unverified:3};
+const counts={confirmed:11,likely:8,unverified:3};
 const BOUNDS={minLat:35.59,maxLat:35.81,minLng:51.29,maxLng:51.53};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
@@ -150,9 +153,9 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
   const tiers=[
     {n:"Tier 1 — Wire services",v:"AP, Reuters",d:"Gold standard. On-ground correspondents where possible"},
-    {n:"Tier 2 — Major broadcasters",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS",d:"Independent geolocation, satellite analysis, verified footage"},
-    {n:"Tier 3 — Iranian state media",v:"Fars, Tasnim, IRNA",d:"Reliable on confirming strikes occurred. May spin details politically"},
-    {n:"Tier 4 — Aggregators (caution)",v:"LiveUAMap, MahsaAlert",d:"Crowdsourced. Fast but not independently verified"},
+    {n:"Tier 2 — Major broadcasters / analysis",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, Anadolu, TRT World, Times of Israel, Globe and Mail, Middle East Eye, NDTV, ISW",d:"Independent geolocation, satellite analysis, verified footage"},
+    {n:"Tier 3 — State/regional",v:"Fars, Tasnim, IRNA, ISNA, CGTN, Iranian sources",d:"Reliable on confirming strikes occurred. May spin details politically"},
+    {n:"Tier 4 — Aggregators (caution)",v:"LiveUAMap, MahsaAlert, Pravda (images)",d:"Crowdsourced or republished. Fast but not independently verified"},
     {n:"Official military claims",v:"IDF, CENTCOM",d:"First-party claims. Useful but inherently one-sided"},
   ];
 
