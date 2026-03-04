@@ -147,6 +147,12 @@ const T = {
 
 function sC(src,t){if(TIER1.includes(src))return t.s1;if(TIER2.includes(src))return t.s2;if(TIER3.includes(src))return t.s3;if(TIER4.includes(src))return t.s4;if(OFFICIAL.includes(src))return t.sO;return t.sD;}
 
+function formatBuildTime(iso){const d=new Date(iso);const mon=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()];return `${mon} ${d.getUTCDate()}, ${d.getUTCFullYear()} — ${String(d.getUTCHours()).padStart(2,"0")}:${String(d.getUTCMinutes()).padStart(2,"0")} UTC`;}
+function conflictDay(iso){const start=new Date("2026-02-28T00:00:00Z");return Math.floor((new Date(iso)-start)/86400000)+1;}
+const BUILD_ISO=typeof __BUILD_TIMESTAMP__!=="undefined"?__BUILD_TIMESTAMP__:new Date().toISOString();
+const LAST_UPDATED_STR=formatBuildTime(BUILD_ISO);
+const CONFLICT_DAY=conflictDay(BUILD_ISO);
+
 const AIRTABLE_URL = "/api/submit-strike";
 
 async function submitToAirtable(data) {
@@ -201,7 +207,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
               Tehran Strike Map
             </h1>
             <p style={{fontSize:14,color:t.tx3,margin:'6px 0 0',fontFamily:'Arial, sans-serif'}}>
-              Strike Verification Map — Updated Mar 2, 2026
+              Strike Verification Map — Updated {LAST_UPDATED_STR}
             </p>
           </div>
           <button
@@ -219,14 +225,14 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
             <div style={{width:8,height:8,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 10px rgba(34,197,94,0.6)"}}/>
             <div>
               <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>LAST UPDATED</div>
-              <div style={{fontSize:15,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>Mar 2, 2026 — 15:15 UTC</div>
+              <div style={{fontSize:15,color:t.hd,fontWeight:600,fontVariantNumeric:"tabular-nums"}}>{LAST_UPDATED_STR}</div>
             </div>
           </div>
           <div style={{background:t.stBg,border:`1px solid ${t.bd}`,padding:"10px 18px"}}>
             <div style={{fontSize:11,color:t.tx3,lineHeight:1,marginBottom:3}}>SITUATION</div>
             <div style={{fontSize:13,color:"#ef4444",fontWeight:700}}>ACTIVE — Strikes ongoing, new waves expected</div>
           </div>
-          <span style={{background:"#dc2626",color:"#fff",fontSize:11,fontWeight:700,padding:"5px 12px",letterSpacing:1}}>DAY 3</span>
+          <span style={{background:"#dc2626",color:"#fff",fontSize:11,fontWeight:700,padding:"5px 12px",letterSpacing:1}}>DAY {CONFLICT_DAY}</span>
         </div>
 
         <div style={{display:"flex",gap:12,marginTop:20,flexWrap:"wrap"}}>
@@ -401,14 +407,14 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
               <div>
                 <h2 style={{fontSize:18,fontWeight:700,color:dk?'#fff':'#333',margin:0,fontFamily:"'Georgia', serif"}}>Confidence Statement</h2>
-                <p style={{fontSize:11,color:dk?'#888':'#666',marginTop:2}}>Last updated: Mar 2, 2026 — 15:15 UTC</p>
+                <p style={{fontSize:11,color:dk?'#888':'#666',marginTop:2}}>Last updated: {LAST_UPDATED_STR}</p>
               </div>
               <button onClick={()=>setConfModal(false)} style={{background:"none",border:"none",color:dk?'#888':'#666',fontSize:20,cursor:"pointer",padding:4}}>✕</button>
             </div>
 
             <div style={{background:dk?'rgba(99,102,241,0.08)':'#eef2ff',border:`1px solid ${dk?'rgba(99,102,241,0.2)':'#c7d2fe'}`,borderRadius:8,padding:14,marginBottom:16}}>
               <p style={{fontSize:13,color:dk?'#e0e0e0':'#333',lineHeight:1.6,margin:0}}>
-                This map compiles <strong style={{color:dk?'#fff':'#333'}}>{STRIKES.length} reported strike locations</strong> in Tehran from Feb 28 – Mar 2, 2026. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:dk?'#fff':'#333'}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
+                This map compiles <strong style={{color:dk?'#fff':'#333'}}>{STRIKES.length} reported strike locations</strong> in Tehran from Feb 28, 2026 onward. It was built by cross-referencing multiple international news outlets, wire services, and open-source aggregators. It is <strong style={{color:dk?'#fff':'#333'}}>not exhaustive</strong> — Iran's near-total internet blackout (~1% connectivity) means many strikes likely remain unreported in English-language media.
               </p>
             </div>
 

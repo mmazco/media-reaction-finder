@@ -2,6 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
+  define: {
+    __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
+  },
   plugins: [react()],
   // Favicons are served from project root by app.py in production
   // During local dev, favicon requests will 404 (cosmetic only, app works fine)
