@@ -105,6 +105,12 @@ class SearchLogger:
             cursor.execute('ALTER TABLE curated_articles ADD COLUMN recommended INTEGER DEFAULT 0')
         except sqlite3.OperationalError:
             pass  # Column already exists
+
+        # Add category_label column (migration for existing databases)
+        try:
+            cursor.execute('ALTER TABLE curated_articles ADD COLUMN category_label TEXT DEFAULT NULL')
+        except sqlite3.OperationalError:
+            pass
         
         # Create cached_commentary table for storing generated audio commentary
         cursor.execute('''
@@ -506,7 +512,7 @@ class SearchLogger:
             }
         return None
     
-    def add_article_to_collection(self, collection_tag, title, url, source=None, authors=None, date=None, summary=None):
+    def add_article_to_collection(self, collection_tag, title, url, source=None, authors=None, date=None, summary=None, category_label=None):
         """Add an article to a curated collection"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
@@ -521,14 +527,13 @@ class SearchLogger:
         try:
             cursor.execute('''
                 INSERT OR REPLACE INTO curated_articles 
-                (collection_id, title, url, source, authors, date, summary)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (collection_id, title, url, source, authors, date, summary))
+                (collection_id, title, url, source, authors, date, summary, category_label)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (collection_id, title, url, source, authors, date, summary, category_label))
             
             article_id = cursor.lastrowid
             conn.commit()
         except sqlite3.IntegrityError:
-            # Article URL already exists
             article_id = None
         finally:
             conn.close()
@@ -571,7 +576,8 @@ class SearchLogger:
         cursor.execute('''
             SELECT 
                 a.id, a.title, a.url, a.source, a.authors, a.date, a.summary, a.added_at,
-                c.tag, c.tag_display_name, c.icon, COALESCE(a.recommended, 0)
+                c.tag, c.tag_display_name, c.icon, COALESCE(a.recommended, 0),
+                a.category_label
             FROM curated_articles a
             JOIN curated_collections c ON a.collection_id = c.id
             WHERE c.tag = ?
@@ -593,7 +599,8 @@ class SearchLogger:
             'collection_tag': row[8],
             'collection_name': row[9],
             'collection_icon': row[10],
-            'recommended': bool(row[11])
+            'recommended': bool(row[11]),
+            'category_label': row[12]
         } for row in rows]
     
     def get_shared_archive(self, limit=50):

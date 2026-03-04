@@ -10,8 +10,8 @@ Interactive verification map tracking US-Israeli strike locations in Tehran (Feb
 
 ## Current State
 
-- **28 strike locations** tracked across 3 confidence tiers
-- **Data last re-checked:** Mar 3, 2026 — cross-referenced with `tehran_strikes_export.xlsx`; added Malek-Ashtar, Central Prison, Majlis, Assembly of Experts, Evin (IDF warning); IRIB noted as hit again Mar 3
+- **29 strike locations** tracked across 3 confidence tiers
+- **Data last re-checked:** Mar 4, 2026 — overnight sources (ToI, JPost, CNN, NPR, Fox, ISW); added Mar 4 wave (internal security & Basij command centers); updated Thar-Allah/internal security HQ entry with confirmation
 - Confidence Statement modal with methodology and limitations
 - Suggest a Strike Location form → Airtable
 - Styled to match MRF design system (Georgia serif headers, consistent spacing)

@@ -119,6 +119,51 @@ def seed_iran_collection():
             'summary': "Analysis of AI-generated propaganda during the Iran-Israel war, examining the challenges of detecting synthetic media and the impact on civilian populations navigating information blackouts, disinformation, and conflict narratives.",
             'recommended': True
         },
+        {
+            'title': 'Inside the plan to kill Ali Khamenei',
+            'url': 'https://archive.is/obNBX',
+            'source': 'Financial Times',
+            'authors': None,
+            'date': '2026',
+            'summary': 'FT reporting on the plan to kill Iran\'s Supreme Leader. Original: ft.com/content/bf998c69-ab46-4fa3-aae4-8f18f7387836.',
+            'recommended': True
+        },
+        {
+            'title': "Iran Is Built to Withstand the Ayatollah's Assassination",
+            'url': 'https://archive.is/rhWfB',
+            'source': 'Archived analysis',
+            'authors': None,
+            'date': '2026',
+            'summary': 'Analysis piece on Iran\'s institutional resilience to leadership decapitation.',
+            'recommended': True
+        },
+        {
+            'title': 'State-Sponsored Twitter Accounts Pushing for War with Iran',
+            'url': 'https://geoffgolberg.medium.com/state-sponsored-twitter-accounts-pushing-for-war-with-iran-732d3482b847',
+            'source': 'Medium',
+            'authors': 'Geoff Golberg',
+            'date': None,
+            'summary': 'Investigation into state-sponsored Twitter accounts pushing pro-war narratives on Iran, documenting coordinated inauthentic behavior on the platform.',
+            'category_label': 'Analysis'
+        },
+        {
+            'title': 'Why Do Official Israeli Government Twitter Accounts Follow So Many Inauthentic Accounts?',
+            'url': 'https://geoffgolberg.medium.com/why-do-official-israeli-government-twitter-accounts-follow-so-many-inauthentic-accounts-51622563be89',
+            'source': 'Medium',
+            'authors': 'Geoff Golberg',
+            'date': None,
+            'summary': 'Investigation into why official Israeli government Twitter accounts follow large numbers of inauthentic accounts, raising questions about coordinated platform manipulation.',
+            'category_label': 'Analysis'
+        },
+        {
+            'title': 'State-Sponsored Platform Manipulation',
+            'url': 'https://www.socialforensics.com/reports-2/state-sponsored-platform-manipulation',
+            'source': 'Social Forensics',
+            'authors': 'Geoff Golberg',
+            'date': 'July 24, 2023',
+            'summary': "Evidence of state-actor involvement in platform manipulation targeting the Iran policy debate on Twitter, including targeted abuse and gaming trending hashtags, which escalated after Mahsa Amini's death in September 2022.",
+            'category_label': 'Analysis'
+        },
     ]
     
     print(f"\n📁 Seeding 'Iran' collection:")
@@ -130,10 +175,14 @@ def seed_iran_collection():
             article['source'],
             article['authors'],
             article['date'],
-            article['summary']
+            article['summary'],
+            category_label=article.get('category_label')
         )
         if result:
             print(f"  📄 Added: {article['title'][:60]}...")
+            if article.get('recommended'):
+                logger.set_article_recommended(result, True)
+                print(f"     ⭐ Marked as recommended")
         else:
             print(f"  ⏭️  Already exists: {article['title'][:60]}...")
     

@@ -663,6 +663,8 @@ export default function App() {
   const [darkMode, setDarkMode] = useState(false);
   const [showCopyNotification, setShowCopyNotification] = useState(false);
   const [collections, setCollections] = useState([]);
+  const [collectionsLoading, setCollectionsLoading] = useState(true);
+  const [collectionsError, setCollectionsError] = useState(null);
   const [selectedCollection, setSelectedCollection] = useState(null);
   const [collectionArticles, setCollectionArticles] = useState([]);
   const [sidebarTab, setSidebarTab] = useState('collections'); // 'collections' or 'history'
@@ -740,14 +742,21 @@ export default function App() {
 
   // Fetch curated collections from API
   const fetchCollections = async () => {
+    setCollectionsError(null);
+    setCollectionsLoading(true);
     try {
       const response = await fetch('/api/collections');
       if (response.ok) {
         const data = await response.json();
         setCollections(data.collections || []);
+      } else {
+        setCollectionsError('Could not load collections');
       }
     } catch (error) {
       console.error('Error fetching collections:', error);
+      setCollectionsError('Could not load collections. Make sure the backend is running.');
+    } finally {
+      setCollectionsLoading(false);
     }
   };
 
@@ -1657,6 +1666,51 @@ export default function App() {
             {!selectedCollection ? (
               /* Collections List */
               <>
+                {collectionsLoading ? (
+                  <div style={{
+                    padding: '48px 20px',
+                    textAlign: 'center',
+                    color: darkMode ? '#999' : '#666',
+                    fontFamily: 'Arial, sans-serif',
+                    fontSize: '15px'
+                  }}>
+                    Loading collections…
+                  </div>
+                ) : collectionsError ? (
+                  <div style={{
+                    padding: '48px 20px',
+                    textAlign: 'center',
+                    color: darkMode ? '#ccc' : '#333',
+                    fontFamily: 'Arial, sans-serif'
+                  }}>
+                    <p style={{ marginBottom: '16px', fontSize: '15px' }}>{collectionsError}</p>
+                    <button
+                      type="button"
+                      onClick={() => fetchCollections()}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: darkMode ? '#333' : '#e0e0e0',
+                        border: `1px solid ${darkMode ? '#555' : '#ccc'}`,
+                        color: darkMode ? '#fff' : '#111',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : collections.length === 0 ? (
+                  <div style={{
+                    padding: '48px 20px',
+                    textAlign: 'center',
+                    color: darkMode ? '#999' : '#666',
+                    fontFamily: 'Arial, sans-serif',
+                    fontSize: '15px'
+                  }}>
+                    No collections yet.
+                  </div>
+                ) : (
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
@@ -1730,6 +1784,7 @@ export default function App() {
               </div>
                   ))}
                 </div>
+                )}
               </>
             ) : (
               /* Articles in Collection */
@@ -1788,6 +1843,7 @@ export default function App() {
                           e.currentTarget.style.borderColor = darkMode ? '#333' : '#d0d0d0';
                         }}
                       >
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: (article.recommended || article.category_label) ? '10px' : '0' }}>
                         {article.recommended && (
                           <div style={{
                             display: 'inline-block',
@@ -1798,13 +1854,36 @@ export default function App() {
                             letterSpacing: '0.5px',
                             padding: '4px 8px',
                             borderRadius: '4px',
-                            marginBottom: '10px',
                             fontFamily: 'Arial, sans-serif',
                             textTransform: 'uppercase'
                           }}>
                             ★ Recommended
                           </div>
                         )}
+                        {article.category_label && (() => {
+                          const categoryColors = {
+                            'Mainstream Coverage': { bg: '#22c55e', color: '#fff' },
+                            'Analysis': { bg: '#7c3aed', color: '#fff' },
+                            'Opinion': { bg: '#2563eb', color: '#fff' }
+                          };
+                          const colors = categoryColors[article.category_label] || { bg: darkMode ? '#2a2a2a' : '#f0f0f0', color: darkMode ? '#ccc' : '#555' };
+                          return (
+                            <span style={{
+                              fontSize: '10px',
+                              fontWeight: '700',
+                              letterSpacing: '0.5px',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              backgroundColor: colors.bg,
+                              color: colors.color,
+                              fontFamily: 'Arial, sans-serif',
+                              textTransform: 'uppercase'
+                            }}>
+                              {article.category_label}
+                            </span>
+                          );
+                        })()}
+                        </div>
                         <div style={{
                           fontSize: '17px',
                           fontWeight: '600',

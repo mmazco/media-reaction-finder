@@ -224,6 +224,8 @@ def update_recommended_articles():
             'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews',
             'https://www.jadaliyya.com/Details/46906',
             'https://carnegieendowment.org/research/2025/07/iran-israel-ai-war-propaganda-is-a-warning-to-the-world?lang=en',
+            'https://archive.is/obNBX',  # Inside the plan to kill Ali Khamenei (FT)
+            'https://archive.is/rhWfB',  # Iran Is Built to Withstand the Ayatollah's Assassination
             # AI collection
             'https://ai-frontiers.org/articles/ai-will-be-your-personal-political-proxy',
         ]
@@ -237,117 +239,103 @@ def update_recommended_articles():
     except Exception as e:
         print(f"⚠️ Error updating recommended: {e}")
 
-def seed_collections_on_startup():
-    """Seed collections if they don't exist (for fresh deployments)"""
-    try:
-        existing = logger.get_all_collections()
-        
-        # Only seed if no collections exist
-        if len(existing) == 0:
-            print("🌱 Seeding collections for fresh deployment...")
-            
-            # Create collections
-            collections = [
-                ('palestine', 'Palestine', '', "Coverage on Israel's genocide in Gaza and embracing Palestinian culture"),
-                ('culture', 'Culture', '', 'Arts, music, and cultural commentary'),
-                ('ai', 'AI', '', 'Artificial intelligence news and developments'),
-                ('internet', 'Internet', '', 'Digital culture and online trends'),
-                ('politics', 'Politics', '', 'Political news and analysis'),
-            ]
-            
-            for tag, display_name, icon, description in collections:
-                if not logger.get_collection_by_tag(tag):
-                    logger.create_collection(tag, display_name, icon, description)
-                    print(f"  ✅ Created '{display_name}' collection")
-            
-            # Add sample articles to collections
-            # Format: (title, url, source, authors, date, summary, recommended)
-            sample_articles = {
-                'palestine': [
-                    ('The eugenist history of the Zionist movement', 'https://palestinenexus.com/articles/eugenicism', 'Palestine Nexus', None, None, 'From the late 19th century through the 1950s, Zionist leaders adopted a selective immigration policy.', True),
-                    ('Portrait of a Campus in Crisis', 'https://jewishcurrents.org/portrait-of-a-campus-in-crisis', 'Jewish Currents', None, None, 'An examination of campus dynamics amid the Israel-Palestine conflict.', True),
-                    ('Palestinians Are on Their Own', 'https://substack.com/home/post/p-166396887', 'Substack', None, None, 'Analysis of the current political situation facing Palestinians.', True),
-                    ('There Is No Peace in Gaza', 'https://www.newyorker.com/news/essay/there-is-no-peace-in-gaza', 'The New Yorker', None, None, 'An essay examining the ongoing conflict and humanitarian situation in Gaza.', False),
-                    ('Israel\'s Genocide Continues Unabated', 'https://www.amnesty.org/en/latest/news/2025/11/israels-genocide-against-palestinians-in-gaza-continues-unabated-despite-ceasefire/', 'Amnesty International', None, None, 'Amnesty International reports on ongoing violations despite ceasefire.', False),
-                    ('The Israel Lobby Is Melting Down', 'https://mondoweiss.net/2025/12/the-israel-lobby-is-melting-down-before-our-eyes/', 'Mondoweiss', None, None, 'Analysis of shifting political dynamics around Israel advocacy.', False),
-                    ('Politics of Counting Gaza\'s Dead', 'https://arena.org.au/politics-of-counting-gazas-dead/', 'Arena', None, None, 'Examining the politics and challenges of documenting casualties in Gaza.', False),
-                ],
-                'ai': [
-                    ('AI 2027: Predictions and Trajectories', 'https://ai-2027.com/', 'AI 2027', None, None, 'Forecasting the development and impact of AI through 2027.', True),
-                    ('Amanda Askell Publications', 'https://askell.io/publications/', 'Askell.io', 'Amanda Askell', None, 'Research publications on AI alignment, ethics, and language models.', True),
-                    ('Transfer Learning for Efficiency', 'https://ii.inc/web/blog/post/tle', 'ii.inc', None, None, 'Technical research on transfer learning efficiency in AI systems.', True),
-                    ('How Does a Blind Model See the Earth', 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth', 'Outside Text', None, None, 'Exploring how AI models without vision understand spatial concepts.', False),
-                    ('Claude Character Research', 'https://www.anthropic.com/research/claude-character', 'Anthropic', None, None, "Anthropic's research on developing Claude's character and values.", False),
-                    ('Chromaverse', 'https://dotdotdash.com/labs/chromaverse', 'dotdotdash', None, None, 'Interactive AI art and visualization project.', False),
-                ],
-                'culture': [
-                    ('Models.com Feature', 'https://models.com/oftheminute/?p=168720', 'Models.com', None, None, 'Fashion and modeling industry spotlight and cultural commentary.', True),
-                    ('Trishes Talks', 'https://substack.com/@trishestalks/p-176272631', 'Substack', 'Trishes', None, 'Cultural commentary and discussions on current trends.', True),
-                    ('Christianity in Silicon Valley', 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion', 'Vanity Fair', None, None, 'Examining the rise of Christianity in Silicon Valley tech culture.', False),
-                ],
-                'politics': [
-                    ('Building a Prosocial Media Ecosystem', 'https://www.noemamag.com/building-a-prosocial-media-ecosystem/', 'Noema Magazine', None, None, 'Exploring how to create media platforms that promote positive social outcomes.', True),
-                ],
-                'internet': [
-                    ('Internet Archive Reaches Trillion', 'https://blog.archive.org/trillion', 'Internet Archive', None, None, 'The Internet Archive celebrates a major milestone in preserving digital history.', False),
-                ],
-            }
-            
-            for tag, articles in sample_articles.items():
-                for title, url, source, authors, date, summary, recommended in articles:
-                    logger.add_article_to_collection(tag, title, url, source, authors, date, summary)
-                    if recommended:
-                        conn = sqlite3.connect(logger.db_path)
-                        cursor = conn.cursor()
-                        cursor.execute('UPDATE curated_articles SET recommended = 1 WHERE url = ?', (url,))
-                        conn.commit()
-                        conn.close()
-            
-            print("🌱 Collections and articles seeded successfully!")
-        else:
-            print(f"📚 Found {len(existing)} existing collections")
-    except Exception as e:
-        print(f"⚠️ Error seeding collections: {e}")
+# ── Canonical article lists for every collection (synced on every startup) ──
 
-def seed_iran_collection():
-    """Seed Iran collection if it doesn't exist"""
+PALESTINE_ARTICLES = [
+    {'title': 'Israel, Gaza, Holocaust, Genocide, Palestinians', 'url': 'https://www.nytimes.com/2025/07/15/opinion/israel-gaza-holocaust-genocide-palestinians.html', 'source': 'The New York Times', 'authors': None, 'date': 'July 15, 2025', 'summary': 'Opinion piece examining the parallels and distinctions in discussions of genocide and historical atrocities in the context of Gaza.'},
+    {'title': 'Support Late Photographer Mariam Riyad Abu Dagga and Ahmed Younes', 'url': 'https://www.dazed.me/art-photography/support-late-photographer-mariam-riyad-abu-dagga-and-ahmed-younes-through-the-palestine-print-platform', 'source': 'Dazed', 'authors': None, 'date': None, 'summary': 'Supporting Palestinian photographers through the Palestine Print Platform initiative.'},
+    {'title': 'Palestine Is Everywhere: The New Book Demanding Art World Solidarity', 'url': 'https://www.dazeddigital.com/art-photography/article/69037/1/palestine-is-everywhere-the-new-book-demanding-art-world-solidarity', 'source': 'Dazed Digital', 'authors': None, 'date': None, 'summary': 'A new book demanding solidarity from the art world for Palestine.'},
+    {'title': 'Eugenicism and Palestine', 'url': 'https://palestinenexus.com/articles/eugenicism', 'source': 'Palestine Nexus', 'authors': None, 'date': None, 'summary': 'An exploration of eugenicist ideologies in the context of Palestine.', 'recommended': True},
+    {'title': 'There Is No Peace in Gaza', 'url': 'https://www.newyorker.com/news/essay/there-is-no-peace-in-gaza', 'source': 'The New Yorker', 'authors': None, 'date': None, 'summary': 'An essay examining the ongoing conflict and humanitarian situation in Gaza.'},
+    {'title': 'Trump, Gaza, and Oslo Déjà Vu', 'url': 'https://www.dropsitenews.com/p/trump-gaza-abbas-oslo-hamas-palestinian-islamic-jihad-fatah-palestinian-liberation-organization-palestinian-resistance-united-nation-macron-france', 'source': 'Drop Site News', 'authors': 'Jeremy Scahill, Jawa Ahmad', 'date': 'December 1, 2025', 'summary': 'The U.S. is pushing its colonialist plan, as Israel keeps killing. Mahmoud Abbas is changing election laws to ban Hamas.'},
+    {'title': "Israel's Genocide Against Palestinians Continues Unabated Despite Ceasefire", 'url': 'https://www.amnesty.org/en/latest/news/2025/11/israels-genocide-against-palestinians-in-gaza-continues-unabated-despite-ceasefire/', 'source': 'Amnesty International', 'authors': None, 'date': 'November 2025', 'summary': "Amnesty International's report on the ongoing humanitarian crisis in Gaza."},
+    {'title': 'Portrait of a Campus in Crisis', 'url': 'https://jewishcurrents.org/portrait-of-a-campus-in-crisis', 'source': 'Jewish Currents', 'authors': None, 'date': None, 'summary': 'An examination of campus dynamics amid the Israel-Palestine conflict.', 'recommended': True},
+    {'title': 'The Israel Lobby Is Melting Down Before Our Eyes', 'url': 'https://mondoweiss.net/2025/12/the-israel-lobby-is-melting-down-before-our-eyes/', 'source': 'Mondoweiss', 'authors': None, 'date': 'December 2025', 'summary': 'Analysis of the shifting political landscape around Israel advocacy in the US.'},
+    {'title': 'Losing the Republican Base: Israel Pours Millions to Target Evangelicals', 'url': 'https://www.haaretz.com/israel-news/security-aviation/2025-11-09/ty-article-magazine/.premium/losing-the-republican-base-israel-pours-millions-to-target-evangelicals-and-churchgoers/0000019a-540e-db4c-a5fb-dfafea590000', 'source': 'Haaretz', 'authors': None, 'date': 'November 9, 2025', 'summary': 'Israel invests millions in targeting evangelical and churchgoing communities amid shifting political dynamics.'},
+    {'title': "Politics of Counting Gaza's Dead", 'url': 'https://arena.org.au/politics-of-counting-gazas-dead/', 'source': 'Arena', 'authors': None, 'date': None, 'summary': 'An analysis of the political dimensions of casualty counting in Gaza.'},
+    {'title': 'Substack Post on Palestine', 'url': 'https://substack.com/home/post/p-166396887', 'source': 'Substack', 'authors': None, 'date': None, 'summary': 'Commentary and analysis on the Palestine situation.', 'recommended': True},
+    {'title': 'Substack Post on Gaza', 'url': 'https://substack.com/home/post/p-176551170', 'source': 'Substack', 'authors': None, 'date': None, 'summary': 'Recent perspectives on the ongoing situation in Gaza.'},
+    {'title': "Ellison's Paramount, TikTok, and Israel Media Empire", 'url': 'https://www.972mag.com/ellisons-paramount-tiktok-israel-media-empire/', 'source': '+972 Magazine', 'authors': None, 'date': None, 'summary': 'Investigation into media ownership and its connections to Israel.'},
+]
+
+AI_ARTICLES = [
+    {'title': 'AI and Supply Chains', 'url': 'https://www.weforum.org/stories/2025/01/ai-supply-chains/', 'source': 'World Economic Forum', 'authors': None, 'date': 'January 2025', 'summary': 'How artificial intelligence is transforming global supply chain management.'},
+    {'title': 'Chromaverse', 'url': 'https://dotdotdash.com/labs/chromaverse', 'source': 'Dot Dot Dash Labs', 'authors': None, 'date': None, 'summary': 'An experimental AI-powered creative project exploring color and visual synthesis.'},
+    {'title': 'TLE - AI Research', 'url': 'https://ii.inc/web/blog/post/tle', 'source': 'ii.inc', 'authors': None, 'date': None, 'summary': 'Technical research on AI language models and training approaches.', 'recommended': True},
+    {'title': 'How Does a Blind Model See the Earth?', 'url': 'https://outsidetext.substack.com/p/how-does-a-blind-model-see-the-earth', 'source': 'Outside Text', 'authors': None, 'date': None, 'summary': 'Exploring how AI models without visual training understand spatial and geographic concepts.'},
+    {'title': 'AI 2027: Predictions and Trajectories', 'url': 'https://ai-2027.com/', 'source': 'AI 2027', 'authors': None, 'date': None, 'summary': 'Forecasting the development and impact of AI through 2027.', 'recommended': True},
+    {'title': 'Amanda Askell Publications', 'url': 'https://askell.io/publications/', 'source': 'Askell.io', 'authors': 'Amanda Askell', 'date': None, 'summary': 'Research publications on AI alignment, ethics, and language models.', 'recommended': True},
+    {'title': 'Claude Character Research', 'url': 'https://www.anthropic.com/research/claude-character', 'source': 'Anthropic', 'authors': None, 'date': None, 'summary': "Anthropic's research on developing Claude's character and values."},
+    {'title': 'AI Development Insights', 'url': 'https://substack.com/home/post/p-165014643', 'source': 'Substack', 'authors': None, 'date': None, 'summary': 'Analysis and commentary on recent AI developments.'},
+    {'title': 'AI Industry Analysis', 'url': 'https://substack.com/home/post/p-174437267', 'source': 'Substack', 'authors': None, 'date': None, 'summary': 'Deep dive into AI industry trends and implications.'},
+    {'title': 'AI Will Be Your Personal Political Proxy', 'url': 'https://ai-frontiers.org/articles/ai-will-be-your-personal-political-proxy', 'source': 'AI Frontiers', 'authors': 'Bruce Schneier, Nathan E. Sanders', 'date': 'October 21, 2025', 'summary': 'By learning our views and engaging on our behalf, AI could make government more representative and responsive — but not if we allow it to erode our democratic instincts. Excerpt from "Rewiring Democracy."', 'recommended': True},
+    {'title': 'The AI Apocalypse', 'url': 'https://just-tech.ssrc.org/articles/the-ai-apocalypse/', 'source': 'Just Tech (SSRC)', 'authors': 'Ruby Thelot', 'date': 'February 4, 2026', 'summary': 'Explores how AI doomer narratives mirror classical Judeo-Christian eschatological structures, from tribulation to utopia, and asks who gets to be saved by the machine.'},
+    {'title': 'Large Language Models (LLMs) as Agents for Augmented Democracy', 'url': 'https://www.tse-fr.eu/articles/large-language-models-llms-agents-augmented-democracy', 'source': 'Philosophical Transactions of the Royal Society A', 'authors': 'Jairo F. Gudino, Umberto Grandi, César Hidalgo', 'date': 'December 2024', 'summary': 'Research showing LLMs fine-tuned on citizen preference data can predict individual political choices and augment population-level preference estimates more accurately than party-line heuristics.'},
+]
+
+CULTURE_ARTICLES = [
+    {'title': 'Models.com Feature', 'url': 'https://models.com/oftheminute/?p=168720', 'source': 'Models.com', 'authors': None, 'date': None, 'summary': 'Fashion and modeling industry spotlight and cultural commentary.', 'recommended': True},
+    {'title': 'Trish Talks Culture', 'url': 'https://substack.com/@trishestalks/p-176272631', 'source': 'Substack', 'authors': 'Trish', 'date': None, 'summary': 'Cultural commentary and analysis on contemporary trends.', 'recommended': True},
+    {'title': "Christianity Was Borderline Illegal in Silicon Valley. Now It's the New Religion", 'url': 'https://www.vanityfair.com/news/story/christianity-was-borderline-illegal-in-silicon-valley-now-its-the-new-religion', 'source': 'Vanity Fair', 'authors': None, 'date': None, 'summary': 'Examining the rise of Christianity and religious movements in Silicon Valley tech culture.'},
+]
+
+POLITICS_ARTICLES = [
+    {'title': 'Building a Prosocial Media Ecosystem', 'url': 'https://www.noemamag.com/building-a-prosocial-media-ecosystem/', 'source': 'Noema Magazine', 'authors': None, 'date': None, 'summary': 'Exploring how to create media platforms that promote positive social outcomes.', 'recommended': True},
+    {'title': 'Newsom Launches Digital Democracy Initiative', 'url': 'https://www.latimes.com/california/story/2025-02-23/newsom-launches-a-new-digital-democracy-initiative-including-outreach-to-wildfire-victims', 'source': 'Los Angeles Times', 'authors': None, 'date': 'February 23, 2025', 'summary': 'Governor Newsom launches a new digital democracy tool with focus on wildfire victim outreach.'},
+    {'title': 'Warlords of Information: Palantir, Epstein, & The New York Times', 'url': 'https://www.zig.art/p/my-final-message-before-im-on-an', 'source': 'Ziggurat', 'authors': 'Juan Sebastián Pinto', 'date': 'January 9, 2026', 'summary': "Former Palantir employee's analysis of AI surveillance technology, ISTAR systems, and the connections between Silicon Valley, defense contractors, and media manipulation in hybrid warfare."},
+    {'title': 'How Anti-Semitism Helped Create Israel', 'url': 'https://foreignpolicy.com/2010/09/08/how-anti-semitism-helped-create-israel-2/', 'source': 'Foreign Policy', 'authors': 'Jonathan Schneer', 'date': 'September 8, 2010', 'summary': "How British leaders' anti-Semitic beliefs about the power of 'international Jewry' drove them to issue the Balfour Declaration during WWI, paradoxically laying the foundation for modern Israel."},
+]
+
+IRAN_ARTICLES = [
+    {'title': "Tehran's Method of Governance Has Reached a Dead End - Former Top Adviser Tells Euronews", 'url': 'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews', 'source': 'Euronews', 'authors': None, 'date': 'January 5, 2026', 'summary': 'A former top adviser discusses the challenges facing the Iranian government and its governance model.', 'recommended': True},
+    {'title': "In Pursuit of Whiteness: Why Iranian Monarchists Cheer Israel's Genocide", 'url': 'https://www.jadaliyya.com/Details/46906', 'source': 'Jadaliyya', 'authors': 'Reza Zia-Ebrahimi', 'date': 'September 22, 2025', 'summary': 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.', 'recommended': True},
+    {'title': "Iran's Political Opposition Jailed", 'url': 'https://www.theatlantic.com/international/archive/2025/08/iran-political-opposition-jailed/683785/', 'source': 'The Atlantic', 'authors': None, 'date': 'August 2025', 'summary': 'Examination of the imprisonment of political opposition figures in Iran.'},
+    {'title': 'The Israeli Influence Operation in Iran Pushing to Reinstate the Shah Monarchy', 'url': 'https://archive.ph/QvqFh', 'source': 'Haaretz', 'authors': None, 'date': 'October 3, 2025', 'summary': "Investigation into Israeli operations aimed at promoting monarchist restoration in Iran."},
+    {'title': "Iran Toppled the Shah in 1979. Why This Time Isn't Quite Like That", 'url': 'https://time.com/7345623/iran-protests-reza-shah-pahlavi-ayatollah-1979/', 'source': 'TIME', 'authors': 'Narges Bajoghli', 'date': 'January 2026', 'summary': "Analysis comparing current Iran protests to 1979 revolution, examining why structural conditions differ - the bazaar has lost autonomy to IRGC-connected elites, clergy is fragmented, military hasn't defected, and external disinformation complicates genuine opposition."},
+    {'title': "How the U.S. and Israel Are Trying to Co-opt Iran's Protests", 'url': 'https://www.dropsitenews.com/p/iran-protests-us-israel-islamic-republic', 'source': 'Drop Site News', 'authors': 'Samira Mohyeddin, Narges Bajoghli, Jeremy Scahill, Murtaza Hussain', 'date': 'January 13, 2026', 'summary': "Discussion on what's driving Iran's protests, what we know under conditions of severe information blackout, and why Washington's talk of intervention carries enormous risks for Iranians and the broader region.", 'recommended': True},
+    {'title': "Military Intervention Will Not Liberate the Iranian People", 'url': 'https://newrepublic.com/article/205176/iran-crackdown-force-us-military', 'source': 'The New Republic', 'authors': 'Nancy Okail, Sina Toossi', 'date': 'January 13, 2026', 'summary': "Argues that Iranians are caught between their brutal regime and the U.S. war machine, rejecting military intervention as a solution. Discusses how repression cannot restore political order and why external intervention distorts democratic transitions.", 'recommended': True},
+    {'title': "A Fractured Iran Might Not Be So Bad", 'url': 'https://www.wsj.com/opinion/a-fractured-iran-might-not-be-so-bad-5ec2d702', 'source': 'Wall Street Journal', 'authors': None, 'date': 'January 2026', 'summary': "Opinion piece discussing potential outcomes of political fragmentation in Iran."},
+    {'title': "Beyond Black and White: Notes from Tehran", 'url': 'https://themarkaz.org/beyond-black-and-white-notes-from-tehran/', 'source': 'The Markaz Review', 'authors': 'M. Nateqnuri', 'date': 'January 23, 2026', 'summary': "First-hand account from Tehran noting layers of complexity: genuine economic grievances mixed with trained foreign agents (Israeli, US-backed MEK, separatists) attempting to manipulate protests. Describes unprecedented violence, magical thinking about US/Israeli intervention, and fear of civil war without viable opposition.", 'recommended': True},
+    {'title': "Iran-Israel AI War Propaganda Is a Warning to the World", 'url': 'https://carnegieendowment.org/research/2025/07/iran-israel-ai-war-propaganda-is-a-warning-to-the-world?lang=en', 'source': 'Carnegie Endowment for International Peace', 'authors': 'Mahsa Alimardani, Sam Gregory', 'date': 'July 28, 2025', 'summary': "Analysis of AI-generated propaganda during the Iran-Israel war, examining the challenges of detecting synthetic media and the impact on civilian populations navigating information blackouts, disinformation, and conflict narratives.", 'recommended': True},
+    {'title': 'Inside the plan to kill Ali Khamenei', 'url': 'https://archive.is/obNBX', 'source': 'Financial Times', 'authors': None, 'date': '2026', 'summary': "FT reporting on the plan to kill Iran's Supreme Leader. Original: ft.com/content/bf998c69-ab46-4fa3-aae4-8f18f7387836.", 'recommended': True},
+    {'title': "Iran Is Built to Withstand the Ayatollah's Assassination", 'url': 'https://archive.is/rhWfB', 'source': 'Archived analysis', 'authors': None, 'date': '2026', 'summary': "Analysis piece on Iran's institutional resilience to leadership decapitation.", 'recommended': True},
+    {'title': 'State-Sponsored Twitter Accounts Pushing for War with Iran', 'url': 'https://geoffgolberg.medium.com/state-sponsored-twitter-accounts-pushing-for-war-with-iran-732d3482b847', 'source': 'Medium', 'authors': 'Geoff Golberg', 'date': None, 'summary': 'Investigation into state-sponsored Twitter accounts pushing pro-war narratives on Iran, documenting coordinated inauthentic behavior on the platform.', 'category_label': 'Analysis'},
+    {'title': 'Why Do Official Israeli Government Twitter Accounts Follow So Many Inauthentic Accounts?', 'url': 'https://geoffgolberg.medium.com/why-do-official-israeli-government-twitter-accounts-follow-so-many-inauthentic-accounts-51622563be89', 'source': 'Medium', 'authors': 'Geoff Golberg', 'date': None, 'summary': 'Investigation into why official Israeli government Twitter accounts follow large numbers of inauthentic accounts, raising questions about coordinated platform manipulation.', 'category_label': 'Analysis'},
+    {'title': 'State-Sponsored Platform Manipulation', 'url': 'https://www.socialforensics.com/reports-2/state-sponsored-platform-manipulation', 'source': 'Social Forensics', 'authors': 'Geoff Golberg', 'date': 'July 24, 2023', 'summary': 'Evidence of state-actor involvement in platform manipulation targeting the Iran policy debate on Twitter, including targeted abuse and gaming trending hashtags, which escalated after Mahsa Amini\'s death in September 2022.', 'category_label': 'Analysis'},
+]
+
+ALL_COLLECTIONS = {
+    'palestine': {'display_name': 'Palestine', 'icon': '', 'description': "Coverage on Israel's genocide in Gaza and embracing Palestinian culture", 'articles': PALESTINE_ARTICLES},
+    'iran':      {'display_name': 'Iran',      'icon': '', 'description': 'Articles on Iran, Iranian politics, opposition movements, and regional dynamics', 'articles': IRAN_ARTICLES},
+    'culture':   {'display_name': 'Culture',   'icon': '', 'description': 'Arts, music, and cultural commentary', 'articles': CULTURE_ARTICLES},
+    'ai':        {'display_name': 'AI',        'icon': '', 'description': 'Artificial intelligence news and developments', 'articles': AI_ARTICLES},
+    'politics':  {'display_name': 'Politics',  'icon': '', 'description': 'Political news and analysis', 'articles': POLITICS_ARTICLES},
+}
+
+def sync_all_collections():
+    """Ensure every collection exists and all articles are present (runs every startup)."""
     try:
-        if not logger.get_collection_by_tag('iran'):
-            logger.create_collection(
-                'iran', 
-                'Iran', 
-                '', 
-                'Articles on Iran, Iranian politics, opposition movements, and regional dynamics'
-            )
-            print("✅ Created 'Iran' collection")
-            
-            iran_articles = [
-                ("Tehran's Method of Governance Has Reached a Dead End - Former Top Adviser Tells Euronews", 
-                 'https://www.euronews.com/2026/01/05/tehrans-method-of-governance-has-reached-a-dead-end-former-top-adviser-tells-euronews', 
-                 'Euronews', None, 'January 5, 2026', 
-                 'A former top adviser discusses the challenges facing the Iranian government and its governance model.', True),
-                ("In Pursuit of Whiteness: Why Iranian Monarchists Cheer Israel's Genocide", 
-                 'https://www.jadaliyya.com/Details/46906', 
-                 'Jadaliyya', 'Reza Zia-Ebrahimi', 'September 22, 2025', 
-                 'Analysis of Iranian diaspora monarchists supporting Israel, examining dislocative nationalism and the pursuit of whiteness through internalised racial hierarchies and Islamophobia rooted in Western colonial epistemologies.', True),
-                ("Iran's Political Opposition Jailed", 
-                 'https://www.theatlantic.com/international/archive/2025/08/iran-political-opposition-jailed/683785/', 
-                 'The Atlantic', None, 'August 2025', 
-                 'Examination of the imprisonment of political opposition figures in Iran.', False),
-                ('The Israeli Influence Operation in Iran Pushing to Reinstate the Shah Monarchy', 
-                 'https://www.haaretz.com/israel-news/security-aviation/2025-10-03/ty-article-magazine/.premium/the-israeli-influence-operation-in-iran-pushing-to-reinstate-the-shah-monarchy/00000199-9f12-df33-a5dd-9f770d7a0000', 
-                 'Haaretz', None, 'October 3, 2025', 
-                 'Investigation into Israeli operations aimed at promoting monarchist restoration in Iran.', False),
-            ]
-            
-            for title, url, source, authors, date, summary, recommended in iran_articles:
-                logger.add_article_to_collection('iran', title, url, source, authors, date, summary)
-            
-            print(f"  📄 Added {len(iran_articles)} articles to Iran collection")
-        else:
-            print("📁 Iran collection already exists")
+        for tag, meta in ALL_COLLECTIONS.items():
+            if not logger.get_collection_by_tag(tag):
+                logger.create_collection(tag, meta['display_name'], meta['icon'], meta['description'])
+                print(f"  ✅ Created '{meta['display_name']}' collection")
+            for article in meta['articles']:
+                aid = logger.add_article_to_collection(
+                    tag,
+                    article['title'],
+                    article['url'],
+                    article.get('source'),
+                    article.get('authors'),
+                    article.get('date'),
+                    article.get('summary'),
+                    category_label=article.get('category_label')
+                )
+                if aid and article.get('recommended'):
+                    logger.set_article_recommended(aid, True)
+        total = sum(len(m['articles']) for m in ALL_COLLECTIONS.values())
+        print(f"📚 Collections synced – {len(ALL_COLLECTIONS)} collections, {total} articles")
     except Exception as e:
-        print(f"⚠️ Error seeding Iran collection: {e}")
+        print(f"⚠️ Error syncing collections: {e}")
 
 # Seed collections on startup (use file lock to run once across Gunicorn workers)
 _seed_lock_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.seed_lock')
@@ -360,8 +348,7 @@ def _run_startup_tasks():
         return
     
     try:
-        seed_collections_on_startup()
-        seed_iran_collection()
+        sync_all_collections()
         update_recommended_articles()
         logger.clear_expired_cache()
     finally:
