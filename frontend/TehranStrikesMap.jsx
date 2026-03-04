@@ -5,9 +5,9 @@ const STRIKES = [
   {id:1,n:"Supreme Leader's Compound (Pasteur District)",lat:35.700,lng:51.423,c:"confirmed",d:"Feb 28",
    t:"Khamenei's residence & office compound destroyed. Satellite imagery (Airbus) confirms severe damage. Khamenei, family members & security chief Shamkhani killed.",
    s:["AP","CNN","Al Jazeera","BBC","Reuters","CBS","NPR"],cat:"Leadership"},
-  {id:2,n:"IRGC HQ / Thar-Allah HQ (District 6, Central Tehran)",lat:35.696,lng:51.416,c:"confirmed",d:"Feb 28",
-   t:"IDF stated it levelled the General Staff of internal security forces & Thar-Allah HQ. Fars confirmed strikes near IRGC HQ.",
-   s:["IDF","Fars News","Al Jazeera","Wikipedia"],cat:"Military"},
+  {id:2,n:"IRGC HQ / Thar-Allah HQ (District 6, Central Tehran)",lat:35.696,lng:51.416,c:"confirmed",d:"Feb 28–Mar 1",
+   t:"IDF destroyed the General Staff HQ of internal security forces and Thar-Allah complex (command-and-control linking regime with ground forces). Thar-Allah is IRGC unit for Tehran-area security. Fars, ToI confirmed.",
+   s:["IDF","Fars News","Al Jazeera","Times of Israel","Wikipedia"],cat:"Military"},
   {id:3,n:"University St / Jomhouri Area (District 6, Central Tehran)",lat:35.694,lng:51.405,c:"confirmed",d:"Feb 28",
    t:"Multiple missiles hit University Street & Jomhouri area. Two students killed at nearby school east of the capital.",
    s:["Fars News","Al Jazeera","CNN","Wikipedia"],cat:"Mixed"},
@@ -23,9 +23,9 @@ const STRIKES = [
   {id:7,n:"Atomic Energy Org. of Iran (District 6, Amirabad)",lat:35.720,lng:51.395,c:"confirmed",d:"Feb 28",
    t:"AEOI HQ targeted. Confirmed in Al Jazeera's verified mapping report alongside other government ministry strikes.",
    s:["Al Jazeera","Iranian media"],cat:"Nuclear"},
-  {id:8,n:"State Radio & TV HQ (IRIB) (District 6, Central Tehran)",lat:35.715,lng:51.406,c:"confirmed",d:"Feb 28–Mar 1; again Mar 3",
-   t:"State broadcasting HQ struck. IDF confirmed targeting regime communications infrastructure. Hit again early Mar 3 in a separate IAF operation.",
-   s:["Iranian media","Wikipedia","IDF"],cat:"Government"},
+  {id:8,n:"State Radio & TV HQ (IRIB) (District 6, Central Tehran)",lat:35.715,lng:51.406,c:"confirmed",d:"Feb 28, Mar 1, Mar 3",
+   t:"State broadcaster struck at least 3 times. IDF confirmed targeting regime communications; evacuation warning issued for Evin/IRIB zone.",
+   s:["Iranian media","Wikipedia","IDF","Al Jazeera"],cat:"Government"},
   {id:9,n:"Azadi Tower / Azadi Square (District 9, West Tehran)",lat:35.700,lng:51.338,c:"confirmed",d:"Mar 1",
    t:"Video confirmed massive explosions around iconic Azadi Tower during Israel's second wave on Sunday. CNN verified footage.",
    s:["CNN","Al Jazeera (video)","Wikipedia"],cat:"Landmark"},
@@ -62,8 +62,8 @@ const STRIKES = [
   {id:20,n:"Tajrish (District 1, North Tehran)",lat:35.800,lng:51.434,c:"likely",d:"Mar 2",
    t:"Explosions reported in the Tajrish area of far northern Tehran, named alongside Ferdowsi Square in CGTN reporting of IAF's latest wave.",
    s:["CGTN"],cat:"Mixed"},
-  {id:21,n:"Niloofar Square (District 7, Central Tehran)",lat:35.705,lng:51.435,c:"likely",d:"Mar 2",
-   t:"20 civilians killed at Niloofar Square on March 2, per Wikipedia citing Iranian sources. One of the deadliest single incidents in Tehran.",
+  {id:21,n:"Niloofar Square (District 7, Central Tehran)",lat:35.705,lng:51.435,c:"confirmed",d:"Mar 2",
+   t:"Double-tap strike confirmed. 20+ civilians killed. One of the deadliest single incidents in Tehran. Upgraded from likely per multiple source corroboration.",
    s:["Wikipedia","Iranian sources"],cat:"Civilian"},
   {id:22,n:"Quds Basij Base (District 5, NW Tehran)",lat:35.76,lng:51.37,c:"likely",d:"Mar 1",
    t:"Fifth Tehran Municipality Quds Basij Resistance Regional Base. Commercially available satellite imagery shows building damage in airstrikes on Mar 1. One of 23 Basij regional bases in Tehran (IRGC Ground Forces).",
@@ -86,12 +86,24 @@ const STRIKES = [
   {id:28,n:"Evin District (IDF evacuation warning) (District 1)",lat:35.805,lng:51.394,c:"unverified",d:"Mar 3",
    t:"IDF issued evacuation warning for Evin district. Prison admin collapsed, staff abandoned posts. Strike incoming — not yet confirmed hit.",
    s:["IDF","NCRI"],cat:"Government"},
+  {id:29,n:"Internal security & Basij command centers (Mar 4 wave) (District 6, Central Tehran)",lat:35.70,lng:51.41,c:"likely",d:"Mar 4",
+   t:"Israel launched broad wave of strikes on internal security and Basij command centers in Tehran. Dozens of munitions on several facilities; regime supply/logistics also targeted. IDF had dropped 2,500+ bombs on Iran by Mar 4. JPost, Fox, CNN, NPR.",
+   s:["IDF","Times of Israel","Jerusalem Post","CNN","NPR"],cat:"Military"},
+  {id:30,n:"'Minzadehei' Nuclear Compound (District 4, eastern outskirts)",lat:35.75,lng:51.55,c:"confirmed",d:"Mar 3",
+   t:"Secret partially-underground nuclear weapons facility destroyed. IDF tracked scientists relocated here after June 2025 war. Multiple intl outlets.",
+   s:["IDF","CNN","Times of Israel","Jerusalem Post","Critical Threats"],cat:"Nuclear"},
+  {id:31,n:"Parchin Military Complex (Tehran Province, SE)",lat:35.52,lng:51.77,c:"confirmed",d:"Mar 3",
+   t:"Underground facility struck; ~30km SE of Tehran. Key site for munitions, drones, missiles & historic nuclear weapons testing (Taleghan 2). Satellite imagery.",
+   s:["Critical Threats","Israeli analyst"],cat:"Military"},
+  {id:32,n:"Ba'ath Hospital area (District 13/14, East Tehran)",lat:35.70,lng:51.48,c:"likely",d:"Mar 4",
+   t:"Columns of smoke in eastern Tehran. Mehr published images of strikes near Ba'ath Hospital. Tabnak, Entekhab.",
+   s:["Mehr","Tabnak","Entekhab"],cat:"Civilian/Medical"},
 ];
 
-const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","Anadolu Agency","TRT World","Times of Israel","Globe and Mail","Middle East Eye","NDTV","ISW","Iran International"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)"],OFFICIAL=["IDF","CENTCOM"];
+const TIER1=["AP","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","Globe and Mail","Middle East Eye","NDTV","ISW","Iran International","Critical Threats","Israeli analyst"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI","Mehr","Tabnak","Entekhab"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)"],OFFICIAL=["IDF","CENTCOM"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED — MAR 2",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:13,likely:11,unverified:4};
-const BOUNDS={minLat:35.59,maxLat:35.81,minLng:51.29,maxLng:51.53};
+const counts={confirmed:16,likely:12,unverified:4};
+const BOUNDS={minLat:35.50,maxLat:35.81,minLng:51.29,maxLng:51.80};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
 const T = {
@@ -171,7 +183,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
 
   const tiers=[
     {n:"Tier 1 — Wire services",v:"AP, Reuters",d:"Gold standard. On-ground correspondents where possible"},
-    {n:"Tier 2 — Major broadcasters / analysis",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, Anadolu, TRT World, Times of Israel, Globe and Mail, Middle East Eye, NDTV, ISW, Iran International",d:"Independent geolocation, satellite analysis, verified footage"},
+    {n:"Tier 2 — Major broadcasters / analysis",v:"CNN, BBC/BBC Verify, Al Jazeera, NPR, CBS, Anadolu, TRT World, Times of Israel, Jerusalem Post, Globe and Mail, Middle East Eye, NDTV, ISW, Iran International",d:"Independent geolocation, satellite analysis, verified footage"},
     {n:"Tier 3 — State/regional",v:"Fars, Tasnim, IRNA, ISNA, CGTN, Iranian sources, NCRI",d:"Reliable on confirming strikes occurred. May spin details politically"},
     {n:"Tier 4 — Aggregators (caution)",v:"LiveUAMap, MahsaAlert, Pravda (images)",d:"Crowdsourced or republished. Fast but not independently verified"},
     {n:"Official military claims",v:"IDF, CENTCOM",d:"First-party claims. Useful but inherently one-sided"},

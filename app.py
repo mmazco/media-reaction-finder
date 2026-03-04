@@ -111,10 +111,20 @@ CURATED_REACTIONS = {
 
 _CATEGORY_LABELS = ["Mainstream Coverage", "Analysis", "Opinion"]
 
+# Annotation rubric for classification. See docs/content-evaluation.md for full definitions.
+_CLASSIFICATION_RUBRIC = """
+Categories (use exactly these labels):
+- Mainstream Coverage: Straight news reporting from established outlets; report what happened, standard sourcing, minimal editorial voice. Wire services, major dailies, breaking news. Exclude opinion pages and explainers (those go elsewhere).
+- Analysis: Deeper examination—cause/effect, context, interpretation, synthesis. Think-pieces, explainers, backgrounders, research summaries. Not the author's personal take. Exclude straight news (Mainstream) and clear argument/op-eds (Opinion).
+- Opinion: Author's viewpoint, argument, or recommendation. Editorials, op-eds, columns, advocacy. Reader sees it as a perspective. Exclude neutral explainers (Analysis) and straight news (Mainstream).
+Tie-breaker: Same outlet, different section—use the piece's purpose. Hybrid pieces—choose dominant mode; if 50/50 reported+argument, prefer Analysis.
+"""
+
 def classify_web_results(results, article_title=None):
     """
     Classify each web result into a category with a one-line reason.
     Uses a single LLM call for all results to keep costs low.
+    Rubric is in the system message so labels match docs/content-evaluation.md.
     """
     if not results:
         return results
@@ -134,7 +144,11 @@ def classify_web_results(results, article_title=None):
         "Output ONLY valid JSON — no markdown fences, no commentary."
     )
 
-    system_msg = "You classify news/web results. Respond with raw JSON only."
+    system_msg = (
+        "You classify news/web results using this rubric."
+        + _CLASSIFICATION_RUBRIC
+        + "\nRespond with raw JSON only."
+    )
     raw = None
 
     # Try OpenAI first
