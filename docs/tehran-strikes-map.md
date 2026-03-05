@@ -10,8 +10,8 @@ Interactive verification map tracking US-Israeli strike locations in Tehran (Feb
 
 ## Current State
 
-- **29 strike locations** tracked across 3 confidence tiers
-- **Data last re-checked:** Mar 4, 2026 — overnight sources (ToI, JPost, CNN, NPR, Fox, ISW); added Mar 4 wave (internal security & Basij command centers); updated Thar-Allah/internal security HQ entry with confirmation
+- **44 strike locations** tracked across 3 confidence tiers
+- **Data last re-checked:** Mar 5, 2026 — synced with `tehran_strikes_export_v4.xlsx` (43 sites) + ISW Mar 4 evening report (IRGC SE Tehran compound). Added FDD-sourced police stations, Basij bases, Golestan Palace, Azadi Arena, FARAJA Command, IRGC Narmak admin, Zero-Six Garrison, Sohrevardi positions. Updated MoI to ×10, Niloofar to Police Stn 104.
 - Confidence Statement modal with methodology and limitations
 - Suggest a Strike Location form → Airtable
 - Styled to match MRF design system (Georgia serif headers, consistent spacing)
@@ -34,7 +34,7 @@ When new strikes are reported or existing ones need upgrading:
    ```
 4. **Update counts** — The `counts` object near the top of the file:
    ```js
-   const counts = {confirmed: 13, likely: 11, unverified: 4};
+   const counts = {confirmed: 20, likely: 20, unverified: 4};
    ```
 5. **Update header** — Change the "LAST UPDATED" timestamp and DAY counter
 6. **Build and deploy:**
@@ -119,7 +119,7 @@ If Airtable is not configured (env vars missing), the endpoint returns 200 and t
 ## Categories
 
 Strikes are tagged with a category for filtering context:
-`Leadership`, `Military`, `Government`, `Nuclear`, `Landmark`, `Civilian/Medical`, `Mixed`, `Downtown`, `Unknown`
+`Leadership`, `Military`, `Military/Civilian`, `Military/Nuclear`, `Government`, `Government/Prison`, `Nuclear`, `Police`, `Civilian/Police`, `Civilian/Medical`, `Heritage`, `Landmark`, `Mixed`, `Downtown`, `Unknown`
 
 ## Future Upgrades (when traffic justifies)
 
