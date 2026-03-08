@@ -172,7 +172,10 @@ const STRIKES = [
   {id:56,n:"IRGC Compound — SE Tehran (ISW, Mar 4)",lat:35.665,lng:51.455,c:"likely",d:"Mar 4",
    t:"ISW: IDF struck compound housing IRGC Ground Forces, Navy, Quds Force, Basij & Intelligence HQs. Possibly IRGC Central Defense Command Center.",
    s:["ISW","IDF"],cat:"Military"},
-  // ── UNVERIFIED (4) ──
+  {id:61,n:"Narmak residential (D8, Iraaghi St)",lat:35.738,lng:51.490,c:"likely",d:"Mar 2",
+   t:"Residential homes hit on named street in Narmak.",
+   s:["Civilian sites list"],cat:"Residential"},
+  // ── UNVERIFIED (5) ──
   {id:57,n:"Farmanieh Street (D1)",lat:35.787,lng:51.463,c:"unverified",d:"Mar 2",
    t:"LiveUAMap only.",
    s:["LiveUAMap"],cat:"Unknown"},
@@ -185,11 +188,14 @@ const STRIKES = [
   {id:60,n:"Evin District — IDF evacuation warning (D1)",lat:35.805,lng:51.394,c:"unverified",d:"Mar 3–4",
    t:"IDF evacuation warning. Prison admin collapsed.",
    s:["IDF (evac warning)","NCRI"],cat:"Government/Prison"},
+  {id:62,n:"Children's park, Tehran (D4/8)",lat:35.740,lng:51.500,c:"unverified",d:"Mar 2",
+   t:"Reported hit. May overlap with Police Park misidentification or separate site.",
+   s:["Civilian sites list"],cat:"Civilian"},
 ];
 
 const TIER1=["AP","AP photo","AP (video)","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Critical Threats","Israeli analyst","Israeli analyst (sat imagery)","JFeed","UNESCO"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","Civilian sites list"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","CENTCOM"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:28,likely:28,unverified:4};
+const counts={confirmed:28,likely:29,unverified:5};
 const BOUNDS={minLat:35.50,maxLat:35.82,minLng:51.28,maxLng:51.80};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
