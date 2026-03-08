@@ -10,8 +10,8 @@ Interactive verification map tracking US-Israeli strike locations in Tehran (Feb
 
 ## Current State
 
-- **44 strike locations** tracked across 3 confidence tiers
-- **Data last re-checked:** Mar 5, 2026 — synced with `tehran_strikes_export_v4.xlsx` (43 sites) + ISW Mar 4 evening report (IRGC SE Tehran compound). Added FDD-sourced police stations, Basij bases, Golestan Palace, Azadi Arena, FARAJA Command, IRGC Narmak admin, Zero-Six Garrison, Sohrevardi positions. Updated MoI to ×10, Niloofar to Police Stn 104.
+- **60 strike locations** tracked across 3 confidence tiers (28 confirmed / 28 likely / 4 unverified)
+- **Data last re-checked:** Mar 8, 2026 (Day 9) — synced with `tehran_strikes_export_v5.xlsx` (59 sites) + ISW Mar 4 IRGC compound. v5 adds oil infrastructure (Aghdasieh, Tehran Refinery, Shahran), Mehrabad Airport, IRGC AF Command Center, Expediency Council, missile production sites, Grand Bazaar, civilian/residential sites. Parchin expanded to ×3 waves.
 - Confidence Statement modal with methodology and limitations
 - Suggest a Strike Location form → Airtable
 - Styled to match MRF design system (Georgia serif headers, consistent spacing)
@@ -34,7 +34,7 @@ When new strikes are reported or existing ones need upgrading:
    ```
 4. **Update counts** — The `counts` object near the top of the file:
    ```js
-   const counts = {confirmed: 20, likely: 20, unverified: 4};
+   const counts = {confirmed: 28, likely: 28, unverified: 4};
    ```
 5. **Update header** — Change the "LAST UPDATED" timestamp and DAY counter
 6. **Build and deploy:**
@@ -119,7 +119,7 @@ If Airtable is not configured (env vars missing), the endpoint returns 200 and t
 ## Categories
 
 Strikes are tagged with a category for filtering context:
-`Leadership`, `Military`, `Military/Civilian`, `Military/Nuclear`, `Government`, `Government/Prison`, `Nuclear`, `Police`, `Civilian/Police`, `Civilian/Medical`, `Heritage`, `Landmark`, `Mixed`, `Downtown`, `Unknown`
+`Leadership`, `Military`, `Military/Civilian`, `Military/Nuclear`, `Military/Transport`, `Government`, `Government/Prison`, `Nuclear`, `Police`, `Civilian/Police`, `Civilian/Medical`, `Heritage`, `Heritage/Civilian`, `Oil/Energy`, `Residential`, `Landmark`, `Mixed`, `Downtown`, `Unknown`
 
 ## Future Upgrades (when traffic justifies)
 
