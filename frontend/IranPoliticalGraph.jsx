@@ -178,66 +178,65 @@ const predictionMarkets = [
   },
   {
     id: 'pahlavi-visit',
-    title: 'Will Reza Pahlavi enter Iran before September?',
-    probability: 57,
-    previousProb: 34,
-    volume: '$1.8K',
+    title: 'Will Reza Pahlavi visit Iran this year?',
+    probability: 32,
+    previousProb: 57,
+    volume: '$2K+',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxpahlavivisita/will-reza-pahlavi-enter-iran-before-september/kxpahlavivisita',
     linkedEntities: ['pahlavi'],
-    trend: 'up',
-    paused: true,
+    trend: 'down',
   },
   {
     id: 'us-recognize-pahlavi',
     title: 'Will the United States recognize Reza Pahlavi?',
     probability: 37,
     previousProb: 36,
-    volume: '$1.2K',
+    volume: '$1.2K+',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxrecogpersoniran/recognize-reza-pahlavi/kxrecogpersoniran-26',
     linkedEntities: ['pahlavi', 'trump'],
     trend: 'up',
-    paused: true,
   },
   {
     id: 'next-supreme-leader',
-    title: "Who will be Khamenei's successor?",
+    title: "Who will be Khamenei's successor? (Kalshi)",
     probability: null,
-    volume: '$2.3K',
+    volume: '$70K+',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxnextiranleader/who-will-be-khameneis-successor/kxnextiranleader-45jan01',
-    linkedEntities: ['mojtaba', 'hassan_k', 'arafi', 'khamenei'],
+    linkedEntities: ['mojtaba', 'hassan_k', 'arafi', 'khamenei', 'assembly'],
     candidates: [
-      { name: 'Mojtaba Khamenei', prob: 18 },
-      { name: 'Position abolished', prob: 56 },
+      { name: 'Alireza Arafi', prob: 19 },
+      { name: 'Hassan Khomeini', prob: 17 },
+      { name: 'Position abolished', prob: 15 },
+      { name: 'Mojtaba Khamenei', prob: 10 },
+      { name: 'Sadeq Amoli Larijani', prob: 10 },
     ],
     trend: 'up',
-    paused: true,
+    divergence: true,
   },
   {
     id: 'iran-nuclear-deal',
-    title: 'US-Iran nuclear deal this year?',
-    probability: 49,
-    previousProb: 35,
-    volume: '$1.5K',
+    title: 'US-Iran nuclear deal before 2027?',
+    probability: 55,
+    previousProb: 49,
+    volume: '$470K',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxusairanagreement/us-iran-nuclear-deal/kxusairanagreement-27',
-    linkedEntities: ['trump', 'khamenei', 'pezeshkian'],
+    linkedEntities: ['trump', 'khamenei', 'pezeshkian', 'mojtaba'],
     trend: 'up',
-    paused: true,
   },
   {
     id: 'strait-hormuz',
-    title: 'Will Iran close the Strait of Hormuz?',
-    probability: 31,
-    previousProb: 22,
-    volume: '$4.1K',
+    title: 'Will Iran close the Strait of Hormuz before 2027?',
+    probability: 40,
+    previousProb: 31,
+    volume: '$5K+',
     platform: 'kalshi',
     url: 'https://kalshi.com/markets/kxclosehormuz/strait-of-hormuz/kxclosehormuz-27jan',
-    linkedEntities: ['irgc', 'khamenei'],
+    linkedEntities: ['irgc', 'khamenei', 'mojtaba'],
     trend: 'up',
-    paused: true,
   },
 ];
 
@@ -1006,8 +1005,12 @@ export default function IranPoliticalGraph({ darkMode = true, isMobile = false }
               </div>
             </div>
 
-            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '12px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-              The succession question is answered: Mojtaba Khamenei. But whether he actually holds power is the new bet. Only 33% chance he leads Iran by year-end, with Pahlavi (17%) and Pezeshkian (12%) as alternatives. Markets see the Islamic Republic surviving the immediate crisis (regime fall by Mar 31 at just 9%) but facing a turbulent 2026 (fall before 2027 still at 44%). Kalshi remains paused on all Iran markets.
+            <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: theme.text, marginTop: '12px', padding: '10px 12px', background: darkMode ? 'rgba(239,68,68,0.08)' : 'rgba(239,68,68,0.05)', border: `1px solid ${darkMode ? 'rgba(239,68,68,0.2)' : 'rgba(239,68,68,0.15)'}` }}>
+              <div style={{ fontSize: '9px', color: '#ef4444', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '6px', fontWeight: '600' }}>Platform Divergence</div>
+              <span>Polymarket ($37M vol) has Mojtaba at <strong style={{ color: '#22c55e' }}>100%</strong>. Kalshi ($70K vol) has Arafi <strong style={{ color: theme.accent }}>19%</strong>, Khomeini <strong style={{ color: theme.accent }}>17%</strong>, "position abolished" <strong style={{ color: theme.accent }}>15%</strong>, Mojtaba only <strong style={{ color: theme.accent }}>10%</strong>. Kalshi's lower liquidity and slower settlement may explain the gap — or Kalshi traders see a contested succession.</span>
+            </div>
+            <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.textMuted, margin: '10px 0 10px 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
+              Polymarket says it's settled: Mojtaba. But Kalshi traders are far less convinced, still pricing four viable outcomes. Both agree on near-term regime survival (fall by Mar 31 at 9%) and longer-term instability (fall before 2027 at 44%). Kalshi sees 55% chance of a nuclear deal before 2027 and 40% on Hormuz closure.
             </p>
 
             <p style={{ fontSize: '11px', lineHeight: 1.6, color: theme.text, margin: 0, fontFamily: 'Arial, sans-serif' }}>

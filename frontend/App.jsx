@@ -2678,7 +2678,7 @@ export default function App() {
                 margin: '0 0 16px',
                 lineHeight: '1.4'
               }}>
-                Live prediction market odds on Iran-related events — Polymarket active, Kalshi paused
+                Live prediction market odds on Iran-related events — Polymarket &amp; Kalshi active
               </p>
 
               <div style={{
@@ -2745,19 +2745,19 @@ export default function App() {
                   <div style={{ fontSize: '12px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: darkMode ? '#aaa' : '#555' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#22c55e' }}>{'\u25CF'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Succession settled</strong> — Mojtaba Khamenei at 100% ($37M vol). Announcement expected March 9 (98% on $5.4M market).</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Succession settled on Polymarket</strong> — Mojtaba at 100% ($37M vol). But Kalshi ($70K vol) still has Arafi 19%, Khomeini 17%, Mojtaba only 10%.</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#eab308' }}>{'\u2605'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>But can he hold power?</strong> Only 33% to still lead by Dec 31. Pahlavi 17%, Pezeshkian 12%. Regime fall by 2027 at 44%.</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Can he hold power?</strong> Only 33% to lead by Dec 31. Pahlavi 17%, Pezeshkian 12%. Nuclear deal before 2027 at 55% (Kalshi).</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Near-term stability</strong> — Regime fall by Mar 31 down to 9%. Survive US strikes at 68%. Coup attempt 32%.</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Near-term stability</strong> — Regime fall Mar 31 at 9%. Survive strikes 68%. Hormuz closure 40% (Kalshi). Coup 32%.</span>
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    Succession is answered, but stability isn't. Markets see the Islamic Republic surviving the immediate crisis but facing a turbulent 2026. Kalshi remains paused on all Iran markets.
+                    Polymarket and Kalshi diverge sharply on succession. Both agree the regime survives near-term but faces a turbulent 2026. View the full social graph for detailed cross-platform comparison.
                   </p>
                 </div>
 
