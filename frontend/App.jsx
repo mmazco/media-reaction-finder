@@ -2689,11 +2689,11 @@ export default function App() {
                 {/* Top 2 polls */}
                 <div style={{ padding: '10px 16px 0', textAlign: 'right' }}>
                   <span style={{ fontSize: '10px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>
-                    Updated Mar 2, 2026
+                    Updated Mar 8, 2026
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {/* Polymarket — Khamenei out (resolved) */}
+                  {/* Next Supreme Leader — settled */}
                   <div style={{
                     flex: '1 1 250px',
                     padding: '16px',
@@ -2701,31 +2701,33 @@ export default function App() {
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
-                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$104M vol.</span>
-                      <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#ef4444', color: '#fff', fontWeight: '700', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>RESOLVING</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$37M vol.</span>
                     </div>
                     <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
-                      Khamenei out by Feb 28?
+                      Next Supreme Leader of Iran?
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontSize: '28px', fontWeight: '700', color: '#ef4444', fontFamily: 'Arial, sans-serif' }}>99% YES</span>
+                      <span style={{ fontSize: '28px', fontWeight: '700', color: '#22c55e', fontFamily: 'Arial, sans-serif' }}>Mojtaba 100%</span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: darkMode ? '#666' : '#999', fontFamily: 'Arial, sans-serif', marginTop: '4px' }}>
+                      Was 7% on Mar 2. Announcement expected Mar 9 (98%).
                     </div>
                   </div>
-                  {/* Next Supreme Leader */}
+                  {/* Who leads Iran end of 2026? */}
                   <div style={{
                     flex: '1 1 250px',
                     padding: '16px',
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
-                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$4.8M vol.</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$1.2M vol.</span>
                       <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#3b82f6', color: '#fff', fontWeight: '700', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>NEW</span>
                     </div>
                     <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '6px', lineHeight: '1.4' }}>
-                      Next Supreme Leader of Iran?
+                      Who will lead Iran at end of 2026?
                     </div>
                     <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: '1.6', color: darkMode ? '#aaa' : '#555' }}>
-                      H. Khomeini <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>21%</strong> &middot; Arafi <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>19%</strong> &middot; Mohseni-Eje'i <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>13%</strong> &middot; Abolished <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>10%</strong> &middot; S. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>8%</strong> &middot; A. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>7%</strong>
+                      Mojtaba <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>33%</strong> &middot; Pahlavi <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>17%</strong> &middot; Pezeshkian <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>12%</strong> &middot; A. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>5%</strong> &middot; S. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>4%</strong>
                     </div>
                   </div>
                 </div>
@@ -2738,24 +2740,24 @@ export default function App() {
                   margin: '0',
                 }}>
                   <div style={{ fontSize: '9px', color: darkMode ? '#888' : '#999', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
-                    Analysis
+                    Analysis — Mar 8
                   </div>
                   <div style={{ fontSize: '12px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: darkMode ? '#aaa' : '#555' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ color: '#ef4444' }}>{'\u25CF'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Khamenei is out</strong> — Feb 28 and Mar 31 markets both at 99%, resolving YES. $104M + $58.5M volume.</span>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
-                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Regime fall by Mar 31</strong> dropped from 42% to 17% — regime expected to survive despite Khamenei's exit</span>
+                      <span style={{ color: '#22c55e' }}>{'\u25CF'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Succession settled</strong> — Mojtaba Khamenei at 100% ($37M vol). Announcement expected March 9 (98% on $5.4M market).</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#eab308' }}>{'\u2605'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Successor race</strong> wide open — Khomeini 21%, Arafi 19%, Larijani brothers combined 15%. 80% chance named by Mar 31.</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>But can he hold power?</strong> Only 33% to still lead by Dec 31. Pahlavi 17%, Pezeshkian 12%. Regime fall by 2027 at 44%.</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
+                      <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Near-term stability</strong> — Regime fall by Mar 31 down to 9%. Survive US strikes at 68%. Coup attempt 32%.</span>
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    The narrative has shifted from "will Khamenei fall?" to "what comes next?" Markets price an orderly succession within the Islamic Republic, not regime collapse. Kalshi remains paused on all Iran markets.
+                    Succession is answered, but stability isn't. Markets see the Islamic Republic surviving the immediate crisis but facing a turbulent 2026. Kalshi remains paused on all Iran markets.
                   </p>
                 </div>
 
