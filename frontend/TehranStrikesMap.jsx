@@ -87,7 +87,25 @@ const STRIKES = [
   {id:28,n:"Tehran Grand Bazaar area (D12)",lat:35.676,lng:51.423,c:"confirmed",d:"Mar 2–3",
    t:"Major historical bazaar reported damaged.",
    s:["Civilian sites list","Iranian media"],cat:"Heritage/Civilian"},
-  // ── LIKELY (28) ──
+  {id:63,n:"Supreme Court + Prosecutor General (D12)",lat:35.692,lng:51.418,c:"confirmed",d:"Mar 3",
+   t:"Satellite GIF confirms destruction. Part of Mar 3 judicial/govt wave.",
+   s:["CTP-ISW (satellite GIF)","FT"],cat:"Government"},
+  {id:64,n:"IRGC Missile Component Factory (D2/5, W. Tehran)",lat:35.695,lng:51.350,c:"confirmed",d:"Mar 3",
+   t:"IRGC-affiliated site developing components for SSMs & SAMs.",
+   s:["IDF","CTP-ISW"],cat:"Military/Industrial"},
+  {id:65,n:"Chemical Plant, Garmdareh (Alborz Province)",lat:35.780,lng:51.200,c:"confirmed",d:"Mar 3",
+   t:"Produces raw materials for solid-fuel missiles. West of Tehran.",
+   s:["IDF","CTP-ISW"],cat:"Military/Industrial"},
+  {id:66,n:"Ammonium Perchlorate Facility, Parand (SW Tehran)",lat:35.480,lng:51.020,c:"confirmed",d:"Mar 3",
+   t:"IRGC facility processing ammonium perchlorate for solid-fuel missiles. ~4km from Malard missile site.",
+   s:["IDF","CTP-ISW"],cat:"Military/Industrial"},
+  {id:67,n:"Imam Sajjad Missile Base (SW Tehran)",lat:35.550,lng:51.100,c:"confirmed",d:"Mar 3",
+   t:"Named missile base struck by IDF. Southwest of Tehran.",
+   s:["IDF","CTP-ISW"],cat:"Military"},
+  {id:68,n:"Imam Khomeini Intl Airport radar (S. Tehran)",lat:35.416,lng:51.152,c:"confirmed",d:"Mar 3",
+   t:"Destroyed radar dome near IKIA airfield. Part of integrated air defense degradation. Separate from Mehrabad.",
+   s:["CTP-ISW (satellite imagery)","Israeli analyst"],cat:"Military/Transport"},
+  // ── LIKELY (30) ──
   {id:29,n:"Narmak / 72 Sq — Ahmadinejad area (D8)",lat:35.738,lng:51.487,c:"likely",d:"Feb 28",
    t:"Ahmadinejad residence. School damaged. Ahmadinejad confirmed dead.",
    s:["Al Jazeera","local authorities","Wikipedia"],cat:"Leadership"},
@@ -97,9 +115,9 @@ const STRIKES = [
   {id:31,n:"Khatam-al-Anbia Hospital (D6)",lat:35.702,lng:51.422,c:"likely",d:"Mar 1",
    t:"Military-affiliated hospital. BBC Verify confirmed.",
    s:["BBC Verify","NPR","Wikipedia"],cat:"Civilian/Medical"},
-  {id:32,n:"Tehran Revolutionary Court (D12)",lat:35.690,lng:51.410,c:"likely",d:"Feb 28–Mar 1",
-   t:"Court reportedly destroyed.",
-   s:["Wikipedia","Iranian media"],cat:"Government"},
+  {id:32,n:"Tehran Revolutionary Court (D12)",lat:35.690,lng:51.410,c:"confirmed",d:"Feb 28–Mar 3",
+   t:"Court destroyed. CTP-ISW satellite GIF confirms strike.",
+   s:["Wikipedia","Iranian media","CTP-ISW (satellite GIF)","FT"],cat:"Government"},
   {id:33,n:"Milad Tower Area (D2)",lat:35.745,lng:51.375,c:"likely",d:"Mar 1",
    t:"Explosions near tallest tower.",
    s:["Wikipedia","Iranian media"],cat:"Landmark"},
@@ -175,6 +193,12 @@ const STRIKES = [
   {id:61,n:"Narmak residential (D8, Iraaghi St)",lat:35.738,lng:51.490,c:"likely",d:"Mar 2",
    t:"Residential homes hit on named street in Narmak.",
    s:["Civilian sites list"],cat:"Residential"},
+  {id:69,n:"Esteghlal Industrial Zone (D2/9, W. Tehran)",lat:35.700,lng:51.320,c:"likely",d:"Mar 3",
+   t:"IDF evacuation order issued. Zone includes University of Applied Science & Farda Motors.",
+   s:["IDF (evacuation order)","CTP-ISW"],cat:"Industrial"},
+  {id:70,n:"Karaj Helicopter Manufacturing Facility (Alborz)",lat:35.820,lng:50.980,c:"likely",d:"Mar 3",
+   t:"IRGC-affiliated helicopter manufacturing. Near Payam Airport (also IDF evac warning).",
+   s:["Anti-regime media","CTP-ISW"],cat:"Military/Industrial"},
   // ── UNVERIFIED (5) ──
   {id:57,n:"Farmanieh Street (D1)",lat:35.787,lng:51.463,c:"unverified",d:"Mar 2",
    t:"LiveUAMap only.",
@@ -193,10 +217,10 @@ const STRIKES = [
    s:["Civilian sites list"],cat:"Civilian"},
 ];
 
-const TIER1=["AP","AP photo","AP (video)","Reuters"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Critical Threats","Israeli analyst","Israeli analyst (sat imagery)","JFeed","UNESCO"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","Civilian sites list"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","CENTCOM"];
+const TIER1=["AP","AP photo","AP (video)","Reuters","FT"],TIER2=["CNN","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Critical Threats","CTP-ISW","CTP-ISW (satellite GIF)","CTP-ISW (satellite imagery)","Israeli analyst","Israeli analyst (sat imagery)","JFeed","UNESCO"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","Civilian sites list","Anti-regime media"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","IDF (evacuation order)","CENTCOM"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:28,likely:29,unverified:5};
-const BOUNDS={minLat:35.50,maxLat:35.82,minLng:51.28,maxLng:51.80};
+const counts={confirmed:35,likely:30,unverified:5};
+const BOUNDS={minLat:35.40,maxLat:35.84,minLng:50.95,maxLng:51.80};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
 const T = {
