@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const STRIKES = [
-  // ── CONFIRMED (39) ──
+  // ── CONFIRMED (45) ──
   {id:1,n:"Supreme Leader's Compound (Pasteur District)",lat:35.700,lng:51.423,c:"confirmed",d:"Feb 28",
    t:"Khamenei's residence & office compound destroyed. Satellite confirms. Khamenei, family & Shamkhani killed.",
    s:["AP","CNN","CNN (satellite/Airbus)","Al Jazeera","BBC","Reuters","CBS","NPR","CTP-ISW"],cat:"Leadership"},
@@ -58,17 +58,17 @@ const STRIKES = [
    t:"Double-tap. 20+ civilians killed. Police Stn 104 was target. AJ/Anadolu published aftermath photos. Red Crescent rescue teams documented.",
    s:["Wikipedia","FDD","AP photo","AJ (Anadolu photos)","Red Crescent"],cat:"Civilian/Police"},
   {id:19,n:"Golestan Palace area — UNESCO (D12)",lat:35.680,lng:51.422,c:"confirmed",d:"Mar 1–2",
-   t:"UNESCO World Heritage Site damaged. UNESCO condemned.",
-   s:["Wikipedia (2026 Iran war)","UNESCO"],cat:"Heritage"},
+   t:"UNESCO World Heritage Site damaged. UNESCO officially verified. Iran Cultural Heritage Ministry: 56 cultural sites damaged in first 2 weeks.",
+   s:["Wikipedia (2026 Iran war)","UNESCO","Iran Cultural Heritage Ministry","CBS","AP"],cat:"Heritage"},
   {id:20,n:"Basij Headquarters (D11/12)",lat:35.695,lng:51.415,c:"confirmed",d:"Mar 3–4",
-   t:"Basij HQ struck. CTP-ISW Mar 9: combined force struck 11+ Basij regional bases in Tehran since Feb 28. 23 total exist.",
-   s:["Wikipedia","IDF","Al Jazeera","CTP-ISW"],cat:"Military"},
+   t:"Basij HQ struck. CTP-ISW Mar 9: 11+ Basij bases hit. 23 total exist. Alma Center: checkpoints + bases ongoing targets.",
+   s:["Wikipedia","IDF","Al Jazeera","CTP-ISW","Alma Center"],cat:"Military"},
   {id:21,n:"Law Enforcement Command — FARAJA (D12)",lat:35.690,lng:51.400,c:"confirmed",d:"Mar 2",
    t:"FARAJA building destroyed.",
    s:["LiveUAMap","FDD"],cat:"Police"},
-  {id:22,n:"Mehrabad International Airport (D9)",lat:35.689,lng:51.311,c:"confirmed",d:"Mar 7",
-   t:"IDF destroyed 16 Quds Force aircraft. Major domestic airport.",
-   s:["IDF","Al Jazeera","NDTV","Wikipedia"],cat:"Military/Transport"},
+  {id:22,n:"Mehrabad International Airport (D9)",lat:35.689,lng:51.311,c:"confirmed",d:"Mar 7, 11, 12+",
+   t:"IDF destroyed 16 Quds Force aircraft. Major domestic airport. Ongoing targeting confirmed by Alma Center.",
+   s:["IDF","Al Jazeera","NDTV","Wikipedia","Alma Center"],cat:"Military/Transport"},
   {id:23,n:"Aghdasieh Oil Warehouse (D1/4, NE Tehran)",lat:35.790,lng:51.470,c:"confirmed",d:"Mar 7–8",
    t:"Named by AJ. Part of 4-facility oil strike. Black rain over Tehran.",
    s:["Al Jazeera","Fars News","AP (video)","TIME","NPR"],cat:"Oil/Energy"},
@@ -117,7 +117,25 @@ const STRIKES = [
   {id:82,n:"Sahab Pardaz Company — internet censorship (D6/11)",lat:35.710,lng:51.425,c:"confirmed",d:"Mar 9",
    t:"Internet censorship/surveillance company. US-sanctioned Oct 2022. Strike came as internet blackout entered 10th day.",
    s:["CTP-ISW","US Treasury"],cat:"Government/Tech"},
-  // ── LIKELY (40) ──
+  {id:85,n:"Strike near Al-Quds Day rally (D11/12, Ferdowsi Sq)",lat:35.694,lng:51.410,c:"confirmed",d:"Mar 13",
+   t:"Explosion during annual rally with thousands present. Israel warned area in advance. Judiciary head Mohseni Ejei on state TV when strike hit. At least 1 woman killed. President Pezeshkian, FM Araghchi attended.",
+   s:["CNN","PBS","AP","AJ","Iranian state TV","Alma Center","France24","Middle East Eye","Irish Independent"],cat:"Military/Civilian"},
+  {id:90,n:"Kharg Island military assets (Persian Gulf)",lat:26.220,lng:50.330,c:"confirmed",d:"Mar 13–14",
+   t:"CENTCOM struck ~90 military targets. Naval mine storage, missile storage, Kharg Airport, Air Defense Complex, Matla ul Fajr radar destroyed. Oil facilities spared. Not Tehran — off map.",
+   s:["CENTCOM","CBS","CNN","Reuters","TIME","Military.com"],cat:"Oil/Military"},
+  {id:91,n:"Iranian Space Research Center (Tehran)",lat:35.720,lng:51.390,c:"confirmed",d:"Mar 14",
+   t:"IDF struck primary Space Agency research center. Strategic labs for military satellite R&D used to direct IRGC fire. US-sanctioned 2019.",
+   s:["ISW","IDF","Iran International","CGTN","Xinhua","TASS"],cat:"Military/Nuclear"},
+  {id:92,n:"LEC Station 108, Navab (D10)",lat:35.688,lng:51.388,c:"confirmed",d:"Mar 14",
+   t:"Police station used to suppress Dec 2025–Jan 2026 protests. Part of anti-repression campaign targeting internal security apparatus.",
+   s:["ISW","IDF","Israeli journalist"],cat:"Police"},
+  {id:93,n:"LEC Station 148, Enghelab (D6/11)",lat:35.700,lng:51.398,c:"confirmed",d:"Mar 14",
+   t:"Police station in Enghelab neighborhood. Same anti-repression wave as LEC 108.",
+   s:["ISW","IDF","Israeli journalist"],cat:"Police"},
+  {id:94,n:"Air defense production sites (W. Tehran / Karaj)",lat:35.730,lng:51.310,c:"confirmed",d:"Mar 14",
+   t:"IDF struck 'a key factory used to produce air defense systems' plus several production facilities west of Karaj and western Tehran.",
+   s:["IDF","ISW","Hegseth (DoD)"],cat:"Military/Industrial"},
+  // ── LIKELY (45) ──
   {id:29,n:"Narmak / 72 Sq — Ahmadinejad area (D8)",lat:35.738,lng:51.487,c:"likely",d:"Feb 28",
    t:"Videos of strikes near Ahmadinejad residence. High school damaged, 2+ children killed. Ahmadinejad death reports later disputed — may be alive.",
    s:["Al Jazeera","local authorities","Wikipedia","Iranian state media"],cat:"Leadership"},
@@ -221,8 +239,8 @@ const STRIKES = [
    t:"Iran's Security Police agency headquarters. Named by IDF in Mar 10 strike wave.",
    s:["IDF","Times of Israel","CENTCOM","CTP-ISW"],cat:"Police"},
   {id:76,n:"Residential area strike — 40 killed (Mar 10)",lat:35.700,lng:51.420,c:"likely",d:"Mar 10",
-   t:"40 killed in single residential strike — deadliest residential hit of the war. Red Crescent confirmed rescue teams digging through rubble.",
-   s:["IDF","Times of Israel","FDD","CNN (Polglase investigation)"],cat:"Residential"},
+   t:"40 killed in single residential strike — deadliest residential hit of the war. Red Crescent rescue teams in rubble. See also #88 for E. Tehran detail.",
+   s:["IDF","Times of Israel","FDD","CNN (Polglase investigation)","Democracy Now","Reuters"],cat:"Residential"},
   {id:77,n:"Motahari Hospital — burn specialist (D6)",lat:35.702,lng:51.423,c:"likely",d:"Mar 1–2",
    t:"Burns specialist hospital. Red Crescent video names it directly. Damage reported, patients moved. Near Khatam & Red Crescent building.",
    s:["Red Crescent (video)","AJ","WANA/Reuters","Iran MFA"],cat:"Civilian/Medical"},
@@ -241,6 +259,21 @@ const STRIKES = [
   {id:84,n:"Shopping street strike (D11/12, central Tehran)",lat:35.695,lng:51.410,c:"likely",d:"Mar 6",
    t:"CNN's Fred Pleitgen reported from Tehran: state media reports a busy shopping street was hit. Day 8 — residents told CNN it was 'worst night' of airstrikes.",
    s:["CNN","Fars News"],cat:"Civilian"},
+  {id:86,n:"Basij checkpoints — newly established (multiple districts)",lat:35.700,lng:51.410,c:"likely",d:"Mar 13",
+   t:"IDF/IAF struck checkpoints and forces of Basij unit recently established in the city. New positions, not pre-existing bases. Part of Day 14 multi-location wave.",
+   s:["Alma Center"],cat:"Military/Police"},
+  {id:87,n:"Weapons & defense systems production (D11/12)",lat:35.700,lng:51.400,c:"likely",d:"Mar 12–13",
+   t:"Alma: 'facilities used for production of weapons, defense systems, and components for ballistic missiles' struck alongside air defense base. Part of simultaneous 3-city wave.",
+   s:["Alma Center","CTP-ISW"],cat:"Military/Industrial"},
+  {id:88,n:"Three residential buildings (D4/8, E. Tehran)",lat:35.730,lng:51.470,c:"likely",d:"Mar 10",
+   t:"Democracy Now: 'three residential buildings bombed simultaneously, missile struck nearby police station.' Survivors interviewed. More specific detail on 40-killed strike.",
+   s:["Democracy Now","Reuters","AP","survivors"],cat:"Residential"},
+  {id:89,n:"Air defense array central base (D6/11)",lat:35.710,lng:51.415,c:"likely",d:"Mar 13",
+   t:"Alma: 'a central base of the regime's air defense array was targeted' in Tehran. May overlap with IRGC AF Command (#26) or separate facility.",
+   s:["Alma Center"],cat:"Military"},
+  {id:95,n:"Ballistic missile production near Malard (W. Tehran)",lat:35.660,lng:51.170,c:"likely",d:"Mar 15",
+   t:"Israeli analyst citing IDF spokesperson: buildings linked to ballistic missile production west of Tehran near Malard Missile Launch Site. Iranian citizen confirmed 2 sites struck.",
+   s:["ISW","IDF","Israeli analyst","Iranian OSINT"],cat:"Military/Industrial"},
   // ── UNVERIFIED (5) ──
   {id:57,n:"Farmanieh Street (D1)",lat:35.787,lng:51.463,c:"unverified",d:"Mar 2",
    t:"LiveUAMap only.",
@@ -259,9 +292,9 @@ const STRIKES = [
    s:["Civilian sites list"],cat:"Civilian"},
 ];
 
-const TIER1=["AP","AP photo","AP (video)","Reuters","FT","WANA/Reuters"],TIER2=["CNN","CNN (satellite/Airbus)","CNN (satellite analysis)","CNN (Pleitgen/Polglase)","CNN (Polglase investigation)","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","AJ","AJ (Anadolu photos)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Critical Threats","CTP-ISW","CTP-ISW (satellite GIF)","CTP-ISW (satellite imagery)","Israeli analyst","Israeli analyst (sat imagery)","JFeed","UNESCO","WHO","ICRC","Red Crescent","Red Crescent (video)","Alma Center","US Treasury"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian media","IRNA","ISNA","CGTN","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","Civilian sites list","Anti-regime media","anti-regime Iranian media","Iran MFA"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","IDF (evacuation order)","CENTCOM"];
+const TIER1=["AP","AP photo","AP (video)","Reuters","FT","WANA/Reuters","PBS"],TIER2=["CNN","CNN (satellite/Airbus)","CNN (satellite analysis)","CNN (Pleitgen/Polglase)","CNN (Polglase investigation)","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","AJ","AJ (Anadolu photos)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Iran International (video)","Critical Threats","CTP-ISW","CTP-ISW (satellite GIF)","CTP-ISW (satellite imagery)","Israeli analyst","Israeli analyst (sat imagery)","Israeli journalist","JFeed","UNESCO","WHO","ICRC","Red Crescent","Red Crescent (video)","Alma Center","US Treasury","France24","Irish Independent","Democracy Now","Military.com","Xinhua","TASS","CGTN"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian state TV","Iranian media","IRNA","ISNA","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Mehr (images)","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","survivors","Civilian sites list","Anti-regime media","anti-regime Iranian media","Iran MFA","Iran Cultural Heritage Ministry","Iranian OSINT"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","IDF (evacuation order)","CENTCOM","Hegseth (DoD)"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:39,likely:40,unverified:5};
+const counts={confirmed:45,likely:45,unverified:5};
 const BOUNDS={minLat:35.40,maxLat:35.84,minLng:50.95,maxLng:51.80};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
 
