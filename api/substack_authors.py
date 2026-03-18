@@ -67,6 +67,19 @@ CURATED_AUTHORS = [
         "linkedin": "naderdabit",
         "profile_image": "https://substack-post-media.s3.amazonaws.com/public/images/d40f5972-2f71-4c94-860c-5648e16ba9f7_1024x1024.png",
     },
+    {
+        "name": "Shanaka Anslem Perera",
+        "handle": "shanakaanslemperera",
+        "bio": "Independent analyst mapping money, geopolitics, AI, science, and sovereignty. Author of The Ascent Begins.",
+        "publication": "The Ascent Begins",
+        "subscribers": "21K+",
+        "category": "News",
+        "leaderboard": "#17 Rising in Finance",
+        "profile_url": "https://substack.com/@shanakaanslemperera",
+        "feed_url": "https://shanakaanslemperera.substack.com/feed",
+        "linkedin": "shanakaanslemperera",
+        "profile_image": "https://substack-post-media.s3.amazonaws.com/public/images/ad2b747b-7717-4ea6-8bf9-250ee9c93bd4_1320x990.jpeg",
+    },
 ]
 
 _authors_cache = {"data": None, "fetched_at": None}
