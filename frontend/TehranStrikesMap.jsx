@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const STRIKES = [
-  // ── CONFIRMED (45) ──
+  // ── CONFIRMED (48) ──
   {id:1,n:"Supreme Leader's Compound (Pasteur District)",lat:35.700,lng:51.423,c:"confirmed",d:"Feb 28",
    t:"Khamenei's residence & office compound destroyed. Satellite confirms. Khamenei, family & Shamkhani killed.",
    s:["AP","CNN","CNN (satellite/Airbus)","Al Jazeera","BBC","Reuters","CBS","NPR","CTP-ISW"],cat:"Leadership"},
@@ -67,7 +67,7 @@ const STRIKES = [
    t:"FARAJA building destroyed.",
    s:["LiveUAMap","FDD"],cat:"Police"},
   {id:22,n:"Mehrabad International Airport (D9)",lat:35.689,lng:51.311,c:"confirmed",d:"Mar 7, 11, 12+",
-   t:"IDF destroyed 16 Quds Force aircraft. Major domestic airport. Ongoing targeting confirmed by Alma Center.",
+   t:"IDF destroyed 16 Quds Force aircraft. Major domestic airport. Ongoing targeting. Supreme Leader's aircraft destroyed (Alma Mar 16).",
    s:["IDF","Al Jazeera","NDTV","Wikipedia","Alma Center"],cat:"Military/Transport"},
   {id:23,n:"Aghdasieh Oil Warehouse (D1/4, NE Tehran)",lat:35.790,lng:51.470,c:"confirmed",d:"Mar 7–8",
    t:"Named by AJ. Part of 4-facility oil strike. Black rain over Tehran.",
@@ -135,7 +135,16 @@ const STRIKES = [
   {id:94,n:"Air defense production sites (W. Tehran / Karaj)",lat:35.730,lng:51.310,c:"confirmed",d:"Mar 14",
    t:"IDF struck 'a key factory used to produce air defense systems' plus several production facilities west of Karaj and western Tehran.",
    s:["IDF","ISW","Hegseth (DoD)"],cat:"Military/Industrial"},
-  // ── LIKELY (45) ──
+  {id:96,n:"IRGC Navy HQ, Doshan Tappeh (D4/8, E. Tehran)",lat:35.700,lng:51.470,c:"confirmed",d:"Mar 16",
+   t:"IDF confirmed strike on IRGC Navy HQ. Commanders directed Navy forces and planned Strait of Hormuz operations. Primary tool for disrupting commercial traffic.",
+   s:["IDF","ISW","Alma Center","Iran International"],cat:"Military"},
+  {id:97,n:"Doshan Tappeh Air Base / 11th Artesh Tactical (D4/8)",lat:35.705,lng:51.475,c:"confirmed",d:"Mar 16",
+   t:"Second Artesh tactical air base in Tehran struck. Satellite imagery shows air defense systems near runway.",
+   s:["ISW","Israeli OSINT"],cat:"Military/Transport"},
+  {id:98,n:"Basij makeshift HQ — ~300 commanders killed (D6/11)",lat:35.710,lng:51.420,c:"confirmed",d:"Mar 16–17",
+   t:"Overnight strike killed ~300 Basij commanders incl. Commander Soleimani + deputy Ghoureishi. Were coordinating protest suppression for Chaharshanbe Suri.",
+   s:["ISW","IDF","anti-regime Iranian media","EU"],cat:"Military"},
+  // ── LIKELY (51) ──
   {id:29,n:"Narmak / 72 Sq — Ahmadinejad area (D8)",lat:35.738,lng:51.487,c:"likely",d:"Feb 28",
    t:"Videos of strikes near Ahmadinejad residence. High school damaged, 2+ children killed. Ahmadinejad death reports later disputed — may be alive.",
    s:["Al Jazeera","local authorities","Wikipedia","Iranian state media"],cat:"Leadership"},
@@ -259,9 +268,9 @@ const STRIKES = [
   {id:84,n:"Shopping street strike (D11/12, central Tehran)",lat:35.695,lng:51.410,c:"likely",d:"Mar 6",
    t:"CNN's Fred Pleitgen reported from Tehran: state media reports a busy shopping street was hit. Day 8 — residents told CNN it was 'worst night' of airstrikes.",
    s:["CNN","Fars News"],cat:"Civilian"},
-  {id:86,n:"Basij checkpoints — newly established (multiple districts)",lat:35.700,lng:51.410,c:"likely",d:"Mar 13",
-   t:"IDF/IAF struck checkpoints and forces of Basij unit recently established in the city. New positions, not pre-existing bases. Part of Day 14 multi-location wave.",
-   s:["Alma Center"],cat:"Military/Police"},
+  {id:86,n:"Basij checkpoints — newly established (multiple districts)",lat:35.700,lng:51.410,c:"likely",d:"Mar 13, Mar 16",
+   t:"IDF/IAF struck checkpoints and Basij positions. Mar 16: 6 more security force checkpoints struck across Tehran including Enghelab Square.",
+   s:["Alma Center","anti-regime Iranian media","ISW"],cat:"Military/Police"},
   {id:87,n:"Weapons & defense systems production (D11/12)",lat:35.700,lng:51.400,c:"likely",d:"Mar 12–13",
    t:"Alma: 'facilities used for production of weapons, defense systems, and components for ballistic missiles' struck alongside air defense base. Part of simultaneous 3-city wave.",
    s:["Alma Center","CTP-ISW"],cat:"Military/Industrial"},
@@ -274,6 +283,24 @@ const STRIKES = [
   {id:95,n:"Ballistic missile production near Malard (W. Tehran)",lat:35.660,lng:51.170,c:"likely",d:"Mar 15",
    t:"Israeli analyst citing IDF spokesperson: buildings linked to ballistic missile production west of Tehran near Malard Missile Launch Site. Iranian citizen confirmed 2 sites struck.",
    s:["ISW","IDF","Israeli analyst","Iranian OSINT"],cat:"Military/Industrial"},
+  {id:99,n:"Intelligence command center (D11/12, central Tehran)",lat:35.700,lng:51.415,c:"likely",d:"Mar 16",
+   t:"IDF said it struck an unspecified Iranian intelligence command center in central Tehran on Mar 16.",
+   s:["IDF"],cat:"Government"},
+  {id:100,n:"LEC Station 123, Niavaran (D1)",lat:35.800,lng:51.440,c:"likely",d:"Mar 16",
+   t:"Police station struck in Niavaran District. ISW: combined force has struck 16 of Tehran's 69 LEC stations as of Mar 16.",
+   s:["anti-regime Iranian media","ISW"],cat:"Police"},
+  {id:101,n:"Imam Hadi security unit — football stadium (D6/7)",lat:35.720,lng:51.430,c:"likely",d:"Mar 17",
+   t:"Basij + IRGC unit under Mohammad Rasoul Ollah Corps. One of Tehran's most important internal security units. Stationed at football stadium for protective cover.",
+   s:["IDF","ISW"],cat:"Military"},
+  {id:102,n:"IRGC Quds Force Imam Ali training unit (D11/12)",lat:35.690,lng:51.420,c:"likely",d:"Mar 17",
+   t:"Unit responsible for training proxy militias. Open-air shooting ranges, underground ammunition depots, residences for security units. Both anti-regime and regime media confirmed.",
+   s:["anti-regime Iranian media","Iranian media","ISW"],cat:"Military"},
+  {id:103,n:"Basij base, Kamraniyeh District (D1/3, N. Tehran)",lat:35.790,lng:51.440,c:"likely",d:"Mar 17",
+   t:"IDF confirmed strike on Basij base in Kamraniyeh as part of multiple Basij checkpoint and base strikes across Tehran.",
+   s:["IDF","ISW"],cat:"Military"},
+  {id:104,n:"Drone production facility (D11/12, Tehran)",lat:35.710,lng:51.400,c:"likely",d:"Mar 11",
+   t:"CENTCOM Commander Cooper confirmed Mar 16 that US forces struck drone production facility in Tehran on Mar 11. Part of shift to targeting 'wider manufacturing apparatus'.",
+   s:["CENTCOM","ISW"],cat:"Military/Industrial"},
   // ── UNVERIFIED (5) ──
   {id:57,n:"Farmanieh Street (D1)",lat:35.787,lng:51.463,c:"unverified",d:"Mar 2",
    t:"LiveUAMap only.",
@@ -292,11 +319,39 @@ const STRIKES = [
    s:["Civilian sites list"],cat:"Civilian"},
 ];
 
-const TIER1=["AP","AP photo","AP (video)","Reuters","FT","WANA/Reuters","PBS"],TIER2=["CNN","CNN (satellite/Airbus)","CNN (satellite analysis)","CNN (Pleitgen/Polglase)","CNN (Polglase investigation)","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","AJ","AJ (Anadolu photos)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Iran International (video)","Critical Threats","CTP-ISW","CTP-ISW (satellite GIF)","CTP-ISW (satellite imagery)","Israeli analyst","Israeli analyst (sat imagery)","Israeli journalist","JFeed","UNESCO","WHO","ICRC","Red Crescent","Red Crescent (video)","Alma Center","US Treasury","France24","Irish Independent","Democracy Now","Military.com","Xinhua","TASS","CGTN"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian state TV","Iranian media","IRNA","ISNA","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Mehr (images)","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","survivors","Civilian sites list","Anti-regime media","anti-regime Iranian media","Iran MFA","Iran Cultural Heritage Ministry","Iranian OSINT"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","IDF (evacuation order)","CENTCOM","Hegseth (DoD)"];
+const TIER1=["AP","AP photo","AP (video)","Reuters","FT","WANA/Reuters","PBS"],TIER2=["CNN","CNN (satellite/Airbus)","CNN (satellite analysis)","CNN (Pleitgen/Polglase)","CNN (Polglase investigation)","BBC","BBC Verify","Al Jazeera","Al Jazeera (video)","AJ","AJ (Anadolu photos)","NPR","CBS","ABC","Anadolu Agency","TRT World","Times of Israel","Jerusalem Post","JNS","Globe and Mail","Middle East Eye","NDTV","WION","Ynet","TIME","ISW","Iran International","Iran International (video)","Critical Threats","CTP-ISW","CTP-ISW (satellite GIF)","CTP-ISW (satellite imagery)","Israeli analyst","Israeli analyst (sat imagery)","Israeli journalist","JFeed","UNESCO","WHO","ICRC","Red Crescent","Red Crescent (video)","Alma Center","US Treasury","France24","Irish Independent","Democracy Now","Military.com","Xinhua","TASS","CGTN","EU","Israeli OSINT"],TIER3=["Fars News","Tasnim News","Iranian state media","Iranian state TV","Iranian media","IRNA","ISNA","Iranian sources","NCRI","Mehr","Tabnak","Entekhab","Mehr (images)","Wikipedia","Wikipedia (2026 Iran war)","Timeline wiki","local authorities","witnesses","survivors","Civilian sites list","Anti-regime media","anti-regime Iranian media","Iran MFA","Iran Cultural Heritage Ministry","Iranian OSINT"],TIER4=["LiveUAMap","Iranian media via LiveUAMap","Pravda (images)","FDD","FDD (video)","FDD (images)","FDD (videos)"],OFFICIAL=["IDF","IDF (evac warning)","IDF (evacuation order)","CENTCOM","Hegseth (DoD)"];
 const CONF={confirmed:{color:"#ef4444",label:"CONFIRMED",desc:"3+ independent major outlets corroborate"},likely:{color:"#f59e0b",label:"LIKELY",desc:"1–2 credible sources or verified video"},unverified:{color:"#10b981",label:"UNVERIFIED",desc:"Single source, often LiveUAMap only"}};
-const counts={confirmed:45,likely:45,unverified:5};
+const counts={confirmed:48,likely:51,unverified:5};
 const BOUNDS={minLat:35.40,maxLat:35.84,minLng:50.95,maxLng:51.80};
 function toSVG(lat,lng){return{x:4+((lng-BOUNDS.minLng)/(BOUNDS.maxLng-BOUNDS.minLng))*92,y:4+((BOUNDS.maxLat-lat)/(BOUNDS.maxLat-BOUNDS.minLat))*67}}
+
+function clusterMarkers(items, zoom) {
+  const threshold = 3.5 / zoom;
+  const pts = items.map(m => { const p = toSVG(m.lat, m.lng); return { ...m, _x: p.x, _y: p.y }; });
+  const used = new Set();
+  const out = [];
+  for (let i = 0; i < pts.length; i++) {
+    if (used.has(i)) continue;
+    const grp = [pts[i]];
+    used.add(i);
+    for (let j = i + 1; j < pts.length; j++) {
+      if (used.has(j)) continue;
+      const dx = pts[i]._x - pts[j]._x, dy = pts[i]._y - pts[j]._y;
+      if (Math.sqrt(dx * dx + dy * dy) < threshold) { grp.push(pts[j]); used.add(j); }
+    }
+    if (grp.length === 1) {
+      out.push({ kind: 'pin', m: grp[0] });
+    } else {
+      const cx = grp.reduce((s, m) => s + m._x, 0) / grp.length;
+      const cy = grp.reduce((s, m) => s + m._y, 0) / grp.length;
+      const cc = { confirmed: 0, likely: 0, unverified: 0 };
+      grp.forEach(m => cc[m.c]++);
+      const dom = Object.entries(cc).sort((a, b) => b[1] - a[1])[0][0];
+      out.push({ kind: 'cluster', items: grp, x: cx, y: cy, n: grp.length, conf: dom });
+    }
+  }
+  return out;
+}
 
 const T = {
   dark: {
@@ -373,11 +428,58 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
   const [pan, setPan] = useState({x:0,y:0});
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({x:0,y:0});
+  const [clusterView, setClusterView] = useState(null);
   const navigate = useNavigate();
   const mode = darkMode ? "dark" : "light";
   const t = T[mode]; const dk = darkMode;
   const list = flt==="all" ? STRIKES : STRIKES.filter(s=>s.c===flt);
   const s = sel ? STRIKES.find(x=>x.id===sel) : null;
+
+  const svgRef = useRef(null);
+  const lastTouchDist = useRef(null);
+  const clusters = useMemo(() => clusterMarkers(list, zoom), [list, zoom]);
+  const iz = 1 / zoom;
+
+  useEffect(() => {
+    const el = svgRef.current;
+    if (!el) return;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.85 : 1.18;
+      setZoom(z => Math.min(6, Math.max(1, z * factor)));
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  const handleTouchStart = useCallback((e) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      lastTouchDist.current = Math.sqrt(dx * dx + dy * dy);
+    } else if (e.touches.length === 1) {
+      setIsPanning(true);
+      setPanStart({ x: e.touches[0].clientX - pan.x, y: e.touches[0].clientY - pan.y });
+    }
+  }, [pan]);
+
+  const handleTouchMove = useCallback((e) => {
+    if (e.touches.length === 2 && lastTouchDist.current) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      setZoom(z => Math.min(6, Math.max(1, z * (dist / lastTouchDist.current))));
+      lastTouchDist.current = dist;
+    } else if (e.touches.length === 1 && isPanning) {
+      setPan({ x: e.touches[0].clientX - panStart.x, y: e.touches[0].clientY - panStart.y });
+    }
+  }, [isPanning, panStart]);
+
+  const handleTouchEnd = useCallback(() => {
+    lastTouchDist.current = null;
+    setIsPanning(false);
+  }, []);
 
   const tiers=[
     {n:"Tier 1 — Wire services",v:"AP, Reuters",d:"Gold standard. On-ground correspondents where possible"},
@@ -449,41 +551,101 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
         {/* Left Column — Map + Verification Guide */}
         <div style={{flex: isMobile ? '1' : '1 1 550px', minWidth: isMobile ? '100%' : 300, maxWidth: isMobile ? '100%' : '65%'}}>
         {/* Map */}
-        <div style={{padding: isMobile ? "10px 12px 16px" : "8px", position: 'relative', background: dk ? t.mBg : 'rgba(255,255,255,0.9)', border:`1px solid ${t.bd}`, overflow:'hidden', maxHeight: isMobile ? 'none' : 'calc(100vh - 200px)'}}>
+        <div style={{padding: isMobile ? "10px 12px 16px" : "8px", position: 'relative', background: dk ? t.mBg : 'rgba(255,255,255,0.9)', border:`1px solid ${t.bd}`, overflow:'hidden', maxHeight: isMobile ? '55vh' : 'calc(100vh - 200px)'}}>
+          {clusters.some(c => c.kind === 'cluster') && (
+            <div style={{position:'absolute',top:12,left:12,zIndex:10,fontSize:10,color:dk?'#ccc':'#555',background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,padding:'4px 8px',pointerEvents:'none'}}>
+              {clusters.filter(c=>c.kind==='cluster').reduce((s,c)=>s+c.n,0)} markers in {clusters.filter(c=>c.kind==='cluster').length} clusters — click to explore
+            </div>
+          )}
           <div style={{position:'absolute',top:12,right:12,zIndex:10,display:'flex',flexDirection:'column',gap:4}}>
-            <button onClick={()=>setZoom(z=>Math.min(3,z+0.3))} title="Zoom in" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
-            <button onClick={()=>setZoom(z=>Math.max(0.5,z-0.3))} title="Zoom out" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
-            <button onClick={()=>{setZoom(1);setPan({x:0,y:0})}} title="Reset view" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>↺</button>
+            <button onClick={()=>setZoom(z=>Math.min(6,z*1.4))} title="Zoom in" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>+</button>
+            <button onClick={()=>setZoom(z=>Math.max(1,z/1.4))} title="Zoom out" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:18,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>−</button>
+            <button onClick={()=>{setZoom(1);setPan({x:0,y:0});setClusterView(null)}} title="Reset view" style={{width:32,height:32,background:dk?'rgba(30,30,40,0.9)':'rgba(255,255,255,0.9)',border:`1px solid ${dk?'#444':'#ccc'}`,color:dk?'#fff':'#333',fontSize:10,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center'}}>↺</button>
+            <div style={{width:32,textAlign:'center',fontSize:9,color:dk?'#aaa':'#666',fontFamily:'Arial, sans-serif',lineHeight:'16px'}}>{Math.round(zoom*100)}%</div>
           </div>
-          <svg viewBox="0 0 100 75" style={{width:"100%",maxHeight:'calc(100vh - 280px)',cursor:isPanning?'grabbing':'grab'}}
+          <svg ref={svgRef} viewBox="0 0 100 75" style={{width:"100%",maxHeight:isMobile?'50vh':'calc(100vh - 280px)',cursor:isPanning?'grabbing':'grab',touchAction:'none'}}
             onMouseDown={e=>{if(e.target.closest('g[style*="pointer"]'))return;setIsPanning(true);setPanStart({x:e.clientX-pan.x,y:e.clientY-pan.y})}}
             onMouseMove={e=>{if(isPanning){setPan({x:e.clientX-panStart.x,y:e.clientY-panStart.y})}}}
             onMouseUp={()=>setIsPanning(false)}
             onMouseLeave={()=>setIsPanning(false)}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
-            <g transform={`translate(${pan.x/(zoom*14)}, ${pan.y/(zoom*14)}) scale(${zoom})`} style={{transformOrigin:'50px 37.5px'}}>
-            {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12}/>)}
-            {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12}/>)}
-            <text x={3} y={4.5} fontSize={1.8} fill={t.mLb2} fontWeight={700}>N</text>
-            <text x={50} y={3.5} fontSize={1.4} fill={t.mLb} textAnchor="middle" fontWeight={600}>NORTHERN TEHRAN</text>
-            <text x={50} y={73} fontSize={1.4} fill={t.mLb} textAnchor="middle" fontWeight={600}>SOUTHERN TEHRAN</text>
-            <text x={3} y={38} fontSize={1.3} fill={t.mLb}>W</text>
-            <text x={97} y={38} fontSize={1.3} fill={t.mLb} textAnchor="end">E</text>
-            <text x={50} y={44} fontSize={1.1} fill={t.mLb} textAnchor="middle" fontStyle="italic">— Central Tehran —</text>
-            {list.map(st=>{
-              const p=toSVG(st.lat,st.lng);const col=CONF[st.c].color;const iS=sel===st.id;
-              return(
-                <g key={st.id} onClick={()=>setSel(st.id)} style={{cursor:"pointer"}}>
-                  {st.c==="unverified"&&(<circle cx={p.x} cy={p.y} r={2} fill="none" stroke={col} strokeWidth={0.15} opacity={0.6}><animate attributeName="r" from="1.5" to="5" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" from="0.5" to="0" dur="2s" repeatCount="indefinite"/></circle>)}
-                  <circle cx={p.x} cy={p.y} r={iS?4.5:2.8} fill={col} opacity={iS?0.25:0.12}/>
-                  <circle cx={p.x} cy={p.y} r={iS?1.8:1.15} fill={col} stroke={iS?t.mStS:t.mSt} strokeWidth={iS?0.3:0.18}/>
-                  {iS&&(<><line x1={p.x} y1={p.y-2.5} x2={p.x} y2={p.y-4.5} stroke={t.ttLn} strokeWidth={0.1}/><rect x={p.x-16} y={p.y-7} width={32} height={2.8} rx={0.6} fill={t.ttBg} stroke={col} strokeWidth={0.08}/><text x={p.x} y={p.y-5} fontSize={1.35} fill={t.ttTx} textAnchor="middle" fontWeight={700}>{st.n.length>38?st.n.slice(0,36)+"…":st.n}</text></>)}
+            <g transform={`translate(${pan.x/(zoom*6)}, ${pan.y/(zoom*6)}) scale(${zoom})`} style={{transformOrigin:'50px 37.5px'}}>
+            {[10,20,30,40,50,60,70,80,90].map(x=><line key={`gx${x}`} x1={x} y1={0} x2={x} y2={75} stroke={t.mGr} strokeWidth={0.12*iz}/>)}
+            {[10,20,30,40,50,60,70].map(y=><line key={`gy${y}`} x1={0} y1={y} x2={100} y2={y} stroke={t.mGr} strokeWidth={0.12*iz}/>)}
+            <text x={3} y={4.5} fontSize={1.8*iz} fill={t.mLb2} fontWeight={700}>N</text>
+            <text x={50} y={3.5} fontSize={1.4*iz} fill={t.mLb} textAnchor="middle" fontWeight={600}>NORTHERN TEHRAN</text>
+            <text x={50} y={73} fontSize={1.4*iz} fill={t.mLb} textAnchor="middle" fontWeight={600}>SOUTHERN TEHRAN</text>
+            <text x={3} y={38} fontSize={1.3*iz} fill={t.mLb}>W</text>
+            <text x={97} y={38} fontSize={1.3*iz} fill={t.mLb} textAnchor="end">E</text>
+            <text x={50} y={44} fontSize={1.1*iz} fill={t.mLb} textAnchor="middle" fontStyle="italic">— Central Tehran —</text>
+            {clusters.map((cl, ci) => {
+              if (cl.kind === 'pin') {
+                const st = cl.m;
+                const p = { x: st._x, y: st._y };
+                const col = CONF[st.c].color;
+                const iS = sel === st.id;
+                return (
+                  <g key={st.id} onClick={() => setSel(st.id)} style={{ cursor: "pointer" }}>
+                    {st.c === "unverified" && (
+                      <circle cx={p.x} cy={p.y} r={2*iz} fill="none" stroke={col} strokeWidth={0.15*iz} opacity={0.6}>
+                        <animate attributeName="r" from={`${1.5*iz}`} to={`${5*iz}`} dur="2s" repeatCount="indefinite" />
+                        <animate attributeName="opacity" from="0.5" to="0" dur="2s" repeatCount="indefinite" />
+                      </circle>
+                    )}
+                    <circle cx={p.x} cy={p.y} r={(iS ? 4.5 : 2.8)*iz} fill={col} opacity={iS ? 0.25 : 0.12} />
+                    <circle cx={p.x} cy={p.y} r={(iS ? 1.8 : 1.15)*iz} fill={col} stroke={iS ? t.mStS : t.mSt} strokeWidth={(iS ? 0.3 : 0.18)*iz} />
+                    {iS && (
+                      <>
+                        <line x1={p.x} y1={p.y - 2.5*iz} x2={p.x} y2={p.y - 4.5*iz} stroke={t.ttLn} strokeWidth={0.1*iz} />
+                        <rect x={p.x - 16*iz} y={p.y - 7*iz} width={32*iz} height={2.8*iz} rx={0.6*iz} fill={t.ttBg} stroke={col} strokeWidth={0.08*iz} />
+                        <text x={p.x} y={p.y - 5*iz} fontSize={1.35*iz} fill={t.ttTx} textAnchor="middle" fontWeight={700}>{st.n.length > 38 ? st.n.slice(0, 36) + "…" : st.n}</text>
+                      </>
+                    )}
+                  </g>
+                );
+              }
+              const col = CONF[cl.conf].color;
+              const baseR = Math.min(4, 1.8 + Math.log2(cl.n) * 0.7);
+              const r = baseR * iz;
+              const hasSel = sel && cl.items.some(m => m.id === sel);
+              if (hasSel) {
+                const selM = cl.items.find(m => m.id === sel);
+                const p = { x: selM._x, y: selM._y };
+                const selCol = CONF[selM.c].color;
+                const remaining = cl.n - 1;
+                return (
+                  <g key={`cl-${ci}`}>
+                    {remaining > 0 && (
+                      <g onClick={() => setClusterView({ items: cl.items.filter(m => m.id !== sel), cx: cl.x, cy: cl.y })} style={{ cursor: "pointer" }}>
+                        <circle cx={cl.x} cy={cl.y} r={(baseR + 1)*iz} fill={col} opacity={0.12} />
+                        <circle cx={cl.x} cy={cl.y} r={r} fill={col} opacity={0.65} stroke="rgba(255,255,255,0.4)" strokeWidth={0.2*iz} />
+                        <text x={cl.x} y={cl.y + r * 0.35} fontSize={r * 0.7} fill="#fff" textAnchor="middle" fontWeight={700}>{remaining}</text>
+                      </g>
+                    )}
+                    <g onClick={() => setSel(selM.id)} style={{ cursor: "pointer" }}>
+                      <circle cx={p.x} cy={p.y} r={4.5*iz} fill={selCol} opacity={0.25} />
+                      <circle cx={p.x} cy={p.y} r={1.8*iz} fill={selCol} stroke={t.mStS} strokeWidth={0.3*iz} />
+                      <line x1={p.x} y1={p.y - 2.5*iz} x2={p.x} y2={p.y - 4.5*iz} stroke={t.ttLn} strokeWidth={0.1*iz} />
+                      <rect x={p.x - 16*iz} y={p.y - 7*iz} width={32*iz} height={2.8*iz} rx={0.6*iz} fill={t.ttBg} stroke={selCol} strokeWidth={0.08*iz} />
+                      <text x={p.x} y={p.y - 5*iz} fontSize={1.35*iz} fill={t.ttTx} textAnchor="middle" fontWeight={700}>{selM.n.length > 38 ? selM.n.slice(0, 36) + "…" : selM.n}</text>
+                    </g>
+                  </g>
+                );
+              }
+              return (
+                <g key={`cl-${ci}`} onClick={() => setClusterView({ items: cl.items, cx: cl.x, cy: cl.y })} style={{ cursor: "pointer" }}>
+                  <circle cx={cl.x} cy={cl.y} r={(baseR + 1)*iz} fill={col} opacity={0.12} />
+                  <circle cx={cl.x} cy={cl.y} r={r} fill={col} opacity={0.65} stroke="rgba(255,255,255,0.4)" strokeWidth={0.2*iz} />
+                  <text x={cl.x} y={cl.y + r * 0.35} fontSize={r * 0.7} fill="#fff" textAnchor="middle" fontWeight={700}>{cl.n}</text>
                 </g>
               );
             })}
             </g>
             {zoom===1&&pan.x===0&&pan.y===0&&(
-              <text x={50} y={74} fontSize={0.9} fill={t.tx4} textAnchor="middle">Drag to pan · Use +/− to zoom</text>
+              <text x={50} y={74} fontSize={0.9} fill={t.tx4} textAnchor="middle">{isMobile?"Pinch to zoom · Tap clusters for details":"Scroll to zoom · Click clusters for details"}</text>
             )}
           </svg>
         </div>
@@ -531,7 +693,7 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
           {/* Tabs like Markets/Map Info */}
           <div style={{display:'flex',borderBottom:`1px solid ${t.bd}`,marginBottom:12}}>
             {[{k:"all",l:`All (${STRIKES.length})`},{k:"confirmed",l:`Confirmed (${counts.confirmed})`},{k:"likely",l:`Likely (${counts.likely})`},{k:"unverified",l:`Unverified (${counts.unverified})`}].map(tab=>(
-              <button key={tab.k} onClick={()=>{setFlt(tab.k);setSel(null)}} style={{padding:'10px 16px',border:'none',background:'transparent',color:flt===tab.k?t.hd:t.tx3,fontSize:12,fontFamily:'Arial, sans-serif',cursor:'pointer',borderBottom:flt===tab.k?`2px solid ${dk?'#ffd54f':'#8b6914'}`:'2px solid transparent',transition:'all 0.2s ease',fontWeight:flt===tab.k?700:400,textTransform:'uppercase',letterSpacing:'0.5px'}}>
+              <button key={tab.k} onClick={()=>{setFlt(tab.k);setSel(null);setClusterView(null)}} style={{padding:'10px 16px',border:'none',background:'transparent',color:flt===tab.k?t.hd:t.tx3,fontSize:12,fontFamily:'Arial, sans-serif',cursor:'pointer',borderBottom:flt===tab.k?`2px solid ${dk?'#ffd54f':'#8b6914'}`:'2px solid transparent',transition:'all 0.2s ease',fontWeight:flt===tab.k?700:400,textTransform:'uppercase',letterSpacing:'0.5px'}}>
                 {tab.l}
               </button>
             ))}
@@ -561,7 +723,30 @@ export default function TehranStrikesMap({ darkMode = true, isMobile = false }) 
               <div style={{fontSize:11,color:t.tx4,padding:"8px 0",borderTop:`1px solid ${t.bd}`,fontFamily:'Arial, sans-serif'}}>
                 {s.c==="confirmed"?"High confidence — independently verified by multiple major outlets":s.c==="likely"?"Medium confidence — credible but fewer independent verifications":"Low confidence — needs further corroboration"}
               </div>
-              <button onClick={()=>setSel(null)} style={{marginTop:12,background:dk?'rgba(255,213,79,0.1)':'rgba(184,134,11,0.1)',border:`1px solid ${dk?'#6a5a2a':'#c9a227'}`,color:dk?'#ffd54f':'#b8860b',padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>← Back to list</button>
+              <button onClick={()=>setSel(null)} style={{marginTop:12,background:dk?'rgba(255,213,79,0.1)':'rgba(184,134,11,0.1)',border:`1px solid ${dk?'#6a5a2a':'#c9a227'}`,color:dk?'#ffd54f':'#b8860b',padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>{clusterView ? "← Back to cluster" : "← Back to list"}</button>
+            </div>
+          ):clusterView?(
+            <div>
+              <div style={{padding:"12px 16px",background:t.cBg,border:`1px solid ${t.bd}`,marginBottom:8}}>
+                <div style={{fontSize:9,textTransform:"uppercase",letterSpacing:2,color:dk?"#a5b4fc":"#4f46e5",fontWeight:700,marginBottom:4}}>CLUSTER</div>
+                <div style={{fontSize:15,fontWeight:600,color:t.hd}}>{clusterView.items.length} locations</div>
+              </div>
+              {clusterView.items.map(st=>(
+                <div key={st.id} onClick={()=>setSel(st.id)} style={{padding:"10px 12px",cursor:"pointer",background:t.cBg,border:`1px solid ${t.bd}`,marginBottom:8,transition:"all .2s ease",fontFamily:'Arial, sans-serif'}}
+                  onMouseEnter={e=>{e.currentTarget.style.borderColor=dk?'#666':'#999';e.currentTarget.style.background=dk?'rgba(40,40,50,0.9)':'#eee'}} onMouseLeave={e=>{e.currentTarget.style.borderColor=t.bd;e.currentTarget.style.background=t.cBg}}>
+                  <div style={{display:'flex',alignItems:'center',gap:10}}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:CONF[st.c].color,flexShrink:0}}/>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:12,color:t.hd,fontWeight:600,lineHeight:1.4}}>{st.n}</div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:3}}>
+                        <span style={{fontSize:11,color:t.tx3}}>{st.d}</span>
+                        <span style={{fontSize:10,color:t.tx3,background:t.tag,padding:"2px 7px",border:`1px solid ${t.bd}`}}>{st.s.length} source{st.s.length!==1?"s":""}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button onClick={()=>setClusterView(null)} style={{marginTop:4,background:dk?'rgba(255,213,79,0.1)':'rgba(184,134,11,0.1)',border:`1px solid ${dk?'#6a5a2a':'#c9a227'}`,color:dk?'#ffd54f':'#b8860b',padding:"8px 14px",fontSize:11,cursor:"pointer",width:"100%",fontFamily:'Arial, sans-serif'}}>← Back to all locations</button>
             </div>
           ):(
             <>
