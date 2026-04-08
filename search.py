@@ -30,7 +30,8 @@ def search_news(query, num_results=5, user_ip=None):
     }
 
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=15)
+        response.raise_for_status()
         data = response.json()
         results = data.get("organic_results", [])
         
@@ -112,7 +113,8 @@ def search_substack(query, num_results=5, user_ip=None):
                 "hl": "en",
                 "gl": "us"
             }
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=15)
+            response.raise_for_status()
             data = response.json()
             
             for res in data.get("organic_results", []):

@@ -419,15 +419,17 @@ def extract_article_metadata(url):
                 # Fallback to get_text() if string is None (nested elements)
                 title = soup.title.get_text().strip()
             print(f"📰 Extracted title: {title[:50] if title else 'None'}...", flush=True)
+
+            # Clean title by removing site name after | or -
+            if title:
+                if "|" in title:
+                    title = title.split("|")[0].strip()
+                elif " - " in title:
+                    parts = title.split(" - ")
+                    if len(parts) > 1:
+                        title = parts[0].strip()
         else:
             print("⚠️ No title tag found in HTML", flush=True)
-            # Clean title by removing site name after | or -
-            if "|" in title:
-                title = title.split("|")[0].strip()
-            elif " - " in title:
-                parts = title.split(" - ")
-                if len(parts) > 1:
-                    title = parts[0].strip()
         
         # Extract source/publication
         source = None
