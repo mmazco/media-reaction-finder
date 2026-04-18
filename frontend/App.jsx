@@ -2809,7 +2809,11 @@ export default function App() {
             {/* Featured Publications */}
             {substackAuthors.length > 0 && (() => {
               const categories = ['All', 'News', 'Tech', 'Culture'];
-              const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter(a => a.category === pubCategory);
+              const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter((a) => {
+                if (!a.category) return false;
+                const want = pubCategory.toLowerCase();
+                return a.category.split(',').some((c) => c.trim().toLowerCase() === want);
+              });
               return (
               <div style={{ marginBottom: '44px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
