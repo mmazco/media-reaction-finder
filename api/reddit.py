@@ -25,6 +25,25 @@ def _has_llm_refusal(text):
     return any(p in lower for p in _LLM_REFUSAL_PATTERNS)
 
 
+def _word_present(keyword, text):
+    """Check if keyword appears as a whole word in text (not as a substring).
+    For short keywords (<=3 chars) this avoids false positives like 'la' in 'elaborate'."""
+    if len(keyword) <= 3:
+        return bool(re.search(r'\b' + re.escape(keyword) + r'\b', text))
+    return keyword in text
+
+
+def _extract_key_phrases(title_words):
+    """Extract adjacent-word phrases (bigrams) from title words.
+    These are much more specific than individual words — 'city attorney'
+    as a phrase filters far better than 'city' + 'attorney' separately."""
+    phrases = []
+    for i in range(len(title_words) - 1):
+        bigram = f"{title_words[i]} {title_words[i+1]}"
+        phrases.append(bigram)
+    return phrases
+
+
 def _fetch_top_comments(reddit_client, permalink, limit=3):
     """Fetch the top-level comments for a post, sorted by score."""
     try:
@@ -95,23 +114,68 @@ def search_reddit_posts(query, limit=5, article_title=None):
             
             # Extract key topic words early for relevance filtering
             key_topic_words = []
+            key_phrases = []
             if article_title:
                 # Clean and extract key words from article title
                 clean_title = article_title
                 for suffix in [' | NOEMA', ' - The New York Times', ' | CNN', ' - BBC', ' - The Guardian', '| NYT', '| WSJ', ' | TIME', '| TIME']:
                     if suffix in clean_title:
                         clean_title = clean_title.split(suffix)[0].strip()
+                # Also strip "– Site Name" or "| Site Name" patterns
+                for sep in [' – ', ' — ', ' | ']:
+                    if sep in clean_title:
+                        clean_title = clean_title.split(sep)[0].strip()
+                
+                # Generic verbs/adverbs/adjectives that match too broadly
+                # across Reddit — keep contextual nouns (city, state, etc.)
+                # since they provide specificity when combined via min_matches
+                _generic_words = {
+                    'running', 'people', 'story',
+                    'says', 'said', 'year', 'years', 'first', 'last', 'every',
+                    'going', 'getting', 'looking', 'want', 'need', 'help',
+                    'money', 'back', 'life', 'work', 'long', 'real',
+                    'part', 'open', 'high', 'full', 'good', 'best', 'after',
+                    'still', 'does', 'much', 'many', 'most', 'more', 'over',
+                    'take', 'make', 'come', 'know', 'think', 'could', 'would',
+                    'should', 'being', 'here', 'when', 'where', 'which',
+                    # Source/meta words that leak from article titles
+                    'news', 'report', 'reports', 'update', 'updates',
+                    'video', 'watch', 'read', 'opinion', 'editorial',
+                    'across', 'persist',
+                }
+                
+                _source_abbreviations = {'ap', 'bbc', 'cnn', 'nyt', 'wsj'}
+                _stop_words = {
+                    'is', 'are', 'was', 'were', 'be', 'been', 'am',
+                    'do', 'did', 'has', 'had', 'have', 'will', 'shall',
+                    'the', 'an', 'of', 'to', 'in', 'on', 'at', 'by',
+                    'for', 'or', 'and', 'nor', 'but', 'so', 'yet',
+                    'it', 'its', 'he', 'she', 'we', 'they', 'me',
+                    'as', 'if', 'no', 'not', 'up', 'out', 'off',
+                }
                 
                 for word in clean_title.split():
                     clean_word = word.strip('.,!?()[]"\'').lower()
-                    if len(clean_word) >= 4:
-                        # Prioritize proper nouns (names, places) and specific terms
-                        if word[0].isupper() or clean_word.isdigit():
-                            key_topic_words.append(clean_word)
-                        elif len(clean_word) >= 5:
-                            key_topic_words.append(clean_word)
+                    # Normalize period-separated abbreviations: "L.A." -> "la"
+                    normalized = clean_word.replace('.', '')
+                    if normalized in _generic_words or normalized in _stop_words:
+                        continue
+                    # Check if the word is an ALL-CAPS abbreviation
+                    stripped = word.strip('.,!?()[]"\'').replace('.', '')
+                    if normalized in _source_abbreviations:
+                        continue
+                    if stripped.isupper() and len(normalized) >= 2:
+                        key_topic_words.append(normalized)
+                    elif len(normalized) >= 4:
+                        if word[0].isupper() or normalized.isdigit():
+                            key_topic_words.append(normalized)
+                        elif len(normalized) >= 5:
+                            key_topic_words.append(normalized)
                 
+                # Also extract bigram phrases for high-precision matching
+                key_phrases = _extract_key_phrases([w.lower() for w in key_topic_words])
                 print(f"🔑 Key topic words for filtering: {key_topic_words[:10]}")
+                print(f"🔑 Key phrases for filtering: {key_phrases[:5]}")
             
             # PHASE 1: Search for exact URL matches (specific article discussions)
             print(f"📍 Phase 1: Searching for exact URL matches...")
@@ -162,12 +226,19 @@ def search_reddit_posts(query, limit=5, article_title=None):
                     if suffix in topic_query:
                         topic_query = topic_query.split(suffix)[0].strip()
                 
-                # Remove very common/generic words that cause noise
-                common_words = ['building', 'creating', 'making', 'new', 'how', 'why', 'what', 'the', 'a', 'an', 
-                               'this', 'that', 'time', 'isn', 'like', 'quite', 'just', 'about', 'from', 'with', 'have']
+                # Only strip true stop words from the search query — keep
+                # contextual nouns like "city", "state" that narrow the search
+                _search_stop_words = {
+                    'building', 'creating', 'making', 'new', 'how', 'why', 'what', 'the', 'a', 'an',
+                    'this', 'that', 'isn', 'like', 'quite', 'just', 'about', 'from', 'with', 'have',
+                    'going', 'getting', 'looking', 'want', 'need', 'help', 'does', 'being',
+                    'says', 'said', 'running', 'who', 'are', 'for', 'its', 'can', 'will',
+                }
                 words = topic_query.split()
-                # Keep only meaningful words (longer than 3 chars, not common)
-                filtered_words = [w for w in words if len(w) > 3 and w.lower() not in common_words]
+                filtered_words = [
+                    w for w in words
+                    if (w.isupper() and len(w) >= 2) or (len(w) > 3 and w.lower() not in _search_stop_words)
+                ]
                 
                 print(f"🔑 Using key topic words for relevance: {key_topic_words[:8]}")
                 
@@ -201,19 +272,43 @@ def search_reddit_posts(query, limit=5, article_title=None):
                             post_selftext_lower = (post.selftext if hasattr(post, 'selftext') else "").lower()
                             subreddit_name = str(post.subreddit).lower() if hasattr(post, 'subreddit') else ""
                             
-                            # Check if any key topic word appears in the post
+                            # Check if any key topic word appears in the post (whole-word for short keywords)
                             relevance_score = 0
                             matched_words = []
+                            combined_text = f"{post_title_lower} {post_selftext_lower} {subreddit_name}"
                             for key_word in key_topic_words:
-                                if key_word in post_title_lower or key_word in post_selftext_lower or key_word in subreddit_name:
+                                if _word_present(key_word, post_title_lower) or _word_present(key_word, post_selftext_lower) or _word_present(key_word, subreddit_name):
                                     relevance_score += 1
                                     matched_words.append(key_word)
                             
-                            # Require at least 1 key word match (or 2 if we have many key words)
-                            min_matches = 2 if len(key_topic_words) > 4 else 1
-                            if relevance_score < min_matches:
-                                print(f"  ⏭️  Skipping irrelevant: {post.title[:40]}... (no key words matched)")
-                                continue
+                            # Bonus: matching a key phrase (bigram) is a strong relevance signal
+                            phrase_matched = False
+                            if key_phrases:
+                                for phrase in key_phrases:
+                                    if phrase in combined_text:
+                                        phrase_matched = True
+                                        relevance_score += 2
+                                        matched_words.append(f'PHRASE:"{phrase}"')
+                                        break
+                            
+                            # Require EITHER a phrase match OR a high keyword-count threshold.
+                            # Phrases are essential for short/common-word titles ("LA City Attorney")
+                            # but too rigid for longer distinctive titles ("Iran ceasefire mideast").
+                            if not phrase_matched:
+                                if len(key_topic_words) <= 3:
+                                    # Few keywords and all common: phrases are the only reliable signal
+                                    if key_phrases:
+                                        print(f"  ⏭️  Skipping irrelevant: {post.title[:40]}... (no phrase match)")
+                                        continue
+                                    elif relevance_score < len(key_topic_words):
+                                        print(f"  ⏭️  Skipping irrelevant: {post.title[:40]}... ({relevance_score}/{len(key_topic_words)} words)")
+                                        continue
+                                else:
+                                    # Many keywords: require ~50% to match
+                                    min_matches = max(3, (len(key_topic_words) + 1) // 2)
+                                    if relevance_score < min_matches:
+                                        print(f"  ⏭️  Skipping irrelevant: {post.title[:40]}... ({relevance_score}/{min_matches} needed)")
+                                        continue
                             
                             post_data = {
                                 "title": post.title,
@@ -255,6 +350,26 @@ def search_reddit_posts(query, limit=5, article_title=None):
                         num_comments = post.num_comments if hasattr(post, 'num_comments') else 0
                         if num_comments < 2:
                             continue
+                        
+                        # Apply same relevance filter as Phase 2
+                        if key_topic_words:
+                            post_title_lower = post.title.lower()
+                            post_selftext_lower = (post.selftext if hasattr(post, 'selftext') else "").lower()
+                            subreddit_name = str(post.subreddit).lower() if hasattr(post, 'subreddit') else ""
+                            combined_text = f"{post_title_lower} {post_selftext_lower} {subreddit_name}"
+                            matched = sum(
+                                1 for kw in key_topic_words
+                                if _word_present(kw, post_title_lower) or _word_present(kw, post_selftext_lower) or _word_present(kw, subreddit_name)
+                            )
+                            has_phrase = key_phrases and any(p in combined_text for p in key_phrases)
+                            if not has_phrase:
+                                if len(key_topic_words) <= 3:
+                                    if key_phrases or matched < len(key_topic_words):
+                                        print(f"  ⏭️  Phase 3 skipping irrelevant: {post.title[:40]}...")
+                                        continue
+                                elif matched < max(3, (len(key_topic_words) + 1) // 2):
+                                    print(f"  ⏭️  Phase 3 skipping irrelevant: {post.title[:40]}...")
+                                    continue
                             
                         try:
                             post_data = {
