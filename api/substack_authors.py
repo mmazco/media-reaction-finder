@@ -85,6 +85,18 @@ CURATED_AUTHORS = [
         "profile_image": None,
     },
     {
+        "name": "NEMESIS",
+        "handle": "nemesisglobal",
+        "bio": "Strategy consulting firm founded by Emily Segal and Martti Kalliala. Notes on brand, culture, and strategy from nemesis.global.",
+        "publication": "Nemesis Memos",
+        "subscribers": "—",
+        "category": "Culture",
+        "profile_url": "https://substack.com/@nemesisglobal",
+        "feed_url": "https://nemesisglobal.substack.com/feed",
+        "linkedin": "nemesisglobal",
+        "profile_image": "https://substack-post-media.s3.amazonaws.com/public/images/2bd31088-283b-4fd1-80be-c775c27b8e43_1280x1280.png",
+    },
+    {
         "name": "Shanaka Anslem Perera",
         "handle": "shanakaanslemperera",
         "bio": "Independent analyst mapping money, geopolitics, AI, science, and sovereignty. Author of The Ascent Begins.",
