@@ -2689,47 +2689,69 @@ export default function App() {
                 {/* Top 2 polls */}
                 <div style={{ padding: '10px 16px 0', textAlign: 'right' }}>
                   <span style={{ fontSize: '10px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>
-                    Updated Mar 8, 2026
+                    Updated May 27, 2026
                   </span>
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-                  {/* Next Supreme Leader — settled */}
-                  <div style={{
-                    flex: '1 1 250px',
-                    padding: '16px',
-                    borderRight: `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}`,
-                  }}>
+                  {/* US x Iran peace deal — Polymarket */}
+                  <a
+                    href="https://polymarket.com/event/us-x-iran-permanent-peace-deal-by"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      flex: '1 1 250px',
+                      padding: '16px',
+                      borderRight: `1px solid ${darkMode ? '#2a2a2a' : '#e0e0e0'}`,
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'background-color 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                       <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
-                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$37M vol.</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$195M vol.</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#aaa'} strokeWidth="2.5" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                     </div>
                     <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '8px', lineHeight: '1.4' }}>
-                      Next Supreme Leader of Iran?
+                      US × Iran permanent peace deal by…?
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                      <span style={{ fontSize: '28px', fontWeight: '700', color: '#22c55e', fontFamily: 'Arial, sans-serif' }}>Mojtaba 100%</span>
+                      <span style={{ fontSize: '28px', fontWeight: '700', color: '#22c55e', fontFamily: 'Arial, sans-serif' }}>Dec 31 · 81%</span>
                     </div>
                     <div style={{ fontSize: '10px', color: darkMode ? '#666' : '#999', fontFamily: 'Arial, sans-serif', marginTop: '4px' }}>
-                      Was 7% on Mar 2. Announcement expected Mar 9 (98%).
+                      July 31 at 66% · Launched Apr 8, 2026.
                     </div>
-                  </div>
-                  {/* Who leads Iran end of 2026? */}
-                  <div style={{
-                    flex: '1 1 250px',
-                    padding: '16px',
-                  }}>
+                  </a>
+                  {/* US-Iran nuclear deal — Kalshi */}
+                  <a
+                    href="https://kalshi.com/markets/kxusairanagreement/us-iran-nuclear-deal"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      flex: '1 1 250px',
+                      padding: '16px',
+                      textDecoration: 'none',
+                      color: 'inherit',
+                      transition: 'background-color 0.15s ease',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = darkMode ? '#222' : '#efefef'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
-                      <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#1652F0', color: '#fff', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Polymarket</span>
-                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$1.2M vol.</span>
+                      <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '3px', backgroundColor: '#00d4aa', color: '#000', fontWeight: '600', fontFamily: 'Arial, sans-serif' }}>Kalshi</span>
+                      <span style={{ fontSize: '11px', color: darkMode ? '#555' : '#aaa', fontFamily: 'Arial, sans-serif' }}>$9M vol.</span>
                       <span style={{ fontSize: '9px', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#3b82f6', color: '#fff', fontWeight: '700', fontFamily: 'Arial, sans-serif', letterSpacing: '0.3px' }}>NEW</span>
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={darkMode ? '#666' : '#aaa'} strokeWidth="2.5" style={{ marginLeft: 'auto', flexShrink: 0 }}><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                     </div>
                     <div style={{ fontSize: '13px', color: darkMode ? '#ccc' : '#333', fontFamily: 'Arial, sans-serif', fontWeight: '500', marginBottom: '6px', lineHeight: '1.4' }}>
-                      Who will lead Iran at end of 2026?
+                      US-Iran nuclear deal by…?
                     </div>
                     <div style={{ fontSize: '11px', fontFamily: 'Arial, sans-serif', lineHeight: '1.6', color: darkMode ? '#aaa' : '#555' }}>
-                      Mojtaba <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>33%</strong> &middot; Pahlavi <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>17%</strong> &middot; Pezeshkian <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>12%</strong> &middot; A. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>5%</strong> &middot; S. Larijani <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>4%</strong>
+                      By 2027 <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>60%</strong> &middot; By 2028 <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>74%</strong> &middot; By Sep <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>46%</strong> &middot; By Aug <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>34%</strong> &middot; By Jul <strong style={{ color: darkMode ? '#fff' : '#1a1a1a' }}>20%</strong>
                     </div>
-                  </div>
+                  </a>
                 </div>
 
                 {/* Analysis summary */}
@@ -2740,24 +2762,24 @@ export default function App() {
                   margin: '0',
                 }}>
                   <div style={{ fontSize: '9px', color: darkMode ? '#888' : '#999', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px', fontFamily: 'Arial, sans-serif', fontWeight: '600' }}>
-                    Analysis — Mar 8
+                    Analysis — May 27
                   </div>
                   <div style={{ fontSize: '12px', fontFamily: 'Arial, sans-serif', lineHeight: 1.7, color: darkMode ? '#aaa' : '#555' }}>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#22c55e' }}>{'\u25CF'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Succession settled on Polymarket</strong> — Mojtaba at 100% ($37M vol). But Kalshi ($70K vol) still has Arafi 19%, Khomeini 17%, Mojtaba only 10%.</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Peace deal expected by year-end</strong> — Polymarket prices a US-Iran resolution at 81% by Dec 31 ($195M vol), the largest active Iran market on the platform.</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#eab308' }}>{'\u2605'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Can he hold power?</strong> Only 33% to lead by Dec 31. Pahlavi 17%, Pezeshkian 12%. Nuclear deal before 2027 at 55% (Kalshi).</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Nuclear deal more uncertain</strong> — Kalshi traders see 60% odds of a US-Iran nuclear agreement by 2027, down from 65% in mid-May as talks stalled.</span>
                     </div>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                       <span style={{ color: '#ef4444' }}>{'\u25BC'}</span>
-                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Near-term stability</strong> — Regime fall Mar 31 at 9%. Survive strikes 68%. Hormuz closure 40% (Kalshi). Coup 32%.</span>
+                      <span><strong style={{ color: darkMode ? '#ccc' : '#333' }}>Platform divergence</strong> — Polymarket ($195M) more bullish on peace than Kalshi ($9M) on nuclear specifics. Near-term (by Jul) only 20% on Kalshi.</span>
                     </div>
                   </div>
                   <p style={{ fontSize: '11px', lineHeight: 1.5, color: darkMode ? '#777' : '#888', margin: '10px 0 0', fontFamily: 'Arial, sans-serif', fontStyle: 'italic' }}>
-                    Polymarket and Kalshi diverge sharply on succession. Both agree the regime survives near-term but faces a turbulent 2026. View the full social graph for detailed cross-platform comparison.
+                    Markets price a diplomatic resolution as likely by year-end, but disagree on timing and whether nuclear specifics get locked in. View the full social graph for cross-platform comparison.
                   </p>
                 </div>
 
@@ -2809,7 +2831,11 @@ export default function App() {
             {/* Featured Publications */}
             {substackAuthors.length > 0 && (() => {
               const categories = ['All', 'News', 'Tech', 'Culture'];
-              const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter(a => a.category === pubCategory);
+              const filtered = pubCategory === 'All' ? substackAuthors : substackAuthors.filter((a) => {
+                if (!a.category) return false;
+                const want = pubCategory.toLowerCase();
+                return a.category.split(',').some((c) => c.trim().toLowerCase() === want);
+              });
               return (
               <div style={{ marginBottom: '44px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
