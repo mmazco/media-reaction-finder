@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 const SITE_URL = 'https://mrf.up.railway.app';
 const OG_IMAGE = `${SITE_URL}/og-image.png`;
 const DEFAULT_DESCRIPTION =
-  'Discover reactions and discussions on any article, content or media across Reddit, Substack and the web. With curated topics, trending market polls and featured Substack authors.';
+  'Discover reactions and discussions on any article, content or media across Reddit, Substack and Web. With curated topics, news trending market polls and featured Substack authors.';
 
 const ROUTE_META = {
   '/': {
