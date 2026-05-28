@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import IranPoliticalGraph from './IranPoliticalGraph';
 import TehranStrikesMap from './TehranStrikesMap';
+import SEO from './SEO';
 // v2.1.0 - Simplified error message styling
 
 // Trending Topic Reactions Page Component
@@ -1509,6 +1510,7 @@ export default function App() {
 
   return (
     <div style={styles.container}>
+      <SEO />
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }

@@ -6,9 +6,10 @@ export default defineConfig({
     __BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString()),
   },
   plugins: [react()],
-  // Favicons are served from project root by app.py in production
-  // During local dev, favicon requests will 404 (cosmetic only, app works fine)
-  publicDir: false,
+  // Static assets (favicons, OG image, robots.txt, sitemap.xml) live in
+  // frontend/public/ and are copied to dist/ at build time. Served from
+  // dist/ by Flask in production and by Vite directly in dev.
+  publicDir: 'public',
   server: {
     proxy: {
       '/api': {
