@@ -5,11 +5,11 @@ import { useLocation } from 'react-router-dom';
 const SITE_URL = 'https://mrf.up.railway.app';
 const OG_IMAGE = `${SITE_URL}/og-image.png`;
 const DEFAULT_DESCRIPTION =
-  'Paste any article URL and see how Reddit, the web, Substack, and X are reacting. Curated discussions, prediction markets, and audio commentary.';
+  'Discover reactions and discussions on any article, content or media across Reddit, Substack and Web. With curated topics, news trending market polls and featured Substack authors.';
 
 const ROUTE_META = {
   '/': {
-    title: 'Media Reaction Finder — Reactions to any article, in one place',
+    title: 'Media Reaction Finder',
     description: DEFAULT_DESCRIPTION,
   },
   '/collections': {
